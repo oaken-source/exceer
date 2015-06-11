@@ -17,41 +17,11 @@
     <string name="TrainingActivityContextButtonTextSkip">Skip</string>
     <string name="TrainingActivityContextButtonTextFinish">Finish</string>
 
-    <string name="TrainingActivityCurrentExerciseWarmUp">Dynamic Warm Up</string>
-    <string name="TrainingActivityCurrentExerciseSquats">Squats</string>
-    <string name="TrainingActivityCurrentExercisePullUps">Pull Ups</string>
-    <string name="TrainingActivityCurrentExerciseHandstandPushUps">Handst. Push Ups</string>
-    <string name="TrainingActivityCurrentExerciseLegRaises">Leg Raises</string>
-    <string name="TrainingActivityCurrentExercisePushUps">Push Ups</string>
-    <string name="TrainingActivityCurrentExerciseDips">Dips</string>
-    <string name="TrainingActivityCurrentExerciseHorizontalPulls">Horizontal Pulls</string>
-    <string name="TrainingActivityCurrentExercisePlank">Plank</string>
-    <string name="TrainingActivityCurrentExerciseStretching">Static Stretching</string>
-
     <string name="TrainingActivityCurrentExerciseLevelNone" />
     <string name="TrainingActivityCurrentExerciseLevelInt">Level </string>
 
     <string name="SharedPreferences">org.grapentin.apps.exceer.SharedPreferences</string>
     <string name="SharedPreferencesLastSession">org.grapentin.apps.exceer.SharedPreferencesLastSession</string>
-    <string name="SharedPreferencesLevelSquats">org.grapentin.apps.exceer.SharedPreferencesLevelSquats</string>
-    <string name="SharedPreferencesLevelPullUps">org.grapentin.apps.exceer.SharedPreferencesLevelPullUps</string>
-    <string name="SharedPreferencesLevelHandstandPushUps">org.grapentin.apps.exceer.SharedPreferencesLevelHandstandPushUps</string>
-    <string name="SharedPreferencesLevelLegRaises">org.grapentin.apps.exceer.SharedPreferencesLevelLegRaises</string>
-    <string name="SharedPreferencesLevelPushUps">org.grapentin.apps.exceer.SharedPreferencesLevelPushUps</string>
-    <string name="SharedPreferencesLevelDips">org.grapentin.apps.exceer.SharedPreferencesLevelDips</string>
-    <string name="SharedPreferencesLevelHorizontalPulls">org.grapentin.apps.exceer.SharedPreferencesLevelHorizontalPulls</string>
-    <string name="SharedPreferencesLevelPlank">org.grapentin.apps.exceer.SharedPreferencesLevelPlank</string>
-    <string name="SharedPreferencesRepsSquats">org.grapentin.apps.exceer.SharedPreferencesRepsSquats</string>
-    <string name="SharedPreferencesRepsPullUps">org.grapentin.apps.exceer.SharedPreferencesRepsPullUps</string>
-    <string name="SharedPreferencesRepsHandstandPushUps">org.grapentin.apps.exceer.SharedPreferencesRepsHandstandPushUps</string>
-    <string name="SharedPreferencesRepsLegRaises">org.grapentin.apps.exceer.SharedPreferencesRepsLegRaises</string>
-    <string name="SharedPreferencesRepsPushUps">org.grapentin.apps.exceer.SharedPreferencesRepsPushUps</string>
-    <string name="SharedPreferencesRepsDips">org.grapentin.apps.exceer.SharedPreferencesRepsDips</string>
-    <string name="SharedPreferencesRepsHorizontalPulls">org.grapentin.apps.exceer.SharedPreferencesRepsHorizontalPulls</string>
-    <string name="SharedPreferencesDurationPlank">org.grapentin.apps.exceer.SharedPreferencesDurationPlank</string>
-    <string name="SharedPreferencesLastSessionWasPushUps">org.grapentin.apps.exceer.SharedPreferencesLastSessionWasPushUps</string>
 
-    <string name="TrainingActivityBundleState">org.grapentin.apps.exceer.TrainingActivityBundleState</string>
-    <string name="TrainingActivityBundleStage">org.grapentin.apps.exceer.TrainingActivityBundleStage</string>
-    <string name="TrainingActivityBundleTimerTask">org.grapentin.apps.exceer.TrainingActivityBundleTimerTask</string>
+    <string name="TrainingActivityBundleTraining">org.grapentin.apps.exceer.TrainingActivityBundleTraining</string>
 </resources>

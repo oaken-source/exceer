@@ -102,7 +102,7 @@
     </level>
     <level name="Eccentric Pull Ups">
       <property name="reps_duration_concentric">0</property>
-      <property name="reps duration_eccentric">5s</property>
+      <property name="reps_duration_eccentric">5s</property>
       <property name="image">http://3.bp.blogspot.com/-vFnrE-Qit3Y/Um-0lDnOUEI/AAAAAAAABUM/beSdTxJDmkU/s200/Eccentric+pull+ups.JPG</property>
     </level>
     <level name="Half Pull Ups">
@@ -134,7 +134,7 @@
     <level name="One Arm Towel Assisted Pull Ups And Eccentrics">
       <property name="reps_begin">4,4,4,4,4,4</property>
       <property name="reps_finish">6,6,6,6,6,6</property>
-      <property name="reps duration_eccentric">5s</property>
+      <property name="reps_duration_eccentric">5s</property>
       <property name="image">http://4.bp.blogspot.com/-FhalyqC5tTs/UsgXpQdySGI/AAAAAAAABuo/mZW33Cnm2Bs/s200/IMG_20131218_181800.jpg</property>
     </level>
     <level name="Half One Arm Pull Ups">
@@ -242,7 +242,7 @@
     </level>
   </exercise>
 
-  <alternation>
+  <exercise>
 
     <exercise name="Push Ups">
 
@@ -357,7 +357,7 @@
       </level>
     </exercise>
 
-  </alternation>
+  </exercise>
 
   <exercise name="Horizontal Pulls">
 
@@ -415,7 +415,7 @@
     </level>
     <level name="Kneeling Side Plank">
       <property name="duration_begin">15s,15s</property>
-      <property name="duration_end">30s,30s</property>
+      <property name="duration_finish">30s,30s</property>
       <property name="image">http://4.bp.blogspot.com/-7p3Kv2ijyEQ/UnADKuLqyaI/AAAAAAAABgs/iLElOcb_7yk/s1600/kneeling+side+plank.JPG</property>
     </level>
     <level name="Plank">
@@ -423,7 +423,7 @@
     </level>
     <level name="Side Plank">
       <property name="duration_begin">15s,15s</property>
-      <property name="duration_end">30s,30s</property>
+      <property name="duration_finish">30s,30s</property>
       <property name="image">http://4.bp.blogspot.com/-xOQnxo73h7k/UnAEEJR3dYI/AAAAAAAABhI/dr24w295NSI/s1600/side+plank.JPG</property>
     </level>
     <level name="Decline Plank">
@@ -431,17 +431,17 @@
     </level>
     <level name="Leg Lift Plank">
       <property name="duration_begin">15s,15s</property>
-      <property name="duration_end">30s,30s</property>
+      <property name="duration_finish">30s,30s</property>
       <property name="image">http://4.bp.blogspot.com/-OMgXBSxbYEI/UnAE4hZVd9I/AAAAAAAABho/M_4bzEvVm_U/s200/leg+lift+plank.JPG</property>
     </level>
     <level name="Arm And Leg Lift Plank">
       <property name="duration_begin">15s,15s</property>
-      <property name="duration_end">30s,30s</property>
+      <property name="duration_finish">30s,30s</property>
       <property name="image">http://1.bp.blogspot.com/-ZERuKipEA2w/UnAFQ-WeZmI/AAAAAAAABhw/ndg2NrcKIpw/s1600/arm+and+leg+lift+plank.JPG</property>
     </level>
     <level name="Arm And Leg Lift Side Plank">
       <property name="duration_begin">15s,15s</property>
-      <property name="duration_end">30s,30s</property>
+      <property name="duration_finish">30s,30s</property>
       <property name="image">http://1.bp.blogspot.com/-cCgoHg3zdpE/UnAFp2GSSrI/AAAAAAAABh4/S9Gc-8sZAPI/s200/arm+and+leg+lift+side+plank.JPG</property>
     </level>
     <level name="Wall Plank">

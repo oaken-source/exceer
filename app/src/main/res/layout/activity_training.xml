@@ -15,7 +15,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:gravity="center|center_vertical"
-        android:text="@string/TrainingActivityCurrentExerciseWarmUp"
+        android:text=""
         android:textSize="30sp"
         android:singleLine="true"/>
 
