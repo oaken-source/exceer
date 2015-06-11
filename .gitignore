@@ -1,0 +1,9 @@
+
+.idea/
+.gradle/
+build/
+*.iml
+local.properties
+
+# locally used helper scripts
+*.sh

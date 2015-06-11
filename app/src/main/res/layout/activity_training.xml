@@ -1,0 +1,58 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="org.grapentin.apps.exceer.TrainingActivity">
+
+    <TextView
+        android:id="@+id/TrainingActivityCurrentExerciseLabel"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="center|center_vertical"
+        android:text="@string/TrainingActivityCurrentExerciseWarmUp"
+        android:textSize="30sp"
+        android:singleLine="true"/>
+
+    <TextView
+        android:id="@+id/TrainingActivityCurrentExerciseLevelLabel"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/TrainingActivityCurrentExerciseLabel"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:text="@string/TrainingActivityCurrentExerciseLevelNone"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:singleLine="true"/>
+
+    <TextView
+        android:id="@+id/TrainingActivityTimerLabel"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:gravity="center|center_vertical"
+        android:text="@string/TrainingActivityTimerLabelText"
+        android:textSize="80sp"
+        android:textStyle="bold"
+        android:typeface="monospace"
+        android:singleLine="true"/>
+
+    <Button
+        android:id="@+id/TrainingActivityContextButton"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:onClick="onContextButtonClicked"
+        android:text="@string/TrainingActivityContextButtonTextStart"
+        android:textSize="50sp"
+        android:singleLine="true"/>
+
+</RelativeLayout>
