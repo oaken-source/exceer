@@ -12,9 +12,8 @@
     <string name="MainActivityLastSessionLabel2Text">ago</string>
     <string name="MainActivityTrainButtonText">Train Now!</string>
 
-    <string name="TrainingActivityTimerLabelText">00:00</string>
     <string name="TrainingActivityContextButtonTextStart">Start</string>
-    <string name="TrainingActivityContextButtonTextSkip">Skip</string>
+    <string name="TrainingActivityContextButtonTextPause">Pause</string>
     <string name="TrainingActivityContextButtonTextFinish">Finish</string>
 
     <string name="TrainingActivityCurrentExerciseLevelNone" />
@@ -23,5 +22,5 @@
     <string name="SharedPreferences">org.grapentin.apps.exceer.SharedPreferences</string>
     <string name="SharedPreferencesLastSession">org.grapentin.apps.exceer.SharedPreferencesLastSession</string>
 
-    <string name="TrainingActivityBundleTraining">org.grapentin.apps.exceer.TrainingActivityBundleTraining</string>
+    <string name="TrainingActivityBundleTrainings">org.grapentin.apps.exceer.TrainingActivityBundleTrainings</string>
 </resources>

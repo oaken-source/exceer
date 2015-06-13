@@ -17,7 +17,7 @@ public class Duration implements Serializable
   public Duration (String s)
     {
       for (String part : s.split(","))
-        parts.add(DurationString.parseLong(s));
+        this.parts.add(DurationString.parseLong(s));
     }
 
 }

@@ -15,7 +15,7 @@ public class Reps implements Serializable
   public Reps (String s)
     {
       for (String part : s.split(","))
-        parts.add(Long.parseLong(part));
+        this.parts.add(Long.parseLong(part));
     }
 
 }

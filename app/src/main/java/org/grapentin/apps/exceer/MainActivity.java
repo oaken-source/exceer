@@ -38,8 +38,7 @@ public class MainActivity extends Activity
 
       lastSessionTextView = (TextView)findViewById(R.id.MainActivityLastSessionDate);
 
-      TaskManager.removeCallbacks(updateTimerTask);
-      TaskManager.post(updateTimerTask);
+      updateTimerTask.start();
     }
 
   @Override
@@ -47,7 +46,7 @@ public class MainActivity extends Activity
     {
       super.onStop();
 
-      TaskManager.removeCallbacks(updateTimerTask);
+      updateTimerTask.stop();
     }
 
   @Override
@@ -55,8 +54,7 @@ public class MainActivity extends Activity
     {
       super.onResume();
 
-      TaskManager.removeCallbacks(updateTimerTask);
-      TaskManager.post(updateTimerTask);
+      updateTimerTask.start();
     }
 
   @Override

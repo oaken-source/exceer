@@ -16,7 +16,7 @@ public class DurationString
         {
         case "s":
           return l * 1000;
-        case "ms":
+        case "min":
           return l * 60 * 1000;
         default:
           return l;

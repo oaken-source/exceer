@@ -31,16 +31,6 @@ public class TaskManager
       getInstance();
     }
 
-  public static void removeCallbacks (TimerTask t)
-    {
-      getInstance().handler.removeCallbacks(t);
-    }
-
-  public static void post(TimerTask t)
-    {
-      getInstance().handler.post(t);
-    }
-
   abstract static public class TimerTask implements Runnable
   {
     public void run ()
@@ -53,6 +43,22 @@ public class TaskManager
             Log.d("TimerTask", "[" + this + "] next delay: " + next);
             getInstance().handler.postDelayed(this, next);
           }
+      }
+
+    public void start ()
+      {
+        getInstance().handler.removeCallbacks(this);
+        getInstance().handler.post(this);
+      }
+
+    public void stop ()
+      {
+        getInstance().handler.removeCallbacks(this);
+      }
+
+    public void pause ()
+      {
+        stop();
       }
 
     abstract public long update ();

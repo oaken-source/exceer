@@ -10,15 +10,13 @@ import android.support.annotation.NonNull;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
-import org.grapentin.apps.exceer.training.Training;
+import org.grapentin.apps.exceer.training.TrainingList;
 
 public class TrainingActivity extends Activity
 {
 
-  private Training training;
+  private TrainingList trainings;
 
   @Override
   protected void onCreate (Bundle savedInstanceState)
@@ -28,17 +26,20 @@ public class TrainingActivity extends Activity
 
       if (savedInstanceState == null)
         {
-          training = new Training("default startbodyweight.com routine");
+          trainings = new TrainingList(this);
+          trainings.setCurrentTraining("default startbodyweight.com routine");
         }
       else
         {
-          training = (Training)savedInstanceState.getSerializable(getString(R.string.TrainingActivityBundleTraining));
+          trainings = (TrainingList)savedInstanceState.getSerializable((getString(R.string.TrainingActivityBundleTrainings)));
         }
     }
 
   @Override
   protected void onStop ()
     {
+      trainings.getCurrentTraining().getCurrentExercisable().pause();
+
       super.onStop();
     }
 
@@ -53,7 +54,7 @@ public class TrainingActivity extends Activity
     {
       super.onSaveInstanceState(savedInstanceState);
 
-      savedInstanceState.putSerializable(getString(R.string.TrainingActivityBundleTraining), training);
+      savedInstanceState.putSerializable(getString(R.string.TrainingActivityBundleTrainings), trainings);
     }
 
   @Override
@@ -88,7 +89,10 @@ public class TrainingActivity extends Activity
 
   public void onContextButtonClicked (View view)
     {
-
+      if (trainings.getCurrentExercisable().isRunning())
+        trainings.getCurrentExercisable().pause();
+      else
+        trainings.getCurrentExercisable().start();
     }
 
 }

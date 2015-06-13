@@ -20,7 +20,7 @@
         android:singleLine="true"/>
 
     <TextView
-        android:id="@+id/TrainingActivityCurrentExerciseLevelLabel"
+        android:id="@+id/TrainingActivityCurrentExerciseLevelLabel1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/TrainingActivityCurrentExerciseLabel"
@@ -32,13 +32,22 @@
         android:singleLine="true"/>
 
     <TextView
-        android:id="@+id/TrainingActivityTimerLabel"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/TrainingActivityCurrentExerciseLevelLabel2"
+        android:layout_below="@+id/TrainingActivityCurrentExerciseLevelLabel1"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:singleLine="true"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/TrainingActivityProgressLabel"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:gravity="center|center_vertical"
-        android:text="@string/TrainingActivityTimerLabelText"
         android:textSize="80sp"
         android:textStyle="bold"
         android:typeface="monospace"

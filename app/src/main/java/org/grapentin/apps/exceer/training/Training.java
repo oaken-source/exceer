@@ -4,49 +4,59 @@
 
 package org.grapentin.apps.exceer.training;
 
-import android.util.Log;
+import android.app.Activity;
+import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.helpers.XmlNode;
-import org.grapentin.apps.exceer.managers.ContextManager;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Training implements Serializable
+public class Training extends Exercisable implements Serializable
 {
 
   private String name = null;
 
-  private Properties properties = new Properties();
-
   private ArrayList<Exercise> exercises = new ArrayList<>();
+  private int currentExerciseId = 0;
 
-  public Training (String name)
+  public Training (XmlNode root, Activity gui)
     {
-      XmlNode root;
-      try
-        {
-          root = new XmlNode(ContextManager.get().getResources().getXml(R.xml.training));
-        }
-      catch (Exception e)
-        {
-          Log.e("Training", "failed to parse training.xml", e);
-          return;
-        }
+      super(new Properties(), gui);
 
-      for (XmlNode training : root.getChildren("training"))
-        if (training.getAttribute("name").equals(name))
-          {
-            this.name = name;
-            for (XmlNode property : training.getChildren("property"))
-              this.properties.set(property.getAttribute("name"), property.getValue());
-            for (XmlNode exercise : training.getChildren("exercise"))
-              this.exercises.add(new Exercise(exercise, properties));
-            return;
-          }
+      this.name = root.getAttribute("name");
 
-      Log.e("Training", "not found in data: " + name);
+      for (XmlNode property : root.getChildren("property"))
+        setProperty(property.getAttribute("name"), property.getValue());
+      for (XmlNode exercise : root.getChildren("exercise"))
+        this.exercises.add(new Exercise(exercise, properties, gui));
+    }
+
+  public Exercisable getCurrentExercisable ()
+    {
+      if (!exercises.isEmpty())
+        return exercises.get(currentExerciseId).getCurrentExercisable();
+      return this;
+    }
+
+  public String getName ()
+    {
+      return this.name;
+    }
+
+  @Override
+  public void prepare ()
+    {
+      TextView currentExerciseLabel = (TextView)gui.findViewById(R.id.TrainingActivityCurrentExerciseLabel);
+      TextView currentExerciseLevelLabel1 = (TextView)gui.findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel1);
+      TextView currentExerciseLevelLabel2 = (TextView)gui.findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel2);
+
+      currentExerciseLabel.setText(getName());
+      currentExerciseLevelLabel1.setText("");
+      currentExerciseLevelLabel2.setText("");
+
+      super.prepare();
     }
 
 }

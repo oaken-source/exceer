@@ -17,7 +17,7 @@
 
   <exercise name="Dynamic Warm Up">
 
-    <property name="duration">10min</property>
+    <property name="duration">10s</property>
     <property name="pause_after_exercise">0</property>
 
   </exercise>
