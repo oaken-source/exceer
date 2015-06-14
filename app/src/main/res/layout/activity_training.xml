@@ -39,7 +39,10 @@
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:singleLine="true"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:onClick="onCurrentExerciseLevelLabelClicked"
+        android:clickable="true"
+        android:enabled="true" />
 
     <TextView
         android:id="@+id/TrainingActivityProgressLabel"

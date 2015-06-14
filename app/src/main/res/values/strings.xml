@@ -19,8 +19,5 @@
     <string name="TrainingActivityCurrentExerciseLevelNone" />
     <string name="TrainingActivityCurrentExerciseLevelInt">Level </string>
 
-    <string name="SharedPreferences">org.grapentin.apps.exceer.SharedPreferences</string>
-    <string name="SharedPreferencesLastSession">org.grapentin.apps.exceer.SharedPreferencesLastSession</string>
-
     <string name="TrainingActivityBundleTrainings">org.grapentin.apps.exceer.TrainingActivityBundleTrainings</string>
 </resources>

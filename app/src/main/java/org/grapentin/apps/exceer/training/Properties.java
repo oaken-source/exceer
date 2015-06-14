@@ -14,7 +14,6 @@ import java.lang.reflect.Field;
 public class Properties implements Serializable
 {
 
-  public long pause_after_rep = 0;
   public long pause_after_set = 90000;
   public long pause_after_exercise = 90000;
 
@@ -24,17 +23,18 @@ public class Properties implements Serializable
   public long reps_pause_after_eccentric = 0;
 
   public long duration = 0;
-  public Duration duration_begin = null;
-  public Duration duration_finish = null;
+  public long duration_begin = 0;
+  public long duration_finish = 0;
   public long duration_increment = 5000;
 
-  public PrimaryMotion primary_motion = PrimaryMotion.Concentric;
+  public PrimaryMotion primary_motion = PrimaryMotion.concentric;
+  public boolean two_sided = false;
 
   public Reps reps_begin = null;
   public Reps reps_finish = null;
   public long reps_increment = 0;
-  public RepsIncrementDirection reps_increment_direction = RepsIncrementDirection.FrontToBack;
-  public RepsIncrementStyle reps_increment_style = RepsIncrementStyle.Balanced;
+  public RepsIncrementDirection reps_increment_direction = RepsIncrementDirection.front_to_back;
+  public RepsIncrementStyle reps_increment_style = RepsIncrementStyle.balanced;
 
   public String image = null;
 
@@ -48,7 +48,9 @@ public class Properties implements Serializable
       try
         {
           for (Field f : this.getClass().getFields())
-            f.set(this, f.get(properties));
+            {
+              f.set(this, f.get(properties));
+            }
         }
       catch (Exception e)
         {
@@ -68,15 +70,13 @@ public class Properties implements Serializable
         case "reps_pause_after_concentric":
         case "reps_pause_after_eccentric":
         case "duration":
+        case "duration_begin":
+        case "duration_finish":
         case "duration_increment":
           setLong(key, DurationString.parseLong(value));
           break;
         case "reps_increment":
           setLong(key, Long.parseLong(value));
-          break;
-        case "duration_begin":
-        case "duration_finish":
-          setObject(key, new Duration(value));
           break;
         case "reps_begin":
         case "reps_finish":
@@ -85,46 +85,37 @@ public class Properties implements Serializable
         case "image":
           setObject(key, value);
           break;
+        case "two_sided":
+          setBoolean(key, Boolean.parseBoolean(value));
+          break;
         case "reps_increment_direction":
-          switch (value)
+          try
             {
-            case "front_to_back":
-              this.reps_increment_direction = RepsIncrementDirection.FrontToBack;
-              break;
-            case "back_to_front":
-              this.reps_increment_direction = RepsIncrementDirection.BackToFront;
-              break;
-            default:
+              setObject(key, RepsIncrementDirection.valueOf(value));
+            }
+          catch (Exception e)
+            {
               Log.w("Properties", "unrecognized reps_increment_direction:" + value);
-              break;
             }
           break;
         case "reps_increment_style":
-          switch (value)
+          try
             {
-            case "balanced":
-              this.reps_increment_style = RepsIncrementStyle.Balanced;
-              break;
-            case "fill_sets":
-              this.reps_increment_style = RepsIncrementStyle.FillSets;
-              break;
-            default:
-              Log.w("Properties", "unrecognized reps_increment_style:" + value);
-              break;
+              setObject(key, RepsIncrementStyle.valueOf(value));
+            }
+          catch (Exception e)
+            {
+              Log.w("Properties", "unrecognized reps_increment_direction:" + value);
             }
           break;
         case "primary_motion":
-          switch (value)
+          try
             {
-            case "concentric":
-              this.primary_motion = PrimaryMotion.Concentric;
-              break;
-            case "eccentric":
-              this.primary_motion = PrimaryMotion.Eccentric;
-              break;
-            default:
-              Log.w("Properties", "unrecognized primary_motion:" + value);
-              break;
+              setObject(key, PrimaryMotion.valueOf(value));
+            }
+          catch (Exception e)
+            {
+              Log.w("Properties", "unrecognized reps_increment_direction:" + value);
             }
           break;
         default:
@@ -157,21 +148,33 @@ public class Properties implements Serializable
         }
     }
 
+  private void setBoolean (String key, boolean value)
+    {
+      try
+        {
+          this.getClass().getDeclaredField(key).setBoolean(this, value);
+        }
+      catch (Exception e)
+        {
+          throw new Error(e);
+        }
+    }
+
   public enum RepsIncrementDirection
   {
-    FrontToBack,
-    BackToFront
+    front_to_back,
+    back_to_front
   }
 
   public enum RepsIncrementStyle
   {
-    Balanced,
-    FillSets
+    balanced,
+    fill_sets
   }
 
   public enum PrimaryMotion
   {
-    Concentric,
-    Eccentric
+    concentric,
+    eccentric
   }
 }

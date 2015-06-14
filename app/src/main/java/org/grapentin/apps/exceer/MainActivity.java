@@ -14,8 +14,9 @@ import android.widget.TextView;
 
 import org.grapentin.apps.exceer.managers.ContextManager;
 import org.grapentin.apps.exceer.managers.SoundManager;
-import org.grapentin.apps.exceer.managers.StorageManager;
 import org.grapentin.apps.exceer.managers.TaskManager;
+import org.grapentin.apps.exceer.training.TrainingManager;
+import org.grapentin.apps.exceer.training.TrainingStorage;
 
 public class MainActivity extends Activity
 {
@@ -33,8 +34,10 @@ public class MainActivity extends Activity
       // initialize managers
       ContextManager.init(getApplicationContext());
       SoundManager.init();
-      StorageManager.init();
       TaskManager.init();
+
+      TrainingStorage.init();
+      TrainingManager.init();
 
       lastSessionTextView = (TextView)findViewById(R.id.MainActivityLastSessionDate);
 
@@ -92,7 +95,7 @@ public class MainActivity extends Activity
   {
     public long update ()
       {
-        long last = StorageManager.getLong(R.string.SharedPreferencesLastSession, System.currentTimeMillis());
+        long last = TrainingStorage.getLastTrainingDate();
         long elapsed = System.currentTimeMillis() - last;
 
         elapsed = Math.round(elapsed / 1000.0);

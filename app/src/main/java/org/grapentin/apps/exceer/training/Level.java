@@ -4,7 +4,6 @@
 
 package org.grapentin.apps.exceer.training;
 
-import android.app.Activity;
 import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
@@ -22,9 +21,9 @@ public class Level extends Exercisable implements Serializable
 
   private int level;
 
-  public Level (XmlNode root, Properties properties, Activity gui, Exercise parent, int level)
+  public Level (XmlNode root, Properties properties, Exercise parent, int level)
     {
-      super(properties, gui);
+      super(properties);
 
       this.name = root.getAttribute("name");
       this.parent = parent;
@@ -47,15 +46,30 @@ public class Level extends Exercisable implements Serializable
   @Override
   public void prepare ()
     {
-      TextView currentExerciseLabel = (TextView)gui.findViewById(R.id.TrainingActivityCurrentExerciseLabel);
-      TextView currentExerciseLevelLabel1 = (TextView)gui.findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel1);
-      TextView currentExerciseLevelLabel2 = (TextView)gui.findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel2);
+      TextView currentExerciseLabel = (TextView)TrainingManager.getGui().findViewById(R.id.TrainingActivityCurrentExerciseLabel);
+      TextView currentExerciseLevelLabel1 = (TextView)TrainingManager.getGui().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel1);
+      TextView currentExerciseLevelLabel2 = (TextView)TrainingManager.getGui().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel2);
 
       currentExerciseLabel.setText(parent.getName());
       currentExerciseLevelLabel1.setText(ContextManager.get().getString(R.string.TrainingActivityCurrentExerciseLevelInt) + level);
       currentExerciseLevelLabel2.setText(getName());
 
       super.prepare();
+    }
+
+  public void recordResult (String result)
+    {
+      parent.recordResult(result);
+    }
+
+  public String fetchResult ()
+    {
+      return parent.fetchResult();
+    }
+
+  public boolean levelUp ()
+    {
+      return parent.levelUp();
     }
 
 }

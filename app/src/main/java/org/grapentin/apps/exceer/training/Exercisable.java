@@ -4,7 +4,9 @@
 
 package org.grapentin.apps.exceer.training;
 
-import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -18,29 +20,31 @@ import java.io.Serializable;
 abstract public class Exercisable implements Serializable
 {
 
-  protected Activity gui;
   protected Properties properties;
 
   private TaskManager.TimerTask task;
 
+  private String old_result = null;
+  private String new_result = null;
+
   private boolean running = false;
 
-  protected Exercisable (Properties properties, Activity gui)
+  protected Exercisable (Properties properties)
     {
-      this.gui = gui;
       this.properties = new Properties(properties);
     }
 
   abstract public Exercisable getCurrentExercisable ();
 
+  abstract public String fetchResult ();
+
+  abstract public void recordResult (String result);
+
+  abstract public boolean levelUp ();
+
   protected void setProperty (String key, String value)
     {
       properties.set(key, value);
-    }
-
-  public boolean isFinished ()
-    {
-      return false;
     }
 
   public boolean isRunning ()
@@ -48,41 +52,75 @@ abstract public class Exercisable implements Serializable
       return running;
     }
 
+  public String getImage ()
+    {
+      return properties.image;
+    }
+
   public void prepare ()
     {
       if (properties.reps_begin != null)
-        prepareReps();
-      else if (properties.duration_begin != null)
-        prepareDuration();
+        {
+          Reps reps = new Reps(properties.reps_begin);
+          old_result = fetchResult();
+          if (old_result != null)
+            {
+              reps = new Reps(old_result);
+              if (reps.greaterOrEqual(properties.reps_finish))
+                {
+                  if (levelUp())
+                    return;
+                }
+              for (int i = 0; i < properties.reps_increment; ++i)
+                reps.increment(properties);
+            }
+          new_result = reps.toString();
+
+          TextView progressLabel = (TextView)TrainingManager.getGui().findViewById(R.id.TrainingActivityProgressLabel);
+          progressLabel.setText("1: 0/" + reps.sets.get(0));
+
+          task = new RepsTask(reps);
+        }
+      else if (properties.duration_begin > 0)
+        {
+          long duration = properties.duration_begin;
+          old_result = fetchResult();
+          if (old_result != null)
+            {
+              duration = Long.parseLong(old_result);
+              if (duration >= properties.duration_finish)
+                {
+                  if (levelUp())
+                    return;
+                }
+              duration += properties.duration_increment;
+            }
+          new_result = "" + duration;
+
+          long min = duration / 60000;
+          long sec = (duration % 60000) / 1000;
+
+          TextView progressLabel = (TextView)TrainingManager.getGui().findViewById(R.id.TrainingActivityProgressLabel);
+          progressLabel.setText((min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec);
+
+          task = new DurationTask(duration);
+        }
       else
-        prepareDurationStatic();
-    }
+        {
+          long min = properties.duration / 60000;
+          long sec = (properties.duration % 60000) / 1000;
 
-  private void prepareReps ()
-    {
+          TextView progressLabel = (TextView)TrainingManager.getGui().findViewById(R.id.TrainingActivityProgressLabel);
+          progressLabel.setText((min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec);
 
-    }
-
-  private void prepareDuration ()
-    {
-
-    }
-
-  private void prepareDurationStatic ()
-    {
-      long min = properties.duration / 60000;
-      long sec = (properties.duration % 60000) / 1000;
-
-      TextView progressLabel = (TextView)gui.findViewById(R.id.TrainingActivityProgressLabel);
-      progressLabel.setText((min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec);
-
-      task = new DurationTask(properties.duration);
+          task = new DurationTask(properties.duration);
+        }
     }
 
   public void start ()
     {
       task.start();
-      Button contextButton = (Button)gui.findViewById(R.id.TrainingActivityContextButton);
+      Button contextButton = (Button)TrainingManager.getGui().findViewById(R.id.TrainingActivityContextButton);
       contextButton.setText(ContextManager.get().getString(R.string.TrainingActivityContextButtonTextPause));
       running = true;
     }
@@ -90,46 +128,94 @@ abstract public class Exercisable implements Serializable
   public void pause ()
     {
       task.pause();
-      Button contextButton = (Button)gui.findViewById(R.id.TrainingActivityContextButton);
+      Button contextButton = (Button)TrainingManager.getGui().findViewById(R.id.TrainingActivityContextButton);
       contextButton.setText(ContextManager.get().getString(R.string.TrainingActivityContextButtonTextStart));
       running = false;
     }
 
-  public void finish ()
+  public void finishExercise ()
     {
+      running = false;
+
       if (properties.reps_begin != null)
-        finishReps();
-      else if (properties.duration_begin != null)
-        finishDuration();
+        {
+          DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
+          {
+            @Override
+            public void onClick (DialogInterface dialog, int which)
+              {
+                switch (which)
+                  {
+                  case DialogInterface.BUTTON_POSITIVE:
+                    recordResult(new_result);
+                    break;
+                  case DialogInterface.BUTTON_NEGATIVE:
+                    recordResult(old_result);
+                    break;
+                  }
+              }
+          };
+
+          AlertDialog.Builder builder = new AlertDialog.Builder(TrainingManager.getGui());
+          builder.setMessage("Did you make it?").setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener).show();
+        }
+      else if (properties.duration_begin > 0)
+        {
+          TextView progressLabel = (TextView)TrainingManager.getGui().findViewById(R.id.TrainingActivityProgressLabel);
+          progressLabel.setText("00:00");
+
+          DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
+          {
+            @Override
+            public void onClick (DialogInterface dialog, int which)
+              {
+                switch (which)
+                  {
+                  case DialogInterface.BUTTON_POSITIVE:
+                    recordResult(new_result);
+                    break;
+                  case DialogInterface.BUTTON_NEGATIVE:
+                    recordResult(old_result);
+                    break;
+                  }
+              }
+          };
+
+          AlertDialog.Builder builder = new AlertDialog.Builder(TrainingManager.getGui());
+          builder.setMessage("Did you make it?").setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener).show();
+        }
       else
-        finishDurationStatic();
+        {
+          TextView progressLabel = (TextView)TrainingManager.getGui().findViewById(R.id.TrainingActivityProgressLabel);
+          progressLabel.setText("00:00");
+        }
 
-
+      if (properties.pause_after_exercise > 0)
+        {
+          task = new PauseTask(properties.pause_after_exercise);
+          task.start();
+        }
+      else
+        afterPause();
     }
 
-  private void finishReps ()
+  private void afterPause ()
     {
+      Button contextButton = (Button)TrainingManager.getGui().findViewById(R.id.TrainingActivityContextButton);
+      contextButton.setEnabled(true);
+      contextButton.setText(ContextManager.get().getString(R.string.TrainingActivityContextButtonTextStart));
 
-    }
-
-  private void finishDuration ()
-    {
-
-    }
-
-  private void finishDurationStatic ()
-    {
-      TextView progressLabel = (TextView)gui.findViewById(R.id.TrainingActivityProgressLabel);
-      progressLabel.setText("00:00");
+      TrainingManager.next();
     }
 
   private class DurationTask extends TaskManager.TimerTask
   {
     private long duration;
+
     private long start = 0;
     private long paused = 0;
-
     private long countdown = 3;
+    private boolean halftime = false;
 
     public DurationTask (long duration)
       {
@@ -138,20 +224,256 @@ abstract public class Exercisable implements Serializable
 
     public void pause ()
       {
-        paused = System.currentTimeMillis();
+        if (start > 0)
+          paused = System.currentTimeMillis();
+        else
+          countdown = 3;
+
         super.stop();
       }
 
     public long update ()
       {
+        if (start == 0 && countdown > 0)
+          {
+            SoundManager.play(R.raw.beep_low);
+            countdown--;
+            return System.currentTimeMillis() + 1000;
+          }
+
         if (start == 0)
-          start = System.currentTimeMillis();
+          {
+            SoundManager.play(R.raw.beep_four);
+            start = System.currentTimeMillis();
+            paused = 0;
+            countdown = 3;
+          }
 
         if (paused > 0)
           {
             start += System.currentTimeMillis() - paused;
             paused = 0;
           }
+
+        long elapsed = System.currentTimeMillis() - start;
+        long remaining = Math.round((duration - elapsed) / 1000.0);
+
+        if (properties.two_sided && !halftime && duration / elapsed >= 0.5)
+          {
+            SoundManager.play(R.raw.beep_two);
+            halftime = true;
+          }
+
+        if (countdown > 0 && countdown >= remaining)
+          {
+            SoundManager.play(R.raw.beep_low);
+            countdown--;
+          }
+
+        if (remaining <= 0)
+          {
+            SoundManager.play(R.raw.beep_four);
+            finishExercise();
+            return 0;
+          }
+
+        long min = remaining / 60;
+        long sec = remaining % 60;
+
+        TextView progressLabel = (TextView)TrainingManager.getGui().findViewById(R.id.TrainingActivityProgressLabel);
+        progressLabel.setText((min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec);
+
+        return start + (Math.round(elapsed / 1000.0) + 1) * 1000;
+      }
+  }
+
+  private class RepsTask extends TaskManager.TimerTask
+  {
+    private Reps reps;
+    private Reps done;
+
+    private int currentSet = 0;
+    private int phase = 0;
+
+    private long pause_start = 0;
+    private long pause_duration = 0;
+    private long pause_countdown = 0;
+
+    private long countdown = 3;
+    private int next_sound = 0;
+
+    public RepsTask (Reps reps)
+      {
+        this.reps = reps;
+        this.done = reps.empty();
+      }
+
+    public void pause ()
+      {
+        countdown = 3;
+        phase = 0;
+
+        super.pause();
+      }
+
+    public long update ()
+      {
+        if (countdown > 0)
+          {
+            SoundManager.play(R.raw.beep_low);
+            countdown--;
+            next_sound = R.raw.beep_four;
+            return System.currentTimeMillis() + 1000;
+          }
+
+        if (pause_duration > 0)
+          return updateSetPause();
+
+        phase = (phase + 1) % 5;
+
+        Log.d("RepsTask", "arriving in phase " + phase);
+
+        // phase 0: pause
+        if (phase == 0)
+          {
+            done.sets.set(currentSet, done.sets.get(currentSet) + 1);
+
+            TextView progressLabel = (TextView)TrainingManager.getGui().findViewById(R.id.TrainingActivityProgressLabel);
+            progressLabel.setText("" + (currentSet + 1) + ": " + done.sets.get(currentSet) + "/" + reps.sets.get(currentSet));
+
+            if (done.sets.get(currentSet) >= reps.sets.get(currentSet)) // a set finished
+              {
+                SoundManager.play(R.raw.beep_four);
+                next_sound = 0;
+                currentSet++;
+
+                if (currentSet >= reps.sets.size()) // exercise finished
+                  {
+                    finishExercise();
+                    return 0;
+                  }
+
+                progressLabel.setText("" + (currentSet + 1) + ": " + done.sets.get(currentSet) + "/" + reps.sets.get(currentSet));
+
+                if (properties.pause_after_set > 0)
+                  {
+                    pause_duration = properties.pause_after_set;
+                    return System.currentTimeMillis();
+                  }
+              }
+            phase++;
+          }
+
+        if (next_sound != 0)
+          {
+            SoundManager.play(next_sound);
+            next_sound = 0;
+          }
+
+        // phase 1: primary motion
+        if (phase == 1)
+          {
+            next_sound = (properties.primary_motion == Properties.PrimaryMotion.concentric ? R.raw.beep_high : R.raw.beep_low);
+            if (properties.primary_motion == Properties.PrimaryMotion.concentric && properties.reps_duration_concentric > 0)
+              return System.currentTimeMillis() + properties.reps_duration_concentric;
+            if (properties.primary_motion == Properties.PrimaryMotion.eccentric && properties.reps_duration_eccentric > 0)
+              return System.currentTimeMillis() + properties.reps_duration_eccentric;
+            phase++; // skip phase if no time set
+          }
+
+        // phase 2: pause after primary motion
+        if (phase == 2)
+          {
+            next_sound = (properties.primary_motion == Properties.PrimaryMotion.concentric ? R.raw.beep_high : R.raw.beep_low);
+            if (properties.primary_motion == Properties.PrimaryMotion.concentric && properties.reps_pause_after_concentric > 0)
+              return System.currentTimeMillis() + properties.reps_pause_after_concentric;
+            if (properties.primary_motion == Properties.PrimaryMotion.eccentric && properties.reps_pause_after_eccentric > 0)
+              return System.currentTimeMillis() + properties.reps_pause_after_eccentric;
+            phase++; // skip phase if no time set
+          }
+
+        // phase 3: secondary motion
+        if (phase == 3)
+          {
+            next_sound = (properties.primary_motion == Properties.PrimaryMotion.concentric ? R.raw.beep_low : R.raw.beep_high);
+            if (properties.primary_motion == Properties.PrimaryMotion.concentric && properties.reps_duration_eccentric > 0)
+              return System.currentTimeMillis() + properties.reps_duration_eccentric;
+            if (properties.primary_motion == Properties.PrimaryMotion.eccentric && properties.reps_duration_concentric > 0)
+              return System.currentTimeMillis() + properties.reps_duration_concentric;
+            phase++; // skip phase if no time set
+          }
+
+        // phase 3: pause after secondary motion
+        if (phase == 4)
+          {
+            next_sound = (properties.primary_motion == Properties.PrimaryMotion.concentric ? R.raw.beep_low : R.raw.beep_high);
+            if (properties.primary_motion == Properties.PrimaryMotion.concentric && properties.reps_pause_after_eccentric > 0)
+              return System.currentTimeMillis() + properties.reps_pause_after_eccentric;
+            if (properties.primary_motion == Properties.PrimaryMotion.eccentric && properties.reps_pause_after_concentric > 0)
+              return System.currentTimeMillis() + properties.reps_pause_after_concentric;
+          }
+
+        return System.currentTimeMillis();
+      }
+
+    private long updateSetPause ()
+      {
+        if (pause_start == 0)
+          {
+            pause_start = System.currentTimeMillis();
+            pause_countdown = 3;
+          }
+
+        long elapsed = System.currentTimeMillis() - pause_start;
+        long remaining = Math.round((pause_duration - elapsed) / 1000.0);
+
+        if (pause_countdown > 0 && pause_countdown >= remaining)
+          {
+            SoundManager.play(R.raw.beep_low);
+            pause_countdown--;
+          }
+
+        if (remaining <= 0)
+          {
+            SoundManager.play(R.raw.beep_four);
+            pause_duration = 0;
+            pause_start = 0;
+            countdown = 3;
+            running = false;
+            Button contextButton = (Button)TrainingManager.getGui().findViewById(R.id.TrainingActivityContextButton);
+            contextButton.setEnabled(true);
+            contextButton.setText(ContextManager.get().getString(R.string.TrainingActivityContextButtonTextStart));
+            return 0;
+          }
+
+        long min = remaining / 60;
+        long sec = remaining % 60;
+
+        Button contextButton = (Button)TrainingManager.getGui().findViewById(R.id.TrainingActivityContextButton);
+        contextButton.setEnabled(false);
+        contextButton.setText((min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec);
+
+        return pause_start + (Math.round(elapsed / 1000.0) + 1) * 1000;
+      }
+
+  }
+
+  private class PauseTask extends TaskManager.TimerTask
+  {
+    private long duration;
+
+    private long start = 0;
+    private long countdown = 3;
+
+    public PauseTask (long duration)
+      {
+        this.duration = duration;
+      }
+
+    public long update ()
+      {
+        if (start == 0)
+          start = System.currentTimeMillis();
 
         long elapsed = System.currentTimeMillis() - start;
         long remaining = Math.round((duration - elapsed) / 1000.0);
@@ -165,15 +487,16 @@ abstract public class Exercisable implements Serializable
         if (remaining <= 0)
           {
             SoundManager.play(R.raw.beep_four);
-            finish();
+            afterPause();
             return 0;
           }
 
         long min = remaining / 60;
         long sec = remaining % 60;
 
-        TextView progressLabel = (TextView)gui.findViewById(R.id.TrainingActivityProgressLabel);
-        progressLabel.setText((min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec);
+        Button contextButton = (Button)TrainingManager.getGui().findViewById(R.id.TrainingActivityContextButton);
+        contextButton.setEnabled(false);
+        contextButton.setText((min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec);
 
         return start + (Math.round(elapsed / 1000.0) + 1) * 1000;
       }

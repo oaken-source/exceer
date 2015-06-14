@@ -5,18 +5,25 @@
 package org.grapentin.apps.exceer;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.Toast;
 
-import org.grapentin.apps.exceer.training.TrainingList;
+import org.grapentin.apps.exceer.training.TrainingManager;
+import org.grapentin.apps.exceer.training.TrainingStorage;
+
+import java.io.InputStream;
 
 public class TrainingActivity extends Activity
 {
-
-  private TrainingList trainings;
 
   @Override
   protected void onCreate (Bundle savedInstanceState)
@@ -26,19 +33,19 @@ public class TrainingActivity extends Activity
 
       if (savedInstanceState == null)
         {
-          trainings = new TrainingList(this);
-          trainings.setCurrentTraining("default startbodyweight.com routine");
+          TrainingManager.setGui(this);
+          TrainingManager.setCurrentTraining("default startbodyweight.com routine");
         }
       else
         {
-          trainings = (TrainingList)savedInstanceState.getSerializable((getString(R.string.TrainingActivityBundleTrainings)));
+          TrainingManager.setInstance((TrainingManager)savedInstanceState.getSerializable((getString(R.string.TrainingActivityBundleTrainings))));
         }
     }
 
   @Override
   protected void onStop ()
     {
-      trainings.getCurrentTraining().getCurrentExercisable().pause();
+      TrainingManager.getCurrentTraining().getCurrentExercisable().pause();
 
       super.onStop();
     }
@@ -54,7 +61,7 @@ public class TrainingActivity extends Activity
     {
       super.onSaveInstanceState(savedInstanceState);
 
-      savedInstanceState.putSerializable(getString(R.string.TrainingActivityBundleTrainings), trainings);
+      savedInstanceState.putSerializable(getString(R.string.TrainingActivityBundleTrainings), TrainingManager.getInstance());
     }
 
   @Override
@@ -80,6 +87,7 @@ public class TrainingActivity extends Activity
         }
       if (id == R.id.action_training_abort)
         {
+          TrainingManager.clear();
           super.onBackPressed();
           return true;
         }
@@ -89,10 +97,43 @@ public class TrainingActivity extends Activity
 
   public void onContextButtonClicked (View view)
     {
-      if (trainings.getCurrentExercisable().isRunning())
-        trainings.getCurrentExercisable().pause();
+      if (TrainingManager.getCurrentExercisable().isRunning())
+        TrainingManager.getCurrentExercisable().pause();
+      else if (TrainingManager.getCurrentTraining().isFinished())
+        {
+          TrainingStorage.finish();
+          TrainingManager.clear();
+          super.onBackPressed();
+        }
       else
-        trainings.getCurrentExercisable().start();
+        TrainingManager.getCurrentExercisable().start();
+    }
+
+  public void onCurrentExerciseLevelLabelClicked (View view)
+    {
+      String url = TrainingManager.getCurrentExercisable().getImage();
+      if (url == null)
+        return;
+
+      Bitmap bitmap;
+      try
+        {
+          InputStream in = new java.net.URL(url).openStream();
+          bitmap = BitmapFactory.decodeStream(in);
+        }
+      catch (Exception e)
+        {
+          Log.e("TrainingActivity", "error fetching image", e);
+          return;
+        }
+
+      ImageView imageView = new ImageView(this);
+      imageView.setImageBitmap(bitmap);
+
+      Toast toast = new Toast(getApplicationContext());
+      toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+      toast.setView(imageView);
+      toast.show();
     }
 
 }
