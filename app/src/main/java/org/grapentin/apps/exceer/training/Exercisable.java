@@ -77,7 +77,7 @@ abstract public class Exercisable implements Serializable
           new_result = reps.toString();
 
           TextView progressLabel = (TextView)TrainingManager.getGui().findViewById(R.id.TrainingActivityProgressLabel);
-          progressLabel.setText("1: 0/" + reps.sets.get(0));
+          progressLabel.setText("1:0/" + reps.sets.get(0));
 
           task = new RepsTask(reps);
         }
@@ -339,7 +339,7 @@ abstract public class Exercisable implements Serializable
             done.sets.set(currentSet, done.sets.get(currentSet) + 1);
 
             TextView progressLabel = (TextView)TrainingManager.getGui().findViewById(R.id.TrainingActivityProgressLabel);
-            progressLabel.setText("" + (currentSet + 1) + ": " + done.sets.get(currentSet) + "/" + reps.sets.get(currentSet));
+            progressLabel.setText("" + (currentSet + 1) + ":" + done.sets.get(currentSet) + "/" + reps.sets.get(currentSet));
 
             if (done.sets.get(currentSet) >= reps.sets.get(currentSet)) // a set finished
               {
@@ -353,7 +353,7 @@ abstract public class Exercisable implements Serializable
                     return 0;
                   }
 
-                progressLabel.setText("" + (currentSet + 1) + ": " + done.sets.get(currentSet) + "/" + reps.sets.get(currentSet));
+                progressLabel.setText("" + (currentSet + 1) + ":" + done.sets.get(currentSet) + "/" + reps.sets.get(currentSet));
 
                 if (properties.pause_after_set > 0)
                   {
