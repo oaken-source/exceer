@@ -2,5 +2,4 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="org.grapentin.apps.exceer.TrainingActivity">
     <item android:id="@+id/action_training_abort" android:title="@string/action_training_abort" />
-    <item android:id="@+id/action_settings" android:title="@string/action_settings" />
 </menu>

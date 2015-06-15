@@ -80,13 +80,9 @@ public class TrainingActivity extends Activity
       // as you specify a parent activity in AndroidManifest.xml.
       int id = item.getItemId();
 
-      //noinspection SimplifiableIfStatement
-      if (id == R.id.action_settings)
+      switch (id)
         {
-          return true;
-        }
-      if (id == R.id.action_training_abort)
-        {
+        case R.id.action_training_abort:
           TrainingManager.clear();
           super.onBackPressed();
           return true;
