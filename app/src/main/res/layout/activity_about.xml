@@ -12,10 +12,9 @@
       android:id="@+id/AboutActivityTitleLabel"
       android:layout_width="fill_parent"
       android:layout_height="wrap_content"
-      android:gravity="center"
       android:singleLine="true"
       android:text="@string/app_name"
-      android:textSize="60sp"
+      android:textSize="40sp"
       android:textStyle="bold" />
 
 

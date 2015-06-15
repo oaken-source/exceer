@@ -33,6 +33,9 @@ public class AboutActivity extends Activity
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_about);
 
+      TextView titleLabel = (TextView)findViewById(R.id.AboutActivityTitleLabel);
+      titleLabel.setText(getString(R.string.app_name) + "-" + BuildConfig.VERSION_NAME);
+
       TextView iconCopyrightLabel = (TextView)findViewById(R.id.AboutActivityIconCopyrightLabel);
       iconCopyrightLabel.setMovementMethod((LinkMovementMethod.getInstance()));
 
