@@ -17,7 +17,10 @@
         android:gravity="center|center_vertical"
         android:text=""
         android:textSize="30sp"
-        android:singleLine="true"/>
+        android:singleLine="true"
+        android:clickable="true"
+        android:enabled="true"
+        android:onClick="onCurrentExerciseLevelLabelClicked" />
 
     <TextView
         android:id="@+id/TrainingActivityCurrentExerciseLevelLabel1"
@@ -29,7 +32,10 @@
         android:text="@string/TrainingActivityCurrentExerciseLevelNone"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:singleLine="true"/>
+        android:singleLine="true"
+        android:onClick="onCurrentExerciseLevelLabelClicked"
+        android:enabled="true"
+        android:clickable="true" />
 
     <TextView
         android:layout_width="fill_parent"
