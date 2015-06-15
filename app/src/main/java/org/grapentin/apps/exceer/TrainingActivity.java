@@ -38,14 +38,14 @@ public class TrainingActivity extends Activity
         }
       else
         {
-          TrainingManager.setInstance((TrainingManager)savedInstanceState.getSerializable((getString(R.string.TrainingActivityBundleTrainings))));
+          //TrainingManager.setInstance((TrainingManager)savedInstanceState.getSerializable((getString(R.string.TrainingActivityBundleTrainings))));
         }
     }
 
   @Override
   protected void onStop ()
     {
-      TrainingManager.getCurrentTraining().getCurrentExercisable().pause();
+      // TrainingManager.getCurrentTraining().getCurrentExercisable().pause();
 
       super.onStop();
     }
@@ -61,7 +61,7 @@ public class TrainingActivity extends Activity
     {
       super.onSaveInstanceState(savedInstanceState);
 
-      savedInstanceState.putSerializable(getString(R.string.TrainingActivityBundleTrainings), TrainingManager.getInstance());
+      //savedInstanceState.putSerializable(getString(R.string.TrainingActivityBundleTrainings), TrainingManager.getInstance());
     }
 
   @Override
