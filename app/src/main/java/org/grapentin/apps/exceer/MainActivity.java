@@ -87,10 +87,13 @@ public class MainActivity extends Activity
       switch (id)
         {
         case R.id.action_settings:
-          return true;
+          // Intent settingsIntent = new Intent(this, SettingsActivity.class);
+          // startActivity(settingsIntent);
+          break;
         case R.id.action_about:
-          Intent intent = new Intent(this, AboutActivity.class);
-          startActivity(intent);
+          Intent aboutIntent = new Intent(this, AboutActivity.class);
+          startActivity(aboutIntent);
+          break;
         }
 
       return super.onOptionsItemSelected(item);

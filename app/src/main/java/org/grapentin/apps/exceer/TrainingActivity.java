@@ -20,12 +20,12 @@
 package org.grapentin.apps.exceer;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -54,30 +54,30 @@ public class TrainingActivity extends Activity
   @Override
   public void onBackPressed ()
     {
+      DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
+      {
+        @Override
+        public void onClick (DialogInterface dialog, int which)
+          {
+            switch (which)
+              {
+              case DialogInterface.BUTTON_POSITIVE:
+                abort();
+                break;
+              case DialogInterface.BUTTON_NEGATIVE:
+                break;
+              }
+          }
+      };
 
+      AlertDialog.Builder builder = new AlertDialog.Builder(TrainingManager.getGui());
+      builder.setMessage("Are you sure you want to abort this session?").setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener).show();
     }
 
-  @Override
-  public boolean onCreateOptionsMenu (Menu menu)
+  private void abort ()
     {
-      getMenuInflater().inflate(R.menu.menu_training, menu);
-      return true;
-    }
-
-  @Override
-  public boolean onOptionsItemSelected (MenuItem item)
-    {
-      int id = item.getItemId();
-
-      switch (id)
-        {
-        case R.id.action_training_abort:
-          TrainingManager.clear();
-          super.onBackPressed();
-          return true;
-        }
-
-      return super.onOptionsItemSelected(item);
+      TrainingManager.clear();
+      super.onBackPressed();
     }
 
   public void onContextButtonClicked (View view)
