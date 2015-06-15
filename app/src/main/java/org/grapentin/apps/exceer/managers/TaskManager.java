@@ -19,7 +19,6 @@
 package org.grapentin.apps.exceer.managers;
 
 import android.os.Handler;
-import android.util.Log;
 
 public class TaskManager
 {
@@ -54,7 +53,6 @@ public class TaskManager
         if (next > 0)
           {
             next -= System.currentTimeMillis();
-            Log.d("TimerTask", "[" + this + "] next delay: " + next);
             getInstance().handler.postDelayed(this, next);
           }
       }

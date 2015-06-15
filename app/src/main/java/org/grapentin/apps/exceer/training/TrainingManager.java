@@ -20,7 +20,7 @@
 package org.grapentin.apps.exceer.training;
 
 import android.app.Activity;
-import android.util.Log;
+import android.widget.Toast;
 
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.helpers.XmlNode;
@@ -49,11 +49,6 @@ public class TrainingManager implements Serializable
       return instance;
     }
 
-  public static void setInstance (TrainingManager inst)
-    {
-      instance = inst;
-    }
-
   public static void init ()
     {
       XmlNode root;
@@ -63,7 +58,7 @@ public class TrainingManager implements Serializable
         }
       catch (Exception e)
         {
-          Log.e("Training", "failed to parse training.xml", e);
+          Toast.makeText(ContextManager.get(), "failed to parse config: " + e.getMessage(), Toast.LENGTH_LONG).show();
           return;
         }
 

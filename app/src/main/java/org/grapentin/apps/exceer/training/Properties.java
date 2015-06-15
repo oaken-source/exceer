@@ -19,9 +19,10 @@
 
 package org.grapentin.apps.exceer.training;
 
-import android.util.Log;
+import android.widget.Toast;
 
 import org.grapentin.apps.exceer.helpers.DurationString;
+import org.grapentin.apps.exceer.managers.ContextManager;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -110,7 +111,7 @@ public class Properties implements Serializable
             }
           catch (Exception e)
             {
-              Log.w("Properties", "unrecognized reps_increment_direction:" + value);
+              Toast.makeText(ContextManager.get(), "invalid value for reps_increment_direction: '" + value + "'", Toast.LENGTH_LONG).show();
             }
           break;
         case "reps_increment_style":
@@ -120,7 +121,7 @@ public class Properties implements Serializable
             }
           catch (Exception e)
             {
-              Log.w("Properties", "unrecognized reps_increment_direction:" + value);
+              Toast.makeText(ContextManager.get(), "invalid value for reps_increment_style: '" + value + "'", Toast.LENGTH_LONG).show();
             }
           break;
         case "primary_motion":
@@ -130,11 +131,11 @@ public class Properties implements Serializable
             }
           catch (Exception e)
             {
-              Log.w("Properties", "unrecognized reps_increment_direction:" + value);
+              Toast.makeText(ContextManager.get(), "invalid value for primary_motion: '" + value + "'", Toast.LENGTH_LONG).show();
             }
           break;
         default:
-          Log.w("Properties", "unrecognized property " + key + ":" + value);
+          Toast.makeText(ContextManager.get(), "invalid property: '" + key + "'", Toast.LENGTH_LONG).show();
           break;
         }
     }

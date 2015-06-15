@@ -19,7 +19,6 @@
 
 package org.grapentin.apps.exceer.training;
 
-import android.util.Log;
 import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
@@ -110,7 +109,6 @@ public class Exercise extends Exercisable implements Serializable
 
   public boolean levelUp ()
     {
-      Log.d("Exercise", "levelup!");
       if (currentLevelId >= levels.size() - 1)
         return false;
 

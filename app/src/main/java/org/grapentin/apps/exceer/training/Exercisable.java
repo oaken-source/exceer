@@ -21,7 +21,6 @@ package org.grapentin.apps.exceer.training;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -345,8 +344,6 @@ abstract public class Exercisable implements Serializable
           return updateSetPause();
 
         phase = (phase + 1) % 5;
-
-        Log.d("RepsTask", "arriving in phase " + phase);
 
         // phase 0: pause
         if (phase == 0)
