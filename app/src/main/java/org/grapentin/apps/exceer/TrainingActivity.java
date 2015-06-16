@@ -44,11 +44,7 @@ public class TrainingActivity extends Activity
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_training);
 
-      if (savedInstanceState == null)
-        {
-          TrainingManager.setGui(this);
-          TrainingManager.setCurrentTraining("default startbodyweight.com routine");
-        }
+      TrainingManager.setGui(this);
     }
 
   @Override
