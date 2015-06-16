@@ -17,7 +17,7 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.orm;
+package org.grapentin.apps.exceer.models;
 
 import org.grapentin.apps.exceer.helpers.XmlNode;
 

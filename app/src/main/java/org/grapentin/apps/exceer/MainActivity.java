@@ -20,32 +20,34 @@
 package org.grapentin.apps.exceer;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.AvoidXfermode;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
 import org.grapentin.apps.exceer.managers.ContextManager;
+import org.grapentin.apps.exceer.managers.DatabaseManager;
 import org.grapentin.apps.exceer.managers.SoundManager;
 import org.grapentin.apps.exceer.managers.TaskManager;
-import org.grapentin.apps.exceer.orm.DatabaseManager;
-import org.grapentin.apps.exceer.orm.ModelExercise;
-import org.grapentin.apps.exceer.orm.ModelTraining;
-import org.grapentin.apps.exceer.training.TrainingManager;
-import org.grapentin.apps.exceer.training.TrainingStorage;
+import org.grapentin.apps.exceer.models.ModelSession;
 
 public class MainActivity extends Activity
 {
 
   private TaskManager.TimerTask task = new UpdateTimerTask();
 
+  private ModelSession lastSession = null;
+
+  private static MainActivity instance = null;
+
   @Override
   protected void onCreate (Bundle savedInstanceState)
     {
+      instance = this;
+
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_main);
 
@@ -55,10 +57,16 @@ public class MainActivity extends Activity
       TaskManager.init();
 
       DatabaseManager.init();
+    }
 
-      TrainingStorage.init();
-      TrainingManager.init();
+  public static MainActivity getInstance ()
+    {
+      return instance;
+    }
 
+  public void afterDatabaseInit ()
+    {
+      lastSession = ModelSession.getLast();
       task.start();
     }
 
@@ -115,7 +123,7 @@ public class MainActivity extends Activity
       {
         TextView lastSessionTextView = (TextView)findViewById(R.id.MainActivityLastSessionDate);
 
-        long last = TrainingStorage.getLastTrainingDate();
+        long last = (lastSession == null ? System.currentTimeMillis() : lastSession.date.getLong());
         long elapsed = System.currentTimeMillis() - last;
 
         elapsed = Math.round(elapsed / 1000.0);

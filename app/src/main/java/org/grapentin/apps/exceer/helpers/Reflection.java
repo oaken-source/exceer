@@ -19,6 +19,7 @@
 
 package org.grapentin.apps.exceer.helpers;
 
+import org.grapentin.apps.exceer.MainActivity;
 import org.grapentin.apps.exceer.managers.ContextManager;
 
 import java.lang.reflect.Field;
@@ -41,7 +42,7 @@ public class Reflection
           for (Enumeration<String> i = df.entries(); i.hasMoreElements(); )
             {
               String s = i.nextElement();
-              if (s.startsWith(base.getPackage().getName()) && Class.forName(s).getSuperclass() == base)
+              if (s.startsWith(MainActivity.class.getPackage().getName()) && Class.forName(s).getSuperclass() == base)
                 derived.add(Class.forName(s));
             }
         }

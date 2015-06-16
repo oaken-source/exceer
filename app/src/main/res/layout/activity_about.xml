@@ -30,11 +30,19 @@
         android:orientation="vertical">
 
       <TextView
-          android:id="@+id/AboutActivityCopyrightLabel"
+          android:id="@+id/AboutActivityShortCopyrightLabel"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_marginBottom="10dp"
-          android:text="@string/AboutActivityCopyrightLabelText"
+          android:text="@string/AboutActivityShortCopyrightLabelText"
+          android:textSize="14sp" />
+
+      <TextView
+          android:id="@+id/AboutActivityNickJanvierLabel"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="10dp"
+          android:text="@string/AboutActivityNickJanvierLabelText"
           android:textSize="14sp" />
 
       <TextView
@@ -48,6 +56,7 @@
       <LinearLayout
           android:layout_width="match_parent"
           android:layout_height="match_parent"
+          android:layout_marginBottom="10dp"
           android:orientation="horizontal">
 
         <ImageView
@@ -65,7 +74,17 @@
             android:text="@string/AboutActivityIconCopyrightLabelText"
             android:textSize="14sp" />
       </LinearLayout>
+
+      <TextView
+          android:id="@+id/AboutActivityLongCopyrightLabel"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="10dp"
+          android:text="@string/AboutActivityLongCopyrightLabelText"
+          android:textSize="14sp" />
+
     </LinearLayout>
+
   </ScrollView>
 
 </RelativeLayout>

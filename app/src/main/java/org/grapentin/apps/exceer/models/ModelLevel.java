@@ -17,40 +17,43 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.orm;
+package org.grapentin.apps.exceer.models;
 
 import org.grapentin.apps.exceer.helpers.XmlNode;
 
 import java.util.ArrayList;
 
-public class ModelProperty extends BaseModel
+public class ModelLevel extends BaseModel
 {
 
-  protected final static String TABLE_NAME = "properties";
+  protected final static String TABLE_NAME = "levels";
 
-  public Column key = new Column("key");
-  public Column value = new Column("value");
+  public Column name = new Column("name");
 
-  public static ModelProperty fromXml (XmlNode root)
+  public Relation properties = makeRelation("properties", ModelProperty.class);
+
+  public static ModelLevel fromXml (XmlNode root)
     {
-      ModelProperty m = new ModelProperty();
+      ModelLevel m = new ModelLevel();
 
-      m.key.set(root.getAttribute("name"));
-      m.value.set(root.getValue());
+      m.name.set(root.getAttribute("name"));
+
+      for (XmlNode property : root.getChildren("property"))
+        m.properties.add(ModelProperty.fromXml(property));
 
       return m;
     }
 
-  public static ModelProperty get (long id)
+  public static ModelLevel get (long id)
     {
-      return (ModelProperty)BaseModel.get(ModelProperty.class, id);
+      return (ModelLevel)BaseModel.get(ModelLevel.class, id);
     }
 
-  public static ArrayList<ModelProperty> getAll ()
+  public static ArrayList<ModelLevel> getAll ()
     {
-      ArrayList<ModelProperty> out = new ArrayList<>();
+      ArrayList<ModelLevel> out = new ArrayList<>();
 
-      for (long id : BaseModel.getAllIds(ModelProperty.class))
+      for (long id : BaseModel.getAllIds(ModelLevel.class))
         out.add(get(id));
 
       return out;

@@ -17,50 +17,40 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.orm;
-
+package org.grapentin.apps.exceer.models;
 
 import org.grapentin.apps.exceer.helpers.XmlNode;
 
 import java.util.ArrayList;
 
-public class ModelExercise extends BaseModel
+public class ModelProperty extends BaseModel
 {
 
-  protected final static String TABLE_NAME = "exercises";
+  protected final static String TABLE_NAME = "properties";
 
-  public Column name = new Column("name");
+  public Column key = new Column("key");
+  public Column value = new Column("value");
 
-  public Relation levels = makeRelation("levels", ModelLevel.class);
-  public Relation exercises = makeRelation("exercises", ModelExercise.class);
-  public Relation properties = makeRelation("properties", ModelProperty.class);
-
-  public static ModelExercise fromXml (XmlNode root)
+  public static ModelProperty fromXml (XmlNode root)
     {
-      ModelExercise m = new ModelExercise();
+      ModelProperty m = new ModelProperty();
 
-      m.name.set(root.getAttribute("name"));
-
-      for (XmlNode property : root.getChildren("property"))
-        m.properties.add(ModelProperty.fromXml(property));
-      for (XmlNode exercise : root.getChildren("exercise"))
-        m.exercises.add(ModelExercise.fromXml(exercise));
-      for (XmlNode level : root.getChildren("level"))
-        m.levels.add(ModelLevel.fromXml(level));
+      m.key.set(root.getAttribute("name"));
+      m.value.set(root.getValue());
 
       return m;
     }
 
-  public static ModelExercise get (long id)
+  public static ModelProperty get (long id)
     {
-      return (ModelExercise)BaseModel.get(ModelExercise.class, id);
+      return (ModelProperty)BaseModel.get(ModelProperty.class, id);
     }
 
-  public static ArrayList<ModelExercise> getAll ()
+  public static ArrayList<ModelProperty> getAll ()
     {
-      ArrayList<ModelExercise> out = new ArrayList<>();
+      ArrayList<ModelProperty> out = new ArrayList<>();
 
-      for (long id : BaseModel.getAllIds(ModelExercise.class))
+      for (long id : BaseModel.getAllIds(ModelProperty.class))
         out.add(get(id));
 
       return out;

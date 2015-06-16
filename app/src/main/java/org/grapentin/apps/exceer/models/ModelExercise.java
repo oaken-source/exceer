@@ -17,43 +17,50 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.orm;
+package org.grapentin.apps.exceer.models;
+
 
 import org.grapentin.apps.exceer.helpers.XmlNode;
 
 import java.util.ArrayList;
 
-public class ModelLevel extends BaseModel
+public class ModelExercise extends BaseModel
 {
 
-  protected final static String TABLE_NAME = "levels";
+  protected final static String TABLE_NAME = "exercises";
 
   public Column name = new Column("name");
 
+  public Relation levels = makeRelation("levels", ModelLevel.class);
+  public Relation exercises = makeRelation("exercises", ModelExercise.class);
   public Relation properties = makeRelation("properties", ModelProperty.class);
 
-  public static ModelLevel fromXml (XmlNode root)
+  public static ModelExercise fromXml (XmlNode root)
     {
-      ModelLevel m = new ModelLevel();
+      ModelExercise m = new ModelExercise();
 
       m.name.set(root.getAttribute("name"));
 
       for (XmlNode property : root.getChildren("property"))
         m.properties.add(ModelProperty.fromXml(property));
+      for (XmlNode exercise : root.getChildren("exercise"))
+        m.exercises.add(ModelExercise.fromXml(exercise));
+      for (XmlNode level : root.getChildren("level"))
+        m.levels.add(ModelLevel.fromXml(level));
 
       return m;
     }
 
-  public static ModelLevel get (long id)
+  public static ModelExercise get (long id)
     {
-      return (ModelLevel)BaseModel.get(ModelLevel.class, id);
+      return (ModelExercise)BaseModel.get(ModelExercise.class, id);
     }
 
-  public static ArrayList<ModelLevel> getAll ()
+  public static ArrayList<ModelExercise> getAll ()
     {
-      ArrayList<ModelLevel> out = new ArrayList<>();
+      ArrayList<ModelExercise> out = new ArrayList<>();
 
-      for (long id : BaseModel.getAllIds(ModelLevel.class))
+      for (long id : BaseModel.getAllIds(ModelExercise.class))
         out.add(get(id));
 
       return out;

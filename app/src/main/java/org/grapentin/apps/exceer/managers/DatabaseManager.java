@@ -17,15 +17,18 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.orm;
+package org.grapentin.apps.exceer.managers;
 
+import android.app.ProgressDialog;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import org.grapentin.apps.exceer.MainActivity;
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.helpers.Reflection;
 import org.grapentin.apps.exceer.helpers.XmlNode;
-import org.grapentin.apps.exceer.managers.ContextManager;
+import org.grapentin.apps.exceer.models.BaseModel;
+import org.grapentin.apps.exceer.models.ModelTraining;
 
 import java.util.HashMap;
 
@@ -40,10 +43,11 @@ public class DatabaseManager extends SQLiteOpenHelper
   private static HashMap<Class, HashMap<Long, BaseModel>> cache = new HashMap<>();
   private static DatabaseManager instance = null;
 
+  private boolean deferCallback = false;
+
   private DatabaseManager ()
     {
       super(ContextManager.get(), DATABASE_NAME, null, DATABASE_VERSION);
-
     }
 
   private static DatabaseManager getInstance ()
@@ -57,9 +61,13 @@ public class DatabaseManager extends SQLiteOpenHelper
     {
       getInstance();
 
+      // TODO: remove this, once database schema is stable
       for (Class model : Reflection.getSubclassesOf(BaseModel.class))
         BaseModel.onDrop(model);
       getInstance().onCreate(getSession());
+
+      if (!getInstance().deferCallback)
+        MainActivity.getInstance().afterDatabaseInit();
     }
 
   public static SQLiteDatabase getSession ()
@@ -106,22 +114,76 @@ public class DatabaseManager extends SQLiteOpenHelper
 
   public void onCreate (SQLiteDatabase db)
     {
-      for (Class model : Reflection.getSubclassesOf(BaseModel.class))
-        BaseModel.onCreate(model);
+      deferCallback = true;
 
-      importDefaults();
+      final ProgressDialog progress = new ProgressDialog(MainActivity.getInstance());
+      progress.setTitle("Updating Database");
+      progress.setMessage("Please wait while the database is updated...");
+      progress.show();
+
+      Runnable runnable = new Runnable()
+      {
+        @Override
+        public void run ()
+          {
+            for (Class model : Reflection.getSubclassesOf(BaseModel.class))
+              BaseModel.onCreate(model);
+
+            importDefaults();
+
+            progress.dismiss();
+            MainActivity.getInstance().afterDatabaseInit();
+          }
+      };
+      new Thread(runnable).start();
     }
 
-  public void onUpgrade (SQLiteDatabase db, int oldVersion, int newVersion)
+  public void onUpgrade (final SQLiteDatabase db, final int oldVersion, final int newVersion)
     {
-      for (int i = oldVersion + 1; i <= newVersion; ++i)
-        revisions[i - 2].runUpgrade(db);
+      deferCallback = true;
+
+      final ProgressDialog progress = new ProgressDialog(MainActivity.getInstance());
+      progress.setTitle("Updating Database");
+      progress.setMessage("Please wait while the database is updated...");
+      progress.show();
+
+      Runnable runnable = new Runnable()
+      {
+        @Override
+        public void run ()
+          {
+            for (int i = oldVersion + 1; i <= newVersion; ++i)
+              revisions[i - 2].runUpgrade(db);
+
+            progress.dismiss();
+            MainActivity.getInstance().afterDatabaseInit();
+          }
+      };
+      new Thread(runnable).start();
     }
 
-  public void onDowngrade (SQLiteDatabase db, int oldVersion, int newVersion)
+  public void onDowngrade (final SQLiteDatabase db, final int oldVersion, final int newVersion)
     {
-      for (int i = oldVersion; i > newVersion; --i)
-        revisions[i - 2].runDowngrade(db);
+      deferCallback = true;
+
+      final ProgressDialog progress = new ProgressDialog(MainActivity.getInstance());
+      progress.setTitle("Updating Database");
+      progress.setMessage("Please wait while the database is updated...");
+      progress.show();
+
+      Runnable runnable = new Runnable()
+      {
+        @Override
+        public void run ()
+          {
+            for (int i = oldVersion; i > newVersion; --i)
+              revisions[i - 2].runDowngrade(db);
+
+            progress.dismiss();
+            MainActivity.getInstance().afterDatabaseInit();
+          }
+      };
+      new Thread(runnable).start();
     }
 
   private static class Revision

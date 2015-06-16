@@ -17,33 +17,51 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer;
+package org.grapentin.apps.exceer.models;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.text.method.LinkMovementMethod;
-import android.widget.TextView;
+import android.database.Cursor;
 
-public class AboutActivity extends Activity
+import org.grapentin.apps.exceer.managers.DatabaseManager;
+
+import java.util.ArrayList;
+
+public class ModelSession extends BaseModel
 {
 
-  @Override
-  protected void onCreate (Bundle savedInstanceState)
+  protected final static String TABLE_NAME = "sessions";
+
+  public Column date = new Column("date", TYPE_LONG);
+  public Column training_id = new Column("training_id", TYPE_LONG);
+
+  public static ModelSession get (long id)
     {
-      super.onCreate(savedInstanceState);
-      setContentView(R.layout.activity_about);
+      return (ModelSession)BaseModel.get(ModelSession.class, id);
+    }
 
-      TextView nickJanvierLabel = (TextView)findViewById(R.id.AboutActivityNickJanvierLabel);
-      nickJanvierLabel.setMovementMethod((LinkMovementMethod.getInstance()));
+  public static ModelSession getLast ()
+    {
+      ModelSession out = null;
 
-      TextView titleLabel = (TextView)findViewById(R.id.AboutActivityTitleLabel);
-      titleLabel.setText(getString(R.string.app_name) + "-" + BuildConfig.VERSION_NAME);
+      ModelSession tmp = new ModelSession();
+      Cursor c = DatabaseManager.getSession().query(TABLE_NAME, new String[]{ tmp._ID.name }, null, null, null, null, tmp.date.name + " DESC", "1");
+      if (c.getCount() == 1)
+        {
+          c.moveToFirst();
+          out = get(c.getLong(c.getColumnIndex(tmp._ID.name)));
+        }
+      c.close();
 
-      TextView iconCopyrightLabel = (TextView)findViewById(R.id.AboutActivityIconCopyrightLabel);
-      iconCopyrightLabel.setMovementMethod((LinkMovementMethod.getInstance()));
+      return out;
+    }
 
-      TextView copyrightLabel = (TextView)findViewById(R.id.AboutActivityLongCopyrightLabel);
-      copyrightLabel.setMovementMethod((LinkMovementMethod.getInstance()));
+  public static ArrayList<ModelSession> getAll ()
+    {
+      ArrayList<ModelSession> out = new ArrayList<>();
+
+      for (long id : BaseModel.getAllIds(ModelSession.class))
+        out.add(get(id));
+
+      return out;
     }
 
 }

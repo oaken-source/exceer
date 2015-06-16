@@ -17,12 +17,13 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.orm;
+package org.grapentin.apps.exceer.models;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 
 import org.grapentin.apps.exceer.helpers.Reflection;
+import org.grapentin.apps.exceer.managers.DatabaseManager;
 
 import java.util.ArrayList;
 
@@ -31,6 +32,7 @@ public abstract class BaseModel
 
   protected static final String TYPE_TEXT = "TEXT";
   protected static final String TYPE_INT = "INTEGER";
+  protected static final String TYPE_LONG = "INTEGER";
 
   public Column _ID = new Column("id", TYPE_INT, "PRIMARY KEY");
 
