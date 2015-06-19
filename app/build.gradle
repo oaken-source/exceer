@@ -8,8 +8,8 @@ android {
         applicationId "org.grapentin.apps.exceer"
         minSdkVersion 8
         targetSdkVersion 22
-        versionCode 100
-        versionName "0.1"
+        versionCode 200
+        versionName "0.2"
     }
     buildTypes {
         debug {
