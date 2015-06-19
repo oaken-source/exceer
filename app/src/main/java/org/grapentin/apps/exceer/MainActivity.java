@@ -20,7 +20,6 @@
 package org.grapentin.apps.exceer;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -33,15 +32,18 @@ import org.grapentin.apps.exceer.managers.DatabaseManager;
 import org.grapentin.apps.exceer.managers.SoundManager;
 import org.grapentin.apps.exceer.managers.TaskManager;
 import org.grapentin.apps.exceer.models.ModelSession;
+import org.grapentin.apps.exceer.training.TrainingManager;
 
 public class MainActivity extends Activity
 {
 
-  private TaskManager.TimerTask task = new UpdateTimerTask();
-
-  private ModelSession lastSession = null;
-
   private static MainActivity instance = null;
+  private TaskManager.TimerTask task = null;
+
+  public static MainActivity getInstance ()
+    {
+      return instance;
+    }
 
   @Override
   protected void onCreate (Bundle savedInstanceState)
@@ -57,16 +59,12 @@ public class MainActivity extends Activity
       TaskManager.init();
 
       DatabaseManager.init();
-    }
-
-  public static MainActivity getInstance ()
-    {
-      return instance;
+      TrainingManager.init();
     }
 
   public void afterDatabaseInit ()
     {
-      lastSession = ModelSession.getLast();
+      task = new UpdateTimerTask();
       task.start();
     }
 
@@ -74,14 +72,16 @@ public class MainActivity extends Activity
   protected void onStop ()
     {
       super.onStop();
-      task.stop();
+      if (task != null)
+        task.stop();
     }
 
   @Override
   protected void onResume ()
     {
       super.onResume();
-      task.start();
+      if (task != null)
+        task.start();
     }
 
   @Override
@@ -98,10 +98,10 @@ public class MainActivity extends Activity
 
       switch (id)
         {
-        case R.id.action_settings:
-          Intent settingsIntent = new Intent(this, SettingsActivity.class);
-          startActivity(settingsIntent);
-          break;
+        //case R.id.action_settings:
+        //  Intent settingsIntent = new Intent(this, SettingsActivity.class);
+        //  startActivity(settingsIntent);
+        //  break;
         case R.id.action_about:
           Intent aboutIntent = new Intent(this, AboutActivity.class);
           startActivity(aboutIntent);
@@ -123,6 +123,7 @@ public class MainActivity extends Activity
       {
         TextView lastSessionTextView = (TextView)findViewById(R.id.MainActivityLastSessionDate);
 
+        ModelSession lastSession = ModelSession.getLast();
         long last = (lastSession == null ? System.currentTimeMillis() : lastSession.date.getLong());
         long elapsed = System.currentTimeMillis() - last;
 

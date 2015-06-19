@@ -19,19 +19,29 @@
 
 package org.grapentin.apps.exceer.models;
 
-import org.grapentin.apps.exceer.helpers.XmlNode;
+import android.widget.Button;
+import android.widget.TextView;
 
-import java.util.ArrayList;
+import org.grapentin.apps.exceer.R;
+import org.grapentin.apps.exceer.TrainingActivity;
+import org.grapentin.apps.exceer.helpers.XmlNode;
+import org.grapentin.apps.exceer.managers.ContextManager;
+import org.grapentin.apps.exceer.training.Properties;
 
 public class ModelTraining extends BaseModel
 {
 
+  @SuppressWarnings("unused") // accessed by reflection from BaseModel
   protected final static String TABLE_NAME = "trainings";
 
-  public Column name = new Column("name");
+  // database layout
+  protected Column name = new Column("name");
+  protected Relation exercises = makeRelation("exercises", ModelExercise.class);
+  protected Relation properties = makeRelation("properties", ModelProperty.class);
 
-  public Relation exercises = makeRelation("exercises", ModelExercise.class);
-  public Relation properties = makeRelation("properties", ModelProperty.class);
+  // temporary runtime values
+  private int currentExerciseId = 0;
+  private boolean finished = false;
 
   public static ModelTraining fromXml (XmlNode root)
     {
@@ -52,14 +62,98 @@ public class ModelTraining extends BaseModel
       return (ModelTraining)BaseModel.get(ModelTraining.class, id);
     }
 
-  public static ArrayList<ModelTraining> getAll ()
+  public ModelExercise getCurrentExercise ()
     {
-      ArrayList<ModelTraining> out = new ArrayList<>();
+      return (ModelExercise)exercises.at(currentExerciseId);
+    }
 
-      for (long id : BaseModel.getAllIds(ModelTraining.class))
-        out.add(get(id));
+  public BaseExercisable getLeafExercisable ()
+    {
+      if (exercises.isEmpty())
+        return null;
+      return getCurrentExercise().getLeafExercisable();
+    }
 
-      return out;
+  public boolean isRunning ()
+    {
+      return (getCurrentExercise() != null && getCurrentExercise().isRunning());
+    }
+
+  public boolean isFinished ()
+    {
+      return finished;
+    }
+
+  public void prepare ()
+    {
+      Properties props = new Properties(properties);
+
+      for (BaseModel e : exercises.all())
+        ((ModelExercise)e).prepare(props);
+
+      currentExerciseId = 0;
+      if (getCurrentExercise() == null)
+        {
+          show();
+          return;
+        }
+
+      getLeafExercisable().show();
+    }
+
+  public void show ()
+    {
+      TextView currentExerciseLabel = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLabel);
+      TextView currentExerciseLevelLabel1 = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel1);
+      TextView currentExerciseLevelLabel2 = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel2);
+
+      currentExerciseLabel.setText(ContextManager.get().getString(R.string.TrainingActivityNoExercises));
+      currentExerciseLevelLabel1.setText("");
+      currentExerciseLevelLabel2.setText("");
+    }
+
+  public void next ()
+    {
+      currentExerciseId++;
+      if (getCurrentExercise() == null)
+        {
+          Button contextButton = (Button)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityContextButton);
+          contextButton.setText(ContextManager.get().getString(R.string.TrainingActivityContextButtonTextFinish));
+          finished = true;
+          return;
+        }
+
+      getLeafExercisable().show();
+    }
+
+  public void reset ()
+    {
+      currentExerciseId = 0;
+      finished = false;
+
+      for (BaseModel e : exercises.all())
+        ((ModelExercise)e).reset();
+    }
+
+  public void start ()
+    {
+      if (getLeafExercisable() != null)
+        getLeafExercisable().start();
+    }
+
+  public void pause ()
+    {
+      if (getLeafExercisable() != null)
+        getLeafExercisable().pause();
+    }
+
+  public void wrapUp ()
+    {
+      currentExerciseId = 0;
+      finished = false;
+
+      for (BaseModel e : exercises.all())
+        ((ModelExercise)e).wrapUp();
     }
 
 }

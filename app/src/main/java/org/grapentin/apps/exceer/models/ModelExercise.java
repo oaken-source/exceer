@@ -20,26 +20,35 @@
 package org.grapentin.apps.exceer.models;
 
 
+import android.widget.TextView;
+
+import org.grapentin.apps.exceer.R;
+import org.grapentin.apps.exceer.TrainingActivity;
 import org.grapentin.apps.exceer.helpers.XmlNode;
+import org.grapentin.apps.exceer.training.Properties;
 
-import java.util.ArrayList;
-
-public class ModelExercise extends BaseModel
+public class ModelExercise extends BaseExercisable
 {
 
+  @SuppressWarnings("unused") // accessed by reflection from BaseModel
   protected final static String TABLE_NAME = "exercises";
 
-  public Column name = new Column("name");
-
-  public Relation levels = makeRelation("levels", ModelLevel.class);
-  public Relation exercises = makeRelation("exercises", ModelExercise.class);
-  public Relation properties = makeRelation("properties", ModelProperty.class);
+  // database layout
+  protected Column name = new Column("name");
+  protected Column currentExerciseId = new Column("currentExerciseId", TYPE_INT);
+  protected Column currentLevelId = new Column("currentLevelId", TYPE_INT);
+  protected Column progress = new Column("progress");
+  protected Relation levels = makeRelation("levels", ModelLevel.class);
+  protected Relation exercises = makeRelation("exercises", ModelExercise.class);
+  protected Relation properties = makeRelation("properties", ModelProperty.class);
 
   public static ModelExercise fromXml (XmlNode root)
     {
       ModelExercise m = new ModelExercise();
 
       m.name.set(root.getAttribute("name"));
+      m.currentExerciseId.set(0);
+      m.currentLevelId.set(0);
 
       for (XmlNode property : root.getChildren("property"))
         m.properties.add(ModelProperty.fromXml(property));
@@ -56,14 +65,95 @@ public class ModelExercise extends BaseModel
       return (ModelExercise)BaseModel.get(ModelExercise.class, id);
     }
 
-  public static ArrayList<ModelExercise> getAll ()
+  @Override
+  public BaseExercisable getLeafExercisable ()
     {
-      ArrayList<ModelExercise> out = new ArrayList<>();
+      if (getCurrentExercise() != null)
+        return getCurrentExercise().getLeafExercisable();
+      if (getCurrentLevel() != null)
+        return getCurrentLevel().getLeafExercisable();
+      return this;
+    }
 
-      for (long id : BaseModel.getAllIds(ModelExercise.class))
-        out.add(get(id));
+  public ModelExercise getCurrentExercise ()
+    {
+      return (ModelExercise)exercises.at(currentExerciseId.getInt());
+    }
 
-      return out;
+  public ModelLevel getCurrentLevel ()
+    {
+      return (ModelLevel)levels.at(currentLevelId.getInt());
+    }
+
+  public int getCurrentLevelId ()
+    {
+      return currentLevelId.getInt() + 1;
+    }
+
+  public void prepare (Properties p)
+    {
+      props = new Properties(p, properties);
+
+      if (getCurrentExercise() != null)
+        getCurrentExercise().prepare(props);
+      else if (getCurrentLevel() != null)
+        getCurrentLevel().prepare(props);
+      else
+        super.prepare();
+    }
+
+  public void show ()
+    {
+      TextView currentExerciseLabel = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLabel);
+      TextView currentExerciseLevelLabel1 = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel1);
+      TextView currentExerciseLevelLabel2 = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel2);
+
+      currentExerciseLabel.setText(name.get());
+      currentExerciseLevelLabel1.setText("");
+      currentExerciseLevelLabel2.setText("");
+
+      super.show();
+    }
+
+  public void reset ()
+    {
+      if (getCurrentExercise() != null)
+        getCurrentExercise().reset();
+      else if (getCurrentLevel() != null)
+        getCurrentLevel().reset();
+    }
+
+  public void levelUp ()
+    {
+      if (levels.at(currentLevelId.getInt() + 1) != null)
+        {
+          currentLevelId.set(currentLevelId.getInt() + 1);
+          progress.set(null);
+        }
+    }
+
+  public String getCurrentProgress ()
+    {
+      return progress.get();
+    }
+
+  public void setCurrentProgress (String s)
+    {
+      progress.set(s);
+    }
+
+  public void wrapUp ()
+    {
+      if (!exercises.isEmpty())
+        currentExerciseId.set((currentExerciseId.getInt() + 1) % exercises.size());
+
+      for (BaseModel e : exercises.all())
+        ((ModelExercise)e).wrapUp();
+      for (BaseModel l : levels.all())
+        ((ModelLevel)l).wrapUp();
+
+      commit();
     }
 
 }
+

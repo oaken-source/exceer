@@ -23,6 +23,8 @@ import android.widget.Toast;
 
 import org.grapentin.apps.exceer.helpers.DurationString;
 import org.grapentin.apps.exceer.managers.ContextManager;
+import org.grapentin.apps.exceer.models.BaseModel;
+import org.grapentin.apps.exceer.models.ModelProperty;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -72,6 +74,20 @@ public class Properties implements Serializable
         {
           throw new Error(e);
         }
+    }
+
+  public Properties (BaseModel.Relation properties)
+    {
+      for (BaseModel p : properties.all())
+        set(((ModelProperty)p).key.get(), ((ModelProperty)p).value.get());
+    }
+
+  public Properties (Properties other, BaseModel.Relation properties)
+    {
+      this(other);
+
+      for (BaseModel p : properties.all())
+        set(((ModelProperty)p).key.get(), ((ModelProperty)p).value.get());
     }
 
   public void set (String key, String value)

@@ -62,9 +62,9 @@ public class DatabaseManager extends SQLiteOpenHelper
       getInstance();
 
       // TODO: remove this, once database schema is stable
-      for (Class model : Reflection.getSubclassesOf(BaseModel.class))
-        BaseModel.onDrop(model);
-      getInstance().onCreate(getSession());
+      //for (Class model : Reflection.getSubclassesOf(BaseModel.class))
+      //  BaseModel.onDrop(model);
+      //getInstance().onCreate(getSession());
 
       if (!getInstance().deferCallback)
         MainActivity.getInstance().afterDatabaseInit();
@@ -84,7 +84,7 @@ public class DatabaseManager extends SQLiteOpenHelper
     {
       if (!cache.containsKey(b.getClass()))
         cache.put(b.getClass(), new HashMap<Long, BaseModel>());
-      cache.get(b.getClass()).put(b._ID.getLong(), b);
+      cache.get(b.getClass()).put(b.getId(), b);
     }
 
   public static BaseModel getFromCache (Class c, long id)

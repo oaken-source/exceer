@@ -19,27 +19,24 @@
 
 package org.grapentin.apps.exceer.training;
 
-import android.app.Activity;
-import android.widget.Toast;
-
-import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.helpers.XmlNode;
-import org.grapentin.apps.exceer.managers.ContextManager;
+import org.grapentin.apps.exceer.managers.DatabaseManager;
+import org.grapentin.apps.exceer.models.BaseExercisable;
+import org.grapentin.apps.exceer.models.ModelSession;
+import org.grapentin.apps.exceer.models.ModelTraining;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class TrainingManager implements Serializable
 {
 
   private static TrainingManager instance = null;
-  private ArrayList<Training> trainings = new ArrayList<>();
-  private int currentTrainingId = 0;
 
-  private Activity gui = null;
+  private ModelTraining currentTraining = null;
+  private int currentTrainingId;
 
   private TrainingManager ()
     {
+
     }
 
   public static TrainingManager getInstance ()
@@ -51,58 +48,61 @@ public class TrainingManager implements Serializable
 
   public static void init ()
     {
-      XmlNode root;
-      try
-        {
-          root = new XmlNode(ContextManager.get().getResources().getXml(R.xml.training));
-        }
-      catch (Exception e)
-        {
-          Toast.makeText(ContextManager.get(), "failed to parse config: " + e.getMessage(), Toast.LENGTH_LONG).show();
-          return;
-        }
-
-      for (XmlNode training : root.getChildren("training"))
-        getInstance().trainings.add(new Training(training));
+      getInstance();
     }
 
-  public static Training getCurrentTraining ()
+  public static BaseExercisable getLeafExercisable ()
     {
-      return getInstance().trainings.get(getInstance().currentTrainingId);
+      return getInstance().currentTraining.getLeafExercisable();
     }
 
-  public static void setCurrentTraining (String name)
+  public static boolean isRunning ()
     {
-      for (int i = 0; i < getInstance().trainings.size(); ++i)
-        if (getInstance().trainings.get(i).getName().equals(name))
-          getInstance().currentTrainingId = i;
-
-      getCurrentTraining().getCurrentExercisable().prepare();
+      return getInstance().currentTraining.isRunning();
     }
 
-  public static Exercisable getCurrentExercisable ()
+  public static boolean isFinished ()
     {
-      return getCurrentTraining().getCurrentExercisable();
+      return getInstance().currentTraining.isFinished();
+    }
+
+  public static void prepare ()
+    {
+      if (getInstance().currentTraining != null)
+        return;
+
+      // TODO: get currentTrainingId from settings
+      getInstance().currentTrainingId = 1;
+      getInstance().currentTraining = ModelTraining.get(getInstance().currentTrainingId);
+      getInstance().currentTraining.prepare();
     }
 
   public static void next ()
     {
-      getCurrentTraining().next();
+      getInstance().currentTraining.next();
     }
 
-  public static void clear ()
+  public static void reset ()
     {
-      getCurrentTraining().clear();
+      getInstance().currentTraining.reset();
+      getInstance().currentTraining = null;
     }
 
-  public static Activity getGui ()
+  public static void start ()
     {
-      return getInstance().gui;
+      getInstance().currentTraining.start();
     }
 
-  public static void setGui (Activity gui)
+  public static void pause ()
     {
-      getInstance().gui = gui;
+      getInstance().currentTraining.pause();
+    }
+
+  public static void wrapUp ()
+    {
+      getInstance().currentTraining.wrapUp();
+      DatabaseManager.add(new ModelSession(getInstance().currentTraining.getId()));
+      getInstance().currentTraining = null;
     }
 
 }

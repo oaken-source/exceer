@@ -23,15 +23,26 @@ import android.database.Cursor;
 
 import org.grapentin.apps.exceer.managers.DatabaseManager;
 
-import java.util.ArrayList;
-
 public class ModelSession extends BaseModel
 {
 
+  @SuppressWarnings("unused") // accessed by reflection from BaseModel
   protected final static String TABLE_NAME = "sessions";
 
+  // database layout
   public Column date = new Column("date", TYPE_LONG);
   public Column training_id = new Column("training_id", TYPE_LONG);
+
+  public ModelSession (long training_id)
+    {
+      this.date.set(System.currentTimeMillis());
+      this.training_id.set(training_id);
+    }
+
+  public ModelSession ()
+    {
+
+    }
 
   public static ModelSession get (long id)
     {
@@ -50,16 +61,6 @@ public class ModelSession extends BaseModel
           out = get(c.getLong(c.getColumnIndex(tmp._ID.name)));
         }
       c.close();
-
-      return out;
-    }
-
-  public static ArrayList<ModelSession> getAll ()
-    {
-      ArrayList<ModelSession> out = new ArrayList<>();
-
-      for (long id : BaseModel.getAllIds(ModelSession.class))
-        out.add(get(id));
 
       return out;
     }

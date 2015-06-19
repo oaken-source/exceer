@@ -31,20 +31,28 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import org.grapentin.apps.exceer.training.TrainingManager;
-import org.grapentin.apps.exceer.training.TrainingStorage;
 
 import java.io.InputStream;
 
 public class TrainingActivity extends Activity
 {
 
+  private static TrainingActivity instance;
+
+  public static TrainingActivity getInstance ()
+    {
+      return instance;
+    }
+
   @Override
   protected void onCreate (Bundle savedInstanceState)
     {
+      instance = this;
+
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_training);
 
-      TrainingManager.setGui(this);
+      TrainingManager.prepare();
     }
 
   @Override
@@ -58,7 +66,8 @@ public class TrainingActivity extends Activity
             switch (which)
               {
               case DialogInterface.BUTTON_POSITIVE:
-                abort();
+                TrainingManager.reset();
+                TrainingActivity.super.onBackPressed();
                 break;
               case DialogInterface.BUTTON_NEGATIVE:
                 break;
@@ -66,33 +75,26 @@ public class TrainingActivity extends Activity
           }
       };
 
-      AlertDialog.Builder builder = new AlertDialog.Builder(TrainingManager.getGui());
+      AlertDialog.Builder builder = new AlertDialog.Builder(this);
       builder.setMessage("Are you sure you want to abort this session?").setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener).show();
-    }
-
-  private void abort ()
-    {
-      TrainingManager.clear();
-      super.onBackPressed();
     }
 
   public void onContextButtonClicked (View view)
     {
-      if (TrainingManager.getCurrentExercisable().isRunning())
-        TrainingManager.getCurrentExercisable().pause();
-      else if (TrainingManager.getCurrentTraining().isFinished())
+      if (TrainingManager.isRunning())
+        TrainingManager.pause();
+      else if (TrainingManager.isFinished())
         {
-          TrainingStorage.finish();
-          TrainingManager.clear();
+          TrainingManager.wrapUp();
           super.onBackPressed();
         }
       else
-        TrainingManager.getCurrentExercisable().start();
+        TrainingManager.start();
     }
 
   public void onCurrentExerciseLevelLabelClicked (View view)
     {
-      String url = TrainingManager.getCurrentExercisable().getImage();
+      String url = (TrainingManager.getLeafExercisable() == null) ? null : TrainingManager.getLeafExercisable().getImage();
       if (url == null)
         return;
 

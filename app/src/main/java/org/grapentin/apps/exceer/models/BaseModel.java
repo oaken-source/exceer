@@ -34,7 +34,7 @@ public abstract class BaseModel
   protected static final String TYPE_INT = "INTEGER";
   protected static final String TYPE_LONG = "INTEGER";
 
-  public Column _ID = new Column("id", TYPE_INT, "PRIMARY KEY");
+  protected Column _ID = new Column("id", TYPE_INT, "PRIMARY KEY");
 
   public BaseModel ()
     {
@@ -55,6 +55,9 @@ public abstract class BaseModel
 
   public static void onCreate (Class model)
     {
+      if (getTableName(model) == null)
+        return;
+
       String columns = "";
       for (Object o : Reflection.getDeclaredFieldsOfType(model, Column.class))
         columns += (columns.equals("") ? "" : ", ") + ((Column)o).name + " " + ((Column)o).type + (((Column)o).params.equals("") ? "" : " " + ((Column)o).params);
@@ -68,6 +71,9 @@ public abstract class BaseModel
 
   public static void onDrop (Class model)
     {
+      if (getTableName(model) == null)
+        return;
+
       String query = "DROP TABLE IF EXISTS " + getTableName(model);
       DatabaseManager.getSession().execSQL(query);
 
@@ -90,7 +96,7 @@ public abstract class BaseModel
             {
               m._ID.value = Long.toString(id);
               c.moveToFirst();
-              for (Object o : Reflection.getDeclaredFieldsOfType(model, Column.class))
+              for (Object o : Reflection.getDeclaredFieldsOfType(model, Column.class, m))
                 ((Column)o).value = c.getString(c.getColumnIndex(((Column)o).name));
             }
           c.close();
@@ -137,7 +143,8 @@ public abstract class BaseModel
 
       ContentValues values = new ContentValues();
       for (Object o : Reflection.getDeclaredFieldsOfType(getClass(), Column.class, this))
-        values.put(((Column)o).name, ((Column)o).value);
+        if (o != _ID)
+          values.put(((Column)o).name, ((Column)o).value);
 
       long id = DatabaseManager.getSession().insert(getTableName(this.getClass()), null, values);
       _ID.set(id);
@@ -148,9 +155,35 @@ public abstract class BaseModel
         ((Relation)o).onInsert();
     }
 
+  public void commit ()
+    {
+      if (_ID.value == null)
+        {
+          onInsert();
+          return;
+        }
+
+      ContentValues values = new ContentValues();
+      for (Object o : Reflection.getDeclaredFieldsOfType(getClass(), Column.class, this))
+        if (o != _ID)
+          values.put(((Column)o).name, ((Column)o).value);
+
+      DatabaseManager.getSession().update(getTableName(this.getClass()), values, _ID.name + "=" + _ID.get(), null);
+    }
+
   public Relation makeRelation (String name, Class other)
     {
       return new Relation(this, name, other);
+    }
+
+  public Backref makeBackref (String name, Class other)
+    {
+      return new Backref(this, name, other);
+    }
+
+  public long getId ()
+    {
+      return _ID.getLong();
     }
 
   public static class Column
@@ -187,15 +220,21 @@ public abstract class BaseModel
         return Long.parseLong(this.value);
       }
 
+    public int getInt ()
+      {
+        return Integer.parseInt(this.value);
+      }
+
     public void set (String value)
       {
         this.value = value;
       }
 
-    public void set (Long value)
+    public void set (long value)
       {
         set(Long.toString(value));
       }
+
   }
 
   public static class Relation
@@ -204,7 +243,7 @@ public abstract class BaseModel
     public Class other;
 
     public BaseModel left = null;
-    public ArrayList<BaseModel> right = new ArrayList<>();
+    public ArrayList<BaseModel> right = null;
 
     public Relation (BaseModel left, String name, Class other)
       {
@@ -232,6 +271,9 @@ public abstract class BaseModel
 
     public void onInsert ()
       {
+        if (right == null)
+          return;
+
         for (BaseModel m : right)
           {
             m.onInsert();
@@ -244,17 +286,104 @@ public abstract class BaseModel
 
     public void add (BaseModel m)
       {
-        right.add(m);
+        if (left._ID.value != null)
+          {
+            getRight().add(m);
 
-        if (left._ID.value == null)
-          return;
-
-        m.onInsert();
-        ContentValues values = new ContentValues();
-        values.put("left_id", left._ID.value);
-        values.put("right_id", m._ID.value);
-        DatabaseManager.getSession().insert(getRelationTableName(), null, values);
+            m.onInsert();
+            ContentValues values = new ContentValues();
+            values.put("left_id", left._ID.value);
+            values.put("right_id", m._ID.value);
+            DatabaseManager.getSession().insert(getRelationTableName(), null, values);
+          }
+        else
+          {
+            if (right == null)
+              right = new ArrayList<>();
+            right.add(m);
+          }
       }
+
+    public ArrayList<BaseModel> getRight ()
+      {
+        if (right != null)
+          return right;
+
+        right = new ArrayList<>();
+
+        Cursor c = DatabaseManager.getSession().query(getRelationTableName(), new String[]{
+            "right_id"
+        }, "left_id=" + left._ID.value, null, null, null, null);
+
+        c.moveToFirst();
+        while (!c.isAfterLast())
+          {
+            right.add(BaseModel.get(other, c.getLong(c.getColumnIndex("right_id"))));
+            c.moveToNext();
+          }
+
+        c.close();
+        return right;
+      }
+
+    public BaseModel at (int id)
+      {
+        return (id >= getRight().size() ? null : getRight().get(id));
+      }
+
+    public ArrayList<BaseModel> all ()
+      {
+        return getRight();
+      }
+
+    public boolean isEmpty ()
+      {
+        return getRight().isEmpty();
+      }
+
+    public int size ()
+      {
+        return getRight().size();
+      }
+  }
+
+  public static class Backref
+  {
+    public String name;
+    public Class other;
+
+    public BaseModel left = null;
+    public BaseModel right = null;
+
+    public Backref (BaseModel right, String name, Class other)
+      {
+        this.right = right;
+        this.name = name;
+        this.other = other;
+      }
+
+    private String getRelationTableName ()
+      {
+        return "orm_" + getTableName(other) + "_" + getTableName(right.getClass());
+      }
+
+    public BaseModel get ()
+      {
+        if (left != null)
+          return left;
+
+        Cursor c = DatabaseManager.getSession().query(getRelationTableName(), new String[]{
+            "left_id"
+        }, "right_id=" + right._ID.value, null, null, null, null);
+
+        c.moveToFirst();
+        if (!c.isAfterLast())
+          left = BaseModel.get(other, c.getLong(c.getColumnIndex("left_id")));
+
+        c.close();
+        return left;
+      }
+
   }
 
 }

@@ -19,18 +19,25 @@
 
 package org.grapentin.apps.exceer.models;
 
+import android.widget.TextView;
+
+import org.grapentin.apps.exceer.R;
+import org.grapentin.apps.exceer.TrainingActivity;
 import org.grapentin.apps.exceer.helpers.XmlNode;
+import org.grapentin.apps.exceer.managers.ContextManager;
+import org.grapentin.apps.exceer.training.Properties;
 
-import java.util.ArrayList;
-
-public class ModelLevel extends BaseModel
+public class ModelLevel extends BaseExercisable
 {
 
+  @SuppressWarnings("unused") // accessed by reflection from BaseModel
   protected final static String TABLE_NAME = "levels";
 
+  // database layout
   public Column name = new Column("name");
-
+  public Column progress = new Column("progress");
   public Relation properties = makeRelation("properties", ModelProperty.class);
+  public Backref exercise = makeBackref("exercise", ModelExercise.class);
 
   public static ModelLevel fromXml (XmlNode root)
     {
@@ -49,14 +56,54 @@ public class ModelLevel extends BaseModel
       return (ModelLevel)BaseModel.get(ModelLevel.class, id);
     }
 
-  public static ArrayList<ModelLevel> getAll ()
+  public BaseExercisable getLeafExercisable ()
     {
-      ArrayList<ModelLevel> out = new ArrayList<>();
+      return this;
+    }
 
-      for (long id : BaseModel.getAllIds(ModelLevel.class))
-        out.add(get(id));
+  public void prepare (Properties p)
+    {
+      props = new Properties(p, properties);
 
-      return out;
+      super.prepare();
+    }
+
+  public void show ()
+    {
+      TextView currentExerciseLabel = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLabel);
+      TextView currentExerciseLevelLabel1 = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel1);
+      TextView currentExerciseLevelLabel2 = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel2);
+
+      currentExerciseLabel.setText(((ModelExercise)exercise.get()).name.get());
+      currentExerciseLevelLabel1.setText(ContextManager.get().getString(R.string.TrainingActivityCurrentExerciseLevelInt) + ((ModelExercise)exercise.get()).getCurrentLevelId());
+      currentExerciseLevelLabel2.setText(name.get());
+
+      super.show();
+    }
+
+  public void reset ()
+    {
+
+    }
+
+  public void levelUp ()
+    {
+      ((ModelExercise)exercise.get()).levelUp();
+    }
+
+  public String getCurrentProgress ()
+    {
+      return progress.get();
+    }
+
+  public void setCurrentProgress (String s)
+    {
+      progress.set(s);
+    }
+
+  public void wrapUp ()
+    {
+      commit();
     }
 
 }

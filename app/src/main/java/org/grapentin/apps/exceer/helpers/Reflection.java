@@ -43,7 +43,10 @@ public class Reflection
             {
               String s = i.nextElement();
               if (s.startsWith(MainActivity.class.getPackage().getName()) && Class.forName(s).getSuperclass() == base)
-                derived.add(Class.forName(s));
+                {
+                  derived.add(Class.forName(s));
+                  derived.addAll(getSubclassesOf(Class.forName(s)));
+                }
             }
         }
       catch (Exception e)
@@ -61,19 +64,15 @@ public class Reflection
         {
           Object o = c.newInstance();
 
-          for (Field f : c.getSuperclass().getDeclaredFields())
-            if (f.getType() == t)
-              {
-                f.setAccessible(true);
-                out.add(f.get(o));
-              }
-
           for (Field f : c.getDeclaredFields())
             if (f.getType() == t)
               {
                 f.setAccessible(true);
                 out.add(f.get(o));
               }
+
+          if (c.getSuperclass() != Object.class)
+            out.addAll(getDeclaredFieldsOfType(c.getSuperclass(), t, o));
 
           return out;
         }
@@ -88,19 +87,15 @@ public class Reflection
       ArrayList<Object> out = new ArrayList<>();
       try
         {
-          for (Field f : c.getSuperclass().getDeclaredFields())
-            if (f.getType() == t)
-              {
-                f.setAccessible(true);
-                out.add(f.get(o));
-              }
-
           for (Field f : c.getDeclaredFields())
             if (f.getType() == t)
               {
                 f.setAccessible(true);
                 out.add(f.get(o));
               }
+
+          if (c.getSuperclass() != Object.class)
+            out.addAll(getDeclaredFieldsOfType(c.getSuperclass(), t, o));
 
           return out;
         }

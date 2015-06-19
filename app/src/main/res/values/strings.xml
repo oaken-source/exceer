@@ -15,6 +15,7 @@
   <string name="MainActivityLastSessionLabel2Text">ago</string>
   <string name="MainActivityTrainButtonText">Train Now!</string>
 
+  <string name="TrainingActivityNoExercises">(no exercises)</string>
   <string name="TrainingActivityContextButtonTextStart">Start</string>
   <string name="TrainingActivityContextButtonTextPause">Pause</string>
   <string name="TrainingActivityContextButtonTextFinish">Finish</string>
