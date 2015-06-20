@@ -19,8 +19,9 @@
 
 package org.grapentin.apps.exceer.helpers;
 
-import org.grapentin.apps.exceer.MainActivity;
-import org.grapentin.apps.exceer.managers.ContextManager;
+import android.support.annotation.NonNull;
+
+import org.grapentin.apps.exceer.R;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -32,17 +33,18 @@ import dalvik.system.DexFile;
 public class Reflection
 {
 
-  public static ArrayList<Class> getSubclassesOf (Class base)
+  @NonNull
+  public static ArrayList<Class> getSubclassesOf (@NonNull Class base)
     {
       ArrayList<Class> derived = new ArrayList<>();
 
       try
         {
-          DexFile df = new DexFile(ContextManager.get().getPackageCodePath());
+          DexFile df = new DexFile(Context.get().getPackageCodePath());
           for (Enumeration<String> i = df.entries(); i.hasMoreElements(); )
             {
               String s = i.nextElement();
-              if (s.startsWith(MainActivity.class.getPackage().getName()) && Class.forName(s).getSuperclass() == base)
+              if (s.startsWith(Context.get().getString(R.string.ReflectionBasePackage)) && Class.forName(s).getSuperclass() == base)
                 {
                   derived.add(Class.forName(s));
                   derived.addAll(getSubclassesOf(Class.forName(s)));
@@ -57,7 +59,8 @@ public class Reflection
       return derived;
     }
 
-  public static ArrayList<Object> getDeclaredFieldsOfType (Class c, Type t)
+  @NonNull
+  public static ArrayList<Object> getDeclaredFieldsOfType (@NonNull Class c, @NonNull Type t)
     {
       ArrayList<Object> out = new ArrayList<>();
       try
@@ -82,7 +85,8 @@ public class Reflection
         }
     }
 
-  public static ArrayList<Object> getDeclaredFieldsOfType (Class c, Type t, Object o)
+  @NonNull
+  public static ArrayList<Object> getDeclaredFieldsOfType (@NonNull Class c, @NonNull Type t, @NonNull Object o)
     {
       ArrayList<Object> out = new ArrayList<>();
       try

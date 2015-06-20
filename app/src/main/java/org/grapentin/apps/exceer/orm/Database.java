@@ -19,20 +19,23 @@
 
 package org.grapentin.apps.exceer.orm;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.grapentin.apps.exceer.MainActivity;
 import org.grapentin.apps.exceer.R;
+import org.grapentin.apps.exceer.activity.MainActivity;
 import org.grapentin.apps.exceer.helpers.Reflection;
 import org.grapentin.apps.exceer.helpers.XmlNode;
-import org.grapentin.apps.exceer.managers.ContextManager;
-import org.grapentin.apps.exceer.models.ModelTraining;
+import org.grapentin.apps.exceer.helpers.Context;
+import org.grapentin.apps.exceer.models.Training;
 
 import java.util.HashMap;
 
-public class DatabaseManager extends SQLiteOpenHelper
+public class Database extends SQLiteOpenHelper
 {
 
   private static final int DATABASE_VERSION = 1;
@@ -41,19 +44,20 @@ public class DatabaseManager extends SQLiteOpenHelper
       new Revision("", "")
   };
   private static HashMap<Class, HashMap<Long, BaseModel>> cache = new HashMap<>();
-  private static DatabaseManager instance = null;
+  private static Database instance = null;
 
   private boolean deferCallback = false;
 
-  private DatabaseManager ()
+  private Database ()
     {
-      super(ContextManager.get(), DATABASE_NAME, null, DATABASE_VERSION);
+      super(Context.get(), DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-  private static DatabaseManager getInstance ()
+  @NonNull
+  private static Database getInstance ()
     {
       if (instance == null)
-        instance = new DatabaseManager();
+        instance = new Database();
       return instance;
     }
 
@@ -61,33 +65,31 @@ public class DatabaseManager extends SQLiteOpenHelper
     {
       getInstance();
 
-      // TODO: remove this, once database schema is stable
-      //for (Class model : Reflection.getSubclassesOf(BaseModel.class))
-      //  BaseModel.onDrop(model);
-      //getInstance().onCreate(getSession());
-
       if (!getInstance().deferCallback)
-        MainActivity.getInstance().afterDatabaseInit();
+        ((MainActivity)MainActivity.getInstance()).afterDatabaseInit();
     }
 
+  @NonNull
   public static SQLiteDatabase getSession ()
     {
       return getInstance().getWritableDatabase();
     }
 
-  public static void add (BaseModel b)
+  public static void add (@NonNull BaseModel b)
     {
       b.onInsert();
     }
 
-  public static void addToCache (BaseModel b)
+  @SuppressLint("UseSparseArrays")
+  public static void addToCache (@NonNull BaseModel b)
     {
       if (!cache.containsKey(b.getClass()))
         cache.put(b.getClass(), new HashMap<Long, BaseModel>());
       cache.get(b.getClass()).put(b.getId(), b);
     }
 
-  public static BaseModel getFromCache (Class c, long id)
+  @Nullable
+  public static BaseModel getFromCache (@NonNull Class c, long id)
     {
       if (!cache.containsKey(c))
         return null;
@@ -101,7 +103,7 @@ public class DatabaseManager extends SQLiteOpenHelper
       XmlNode root;
       try
         {
-          root = new XmlNode(ContextManager.get().getResources().getXml(R.xml.trainings_default));
+          root = new XmlNode(Context.get().getResources().getXml(R.xml.trainings_default));
         }
       catch (Exception e)
         {
@@ -109,10 +111,10 @@ public class DatabaseManager extends SQLiteOpenHelper
         }
 
       for (XmlNode n : root.getChildren("training"))
-        add(ModelTraining.fromXml(n));
+        add(Training.fromXml(n));
     }
 
-  public void onCreate (SQLiteDatabase db)
+  public void onCreate (@NonNull SQLiteDatabase db)
     {
       deferCallback = true;
 
@@ -132,13 +134,13 @@ public class DatabaseManager extends SQLiteOpenHelper
             importDefaults();
 
             progress.dismiss();
-            MainActivity.getInstance().afterDatabaseInit();
+            ((MainActivity)MainActivity.getInstance()).afterDatabaseInit();
           }
       };
       new Thread(runnable).start();
     }
 
-  public void onUpgrade (final SQLiteDatabase db, final int oldVersion, final int newVersion)
+  public void onUpgrade (@NonNull final SQLiteDatabase db, final int oldVersion, final int newVersion)
     {
       deferCallback = true;
 
@@ -156,13 +158,13 @@ public class DatabaseManager extends SQLiteOpenHelper
               revisions[i - 2].runUpgrade(db);
 
             progress.dismiss();
-            MainActivity.getInstance().afterDatabaseInit();
+            ((MainActivity)MainActivity.getInstance()).afterDatabaseInit();
           }
       };
       new Thread(runnable).start();
     }
 
-  public void onDowngrade (final SQLiteDatabase db, final int oldVersion, final int newVersion)
+  public void onDowngrade (@NonNull final SQLiteDatabase db, final int oldVersion, final int newVersion)
     {
       deferCallback = true;
 
@@ -180,7 +182,7 @@ public class DatabaseManager extends SQLiteOpenHelper
               revisions[i - 2].runDowngrade(db);
 
             progress.dismiss();
-            MainActivity.getInstance().afterDatabaseInit();
+            ((MainActivity)MainActivity.getInstance()).afterDatabaseInit();
           }
       };
       new Thread(runnable).start();
@@ -197,12 +199,12 @@ public class DatabaseManager extends SQLiteOpenHelper
         this.downgradeSql = downgradeSql;
       }
 
-    public void runUpgrade (SQLiteDatabase db)
+    public void runUpgrade (@NonNull SQLiteDatabase db)
       {
         db.execSQL(this.upgradeSql);
       }
 
-    public void runDowngrade (SQLiteDatabase db)
+    public void runDowngrade (@NonNull SQLiteDatabase db)
       {
         db.execSQL(this.downgradeSql);
       }

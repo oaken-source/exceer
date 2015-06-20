@@ -17,35 +17,39 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.managers;
+package org.grapentin.apps.exceer.models;
 
-import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-public class ContextManager
+import org.grapentin.apps.exceer.helpers.XmlNode;
+import org.grapentin.apps.exceer.orm.BaseModel;
+import org.grapentin.apps.exceer.orm.Column;
+
+public class Property extends BaseModel
 {
 
-  private static ContextManager instance = null;
-  private Context context = null;
+  @SuppressWarnings("unused") // accessed by reflection from BaseModel
+  public final static String TABLE_NAME = "properties";
 
-  private ContextManager ()
+  // database layout
+  public Column key = new Column("key");
+  public Column value = new Column("value");
+
+  public static Property fromXml (@NonNull XmlNode root)
     {
+      Property m = new Property();
+
+      m.key.set(root.getAttribute("name"));
+      m.value.set(root.getValue());
+
+      return m;
     }
 
-  private static ContextManager getInstance ()
+  @Nullable
+  public static Property get (long id)
     {
-      if (instance == null)
-        instance = new ContextManager();
-      return instance;
-    }
-
-  public static void init (Context context)
-    {
-      getInstance().context = context;
-    }
-
-  public static Context get ()
-    {
-      return getInstance().context;
+      return (Property)BaseModel.get(Property.class, id);
     }
 
 }

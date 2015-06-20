@@ -20,6 +20,8 @@
 package org.grapentin.apps.exceer.orm;
 
 import android.database.Cursor;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 public class Backref
 {
@@ -29,24 +31,26 @@ public class Backref
   public BaseModel left = null;
   public BaseModel right = null;
 
-  public Backref (BaseModel right, String name, Class other)
+  public Backref (@NonNull BaseModel right, @NonNull String name, @NonNull Class other)
     {
       this.right = right;
       this.name = name;
       this.other = other;
     }
 
+  @NonNull
   private String getRelationTableName ()
     {
       return "orm_" + BaseModel.getTableName(other) + "_" + BaseModel.getTableName(right.getClass());
     }
 
+  @Nullable
   public BaseModel get ()
     {
       if (left != null)
         return left;
 
-      Cursor c = DatabaseManager.getSession().query(getRelationTableName(), new String[]{
+      Cursor c = Database.getSession().query(getRelationTableName(), new String[]{
           "left_id"
       }, "right_id=" + right._ID.get(), null, null, null, null);
 

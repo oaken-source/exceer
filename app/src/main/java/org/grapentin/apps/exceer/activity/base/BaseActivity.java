@@ -17,25 +17,41 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.helpers;
+package org.grapentin.apps.exceer.activity.base;
 
-public class DurationString
+import android.app.Activity;
+import android.os.Bundle;
+import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+public class BaseActivity extends Activity
 {
 
-  public static long parseLong (String s)
-    {
-      long l = Long.parseLong(s.replaceAll("[\\D]", ""));
-      String extension = s.replaceAll("[^a-zA-Z]", "");
+  @Nullable
+  private static BaseActivity instance = null;
 
-      switch (extension)
-        {
-        case "s":
-          return l * 1000;
-        case "min":
-          return l * 60 * 1000;
-        default:
-          return l;
-        }
+  @NonNull
+  public static BaseActivity getInstance ()
+    {
+      assert instance != null;
+      return instance;
+    }
+
+  @CallSuper
+  @Override
+  protected void onCreate (Bundle savedInstanceState)
+    {
+      instance = this;
+      super.onCreate(savedInstanceState);
+    }
+
+  @CallSuper
+  @Override
+  protected void onDestroy ()
+    {
+      instance = null;
+      super.onDestroy();
     }
 
 }

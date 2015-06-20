@@ -20,6 +20,9 @@
 
 package org.grapentin.apps.exceer.orm;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 public class Column
 {
 
@@ -36,23 +39,24 @@ public class Column
 
   private String value = null;
 
-  public Column (String name)
+  public Column (@NonNull String name)
     {
       this(name, TYPE_TEXT);
     }
 
-  public Column (String name, String type)
+  public Column (@NonNull String name, @NonNull String type)
     {
       this(name, type, "");
     }
 
-  public Column (String name, String type, String params)
+  public Column (@NonNull String name, @NonNull String type, @NonNull String params)
     {
       this.name = name;
       this.type = type;
       this.params = params;
     }
 
+  @Nullable
   public String get ()
     {
       return this.value;
@@ -68,7 +72,7 @@ public class Column
       return Integer.parseInt(this.value);
     }
 
-  public void set (String value)
+  public void set (@Nullable String value)
     {
       this.value = value;
     }

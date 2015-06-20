@@ -17,49 +17,41 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer;
+package org.grapentin.apps.exceer.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import org.grapentin.apps.exceer.managers.ContextManager;
-import org.grapentin.apps.exceer.orm.DatabaseManager;
-import org.grapentin.apps.exceer.managers.SoundManager;
-import org.grapentin.apps.exceer.managers.TaskManager;
-import org.grapentin.apps.exceer.models.ModelSession;
-import org.grapentin.apps.exceer.training.TrainingManager;
+import org.grapentin.apps.exceer.R;
+import org.grapentin.apps.exceer.activity.base.BaseActivity;
+import org.grapentin.apps.exceer.activity.settings.MainSettingsActivity;
+import org.grapentin.apps.exceer.helpers.Context;
+import org.grapentin.apps.exceer.helpers.Sounds;
+import org.grapentin.apps.exceer.helpers.Tasks;
+import org.grapentin.apps.exceer.models.Session;
+import org.grapentin.apps.exceer.orm.Database;
 
-public class MainActivity extends Activity
+public class MainActivity extends BaseActivity
 {
 
-  private static MainActivity instance = null;
-  private TaskManager.TimerTask task = null;
-
-  public static MainActivity getInstance ()
-    {
-      return instance;
-    }
+  @Nullable
+  private Tasks.TimerTask task = null;
 
   @Override
   protected void onCreate (Bundle savedInstanceState)
     {
-      instance = this;
-
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_main);
 
-      // initialize managers
-      ContextManager.init(getApplicationContext());
-      SoundManager.init();
-      TaskManager.init();
-
-      DatabaseManager.init();
-      TrainingManager.init();
+      Context.set(getApplicationContext());
+      Sounds.load();
+      Database.init();
     }
 
   public void afterDatabaseInit ()
@@ -92,16 +84,16 @@ public class MainActivity extends Activity
     }
 
   @Override
-  public boolean onOptionsItemSelected (MenuItem item)
+  public boolean onOptionsItemSelected (@NonNull MenuItem item)
     {
       int id = item.getItemId();
 
       switch (id)
         {
-        //case R.id.action_settings:
-        //  Intent settingsIntent = new Intent(this, SettingsActivity.class);
-        //  startActivity(settingsIntent);
-        //  break;
+        case R.id.action_settings:
+          Intent settingsIntent = new Intent(this, MainSettingsActivity.class);
+          startActivity(settingsIntent);
+          break;
         case R.id.action_about:
           Intent aboutIntent = new Intent(this, AboutActivity.class);
           startActivity(aboutIntent);
@@ -117,13 +109,14 @@ public class MainActivity extends Activity
       startActivity(intent);
     }
 
-  private class UpdateTimerTask extends TaskManager.TimerTask
+  private class UpdateTimerTask extends Tasks.TimerTask
   {
+    @Override
     public long update ()
       {
         TextView lastSessionTextView = (TextView)findViewById(R.id.MainActivityLastSessionDate);
 
-        ModelSession lastSession = ModelSession.getLast();
+        Session lastSession = Session.getLast();
         long last = (lastSession == null ? System.currentTimeMillis() : lastSession.date.getLong());
         long elapsed = System.currentTimeMillis() - last;
 

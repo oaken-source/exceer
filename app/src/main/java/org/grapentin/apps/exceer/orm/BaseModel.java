@@ -21,6 +21,8 @@ package org.grapentin.apps.exceer.orm;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.grapentin.apps.exceer.helpers.Reflection;
 
@@ -36,7 +38,8 @@ public abstract class BaseModel
 
     }
 
-  public static String getTableName (Class model)
+  @Nullable
+  public static String getTableName (@NonNull Class model)
     {
       try
         {
@@ -48,45 +51,51 @@ public abstract class BaseModel
         }
     }
 
-  public static void onCreate (Class model)
+  public static void onCreate (@NonNull Class model)
     {
-      if (getTableName(model) == null)
+      String TABLE_NAME = getTableName(model);
+      if (TABLE_NAME == null)
         return;
 
       String columns = "";
       for (Object o : Reflection.getDeclaredFieldsOfType(model, Column.class))
         columns += (columns.equals("") ? "" : ", ") + ((Column)o).name + " " + ((Column)o).type + (((Column)o).params.equals("") ? "" : " " + ((Column)o).params);
 
-      String query = "CREATE TABLE " + getTableName(model) + " (" + columns + ")";
-      DatabaseManager.getSession().execSQL(query);
+      String query = "CREATE TABLE " + TABLE_NAME + " (" + columns + ")";
+      Database.getSession().execSQL(query);
 
       for (Object o : Reflection.getDeclaredFieldsOfType(model, Relation.class))
         ((Relation)o).onCreate();
     }
 
-  public static void onDrop (Class model)
+  public static void onDrop (@NonNull Class model)
     {
-      if (getTableName(model) == null)
+      String TABLE_NAME = getTableName(model);
+      if (TABLE_NAME == null)
         return;
 
-      String query = "DROP TABLE IF EXISTS " + getTableName(model);
-      DatabaseManager.getSession().execSQL(query);
+      String query = "DROP TABLE IF EXISTS " + TABLE_NAME;
+      Database.getSession().execSQL(query);
 
       for (Object o : Reflection.getDeclaredFieldsOfType(model, Relation.class))
         ((Relation)o).onDrop();
     }
 
-  public static BaseModel get (Class model, long id)
+  @Nullable
+  public static BaseModel get (@NonNull Class model, long id)
     {
-      BaseModel m = DatabaseManager.getFromCache(model, id);
+      BaseModel m = Database.getFromCache(model, id);
       if (m != null)
         return m;
+
+      String TABLE_NAME = getTableName(model);
+      assert TABLE_NAME != null;
 
       try
         {
           m = (BaseModel)model.newInstance();
 
-          Cursor c = DatabaseManager.getSession().query(getTableName(model), null, m._ID.name + "=" + id, null, null, null, null);
+          Cursor c = Database.getSession().query(TABLE_NAME, null, m._ID.name + "=" + id, null, null, null, null);
           if (c.getCount() == 1)
             {
               m._ID.set(id);
@@ -96,7 +105,7 @@ public abstract class BaseModel
             }
           c.close();
 
-          DatabaseManager.addToCache(m);
+          Database.addToCache(m);
 
           return m;
         }
@@ -106,15 +115,18 @@ public abstract class BaseModel
         }
     }
 
-  public static ArrayList<Long> getAllIds (Class model)
+  public static ArrayList<Long> getAllIds (@NonNull Class model)
     {
       ArrayList<Long> out = new ArrayList<>();
+
+      String TABLE_NAME = getTableName(model);
+      assert TABLE_NAME != null;
 
       try
         {
           BaseModel m = (BaseModel)model.newInstance();
 
-          Cursor c = DatabaseManager.getSession().query(getTableName(model), new String[]{ m._ID.name }, null, null, null, null, null);
+          Cursor c = Database.getSession().query(TABLE_NAME, new String[]{ m._ID.name }, null, null, null, null, null);
           c.moveToFirst();
           while (!c.isAfterLast())
             {
@@ -136,15 +148,18 @@ public abstract class BaseModel
       if (_ID.get() != null)
         return;
 
+      String TABLE_NAME = getTableName(getClass());
+      assert TABLE_NAME != null;
+
       ContentValues values = new ContentValues();
       for (Object o : Reflection.getDeclaredFieldsOfType(getClass(), Column.class, this))
         if (o != _ID)
           values.put(((Column)o).name, ((Column)o).get());
 
-      long id = DatabaseManager.getSession().insert(getTableName(this.getClass()), null, values);
+      long id = Database.getSession().insert(TABLE_NAME, null, values);
       _ID.set(id);
 
-      DatabaseManager.addToCache(this);
+      Database.addToCache(this);
 
       for (Object o : Reflection.getDeclaredFieldsOfType(getClass(), Relation.class, this))
         ((Relation)o).onInsert();
@@ -158,20 +173,25 @@ public abstract class BaseModel
           return;
         }
 
+      String TABLE_NAME = getTableName(getClass());
+      assert TABLE_NAME != null;
+
       ContentValues values = new ContentValues();
       for (Object o : Reflection.getDeclaredFieldsOfType(getClass(), Column.class, this))
         if (o != _ID)
           values.put(((Column)o).name, ((Column)o).get());
 
-      DatabaseManager.getSession().update(getTableName(this.getClass()), values, _ID.name + "=" + _ID.get(), null);
+      Database.getSession().update(TABLE_NAME, values, _ID.name + "=" + _ID.get(), null);
     }
 
-  public Relation makeRelation (String name, Class other)
+  @NonNull
+  public Relation makeRelation (@NonNull String name, @NonNull Class other)
     {
       return new Relation(this, name, other);
     }
 
-  public Backref makeBackref (String name, Class other)
+  @NonNull
+  public Backref makeBackref (@NonNull String name, @NonNull Class other)
     {
       return new Backref(this, name, other);
     }

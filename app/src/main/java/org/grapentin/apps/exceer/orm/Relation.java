@@ -21,6 +21,8 @@ package org.grapentin.apps.exceer.orm;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 
@@ -39,6 +41,7 @@ public class Relation
       this.other = other;
     }
 
+  @NonNull
   private String getRelationTableName ()
     {
       return "orm_" + BaseModel.getTableName(left.getClass()) + "_" + BaseModel.getTableName(other);
@@ -47,13 +50,13 @@ public class Relation
   public void onCreate ()
     {
       String query = "CREATE TABLE " + getRelationTableName() + " (" + "left_id " + Column.TYPE_INT + ", right_id " + Column.TYPE_INT + ", PRIMARY KEY (left_id, right_id))";
-      DatabaseManager.getSession().execSQL(query);
+      Database.getSession().execSQL(query);
     }
 
   public void onDrop ()
     {
       String query = "DROP TABLE IF EXISTS " + getRelationTableName();
-      DatabaseManager.getSession().execSQL(query);
+      Database.getSession().execSQL(query);
     }
 
   public void onInsert ()
@@ -67,11 +70,11 @@ public class Relation
           ContentValues values = new ContentValues();
           values.put("left_id", left._ID.get());
           values.put("right_id", m._ID.get());
-          DatabaseManager.getSession().insert(getRelationTableName(), null, values);
+          Database.getSession().insert(getRelationTableName(), null, values);
         }
     }
 
-  public void add (BaseModel m)
+  public void add (@NonNull BaseModel m)
     {
       if (left._ID.get() != null)
         {
@@ -81,7 +84,7 @@ public class Relation
           ContentValues values = new ContentValues();
           values.put("left_id", left._ID.get());
           values.put("right_id", m._ID.get());
-          DatabaseManager.getSession().insert(getRelationTableName(), null, values);
+          Database.getSession().insert(getRelationTableName(), null, values);
         }
       else
         {
@@ -91,6 +94,7 @@ public class Relation
         }
     }
 
+  @NonNull
   public ArrayList<BaseModel> getRight ()
     {
       if (right != null)
@@ -98,7 +102,7 @@ public class Relation
 
       right = new ArrayList<>();
 
-      Cursor c = DatabaseManager.getSession().query(getRelationTableName(), new String[]{
+      Cursor c = Database.getSession().query(getRelationTableName(), new String[]{
           "right_id"
       }, "left_id=" + left._ID.get(), null, null, null, null);
 
@@ -113,11 +117,13 @@ public class Relation
       return right;
     }
 
+  @Nullable
   public BaseModel at (int id)
     {
       return (id >= getRight().size() ? null : getRight().get(id));
     }
 
+  @NonNull
   public ArrayList<BaseModel> all ()
     {
       return getRight();

@@ -17,22 +17,20 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.models;
+package org.grapentin.apps.exceer.training;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.support.annotation.Nullable;
 import android.widget.Button;
 import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.TrainingActivity;
-import org.grapentin.apps.exceer.managers.ContextManager;
-import org.grapentin.apps.exceer.managers.SoundManager;
-import org.grapentin.apps.exceer.managers.TaskManager;
+import org.grapentin.apps.exceer.activity.TrainingActivity;
+import org.grapentin.apps.exceer.helpers.Context;
+import org.grapentin.apps.exceer.helpers.Sounds;
+import org.grapentin.apps.exceer.helpers.Tasks;
 import org.grapentin.apps.exceer.orm.BaseModel;
-import org.grapentin.apps.exceer.training.Properties;
-import org.grapentin.apps.exceer.training.Reps;
-import org.grapentin.apps.exceer.training.TrainingManager;
 
 abstract public class BaseExercisable extends BaseModel
 {
@@ -42,7 +40,8 @@ abstract public class BaseExercisable extends BaseModel
 
   protected Properties props = new Properties();
 
-  private TaskManager.TimerTask task = null;
+  @Nullable
+  private Tasks.TimerTask task = null;
 
   private boolean running = false;
 
@@ -64,6 +63,7 @@ abstract public class BaseExercisable extends BaseModel
       return running;
     }
 
+  @Nullable
   public String getImage ()
     {
       return props.image;
@@ -79,11 +79,11 @@ abstract public class BaseExercisable extends BaseModel
 
           task = new RepsTask(reps);
         }
-      else if (props.duration_begin > 0)
+      else if (props.duration_begin != null)
         {
           String progress = getCurrentProgress();
-          long duration = ((progress == null) ? props.duration_begin : Long.parseLong(progress));
-          setCurrentProgress(Long.toString(duration));
+          Duration duration = ((progress == null) ? props.duration_begin : new Duration(progress));
+          setCurrentProgress(duration.toString());
 
           task = new DurationTask(duration);
         }
@@ -102,20 +102,20 @@ abstract public class BaseExercisable extends BaseModel
           TextView progressLabel = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityProgressLabel);
           progressLabel.setText("1:0/" + reps.sets.get(0));
         }
-      else if (props.duration_begin > 0)
+      else if (props.duration_begin != null)
         {
-          long duration = Long.parseLong(getCurrentProgress());
+          Duration duration = new Duration(getCurrentProgress());
 
-          long min = duration / 60000;
-          long sec = (duration % 60000) / 1000;
+          long min = duration.get() / 60000;
+          long sec = (duration.get() % 60000) / 1000;
 
           TextView progressLabel = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityProgressLabel);
           progressLabel.setText((min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec);
         }
-      else
+      else if (props.duration != null)
         {
-          long min = props.duration / 60000;
-          long sec = (props.duration % 60000) / 1000;
+          long min = props.duration.get() / 60000;
+          long sec = (props.duration.get() % 60000) / 1000;
 
           TextView progressLabel = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityProgressLabel);
           progressLabel.setText((min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec);
@@ -124,18 +124,19 @@ abstract public class BaseExercisable extends BaseModel
 
   public void start ()
     {
+      assert task != null;
       task.start();
       Button contextButton = (Button)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityContextButton);
-      contextButton.setText(ContextManager.get().getString(R.string.TrainingActivityContextButtonTextPause));
+      contextButton.setText(Context.get().getString(R.string.TrainingActivityContextButtonTextPause));
       running = true;
     }
 
   public void pause ()
     {
-      if (task != null)
-        task.pause();
+      assert task != null;
+      task.pause();
       Button contextButton = (Button)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityContextButton);
-      contextButton.setText(ContextManager.get().getString(R.string.TrainingActivityContextButtonTextStart));
+      contextButton.setText(Context.get().getString(R.string.TrainingActivityContextButtonTextStart));
       running = false;
     }
 
@@ -164,7 +165,7 @@ abstract public class BaseExercisable extends BaseModel
           AlertDialog.Builder builder = new AlertDialog.Builder(TrainingActivity.getInstance());
           builder.setMessage("Did you make it?").setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener).show();
         }
-      else if (props.duration_begin > 0)
+      else if (props.duration_begin != null)
         {
           TextView progressLabel = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityProgressLabel);
           progressLabel.setText("00:00");
@@ -207,7 +208,7 @@ abstract public class BaseExercisable extends BaseModel
     {
       Button contextButton = (Button)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityContextButton);
       contextButton.setEnabled(true);
-      contextButton.setText(ContextManager.get().getString(R.string.TrainingActivityContextButtonTextStart));
+      contextButton.setText(Context.get().getString(R.string.TrainingActivityContextButtonTextStart));
 
       TrainingManager.next();
     }
@@ -218,40 +219,46 @@ abstract public class BaseExercisable extends BaseModel
         {
           Reps reps = new Reps(getCurrentProgress());
 
-          if (reps.greaterOrEqual(props.reps_finish))
+          if (props.reps_finish != null && reps.greaterOrEqual(props.reps_finish))
             {
               levelUp();
               return;
             }
 
-          reps.increment(props);
+          for (int i = 0; i < props.reps_increment; ++i)
+            reps.increment(props);
           setCurrentProgress(reps.toString());
         }
-      else if (props.duration_begin > 0)
+      else if (props.duration_begin != null)
         {
-          long duration = Long.parseLong(getCurrentProgress());
+          Duration duration = new Duration(getCurrentProgress());
 
-          if (duration >= props.duration_finish)
+          if (props.duration_finish != null && duration.greaterOrEqual(props.duration_finish))
             {
               levelUp();
               return;
             }
 
-          duration += props.duration_increment;
-          setCurrentProgress(Long.toString(duration));
+          duration.increment(props.duration_increment);
+          setCurrentProgress(duration.toString());
         }
     }
 
-  private class DurationTask extends TaskManager.TimerTask
+  public boolean knowsProgress ()
+    {
+      return props.reps_begin != null || props.duration_begin != null;
+    }
+
+  private class DurationTask extends Tasks.TimerTask
   {
-    private long duration;
+    private Duration duration;
 
     private long start = 0;
     private long paused = 0;
     private long countdown = 3;
     private boolean halftime = false;
 
-    public DurationTask (long duration)
+    public DurationTask (Duration duration)
       {
         this.duration = duration;
       }
@@ -270,14 +277,14 @@ abstract public class BaseExercisable extends BaseModel
       {
         if (start == 0 && countdown > 0)
           {
-            SoundManager.play(R.raw.beep_low);
+            Sounds.play(R.raw.beep_low);
             countdown--;
             return System.currentTimeMillis() + 1000;
           }
 
         if (start == 0)
           {
-            SoundManager.play(R.raw.beep_four);
+            Sounds.play(R.raw.beep_four);
             start = System.currentTimeMillis();
             paused = 0;
             countdown = 3;
@@ -290,23 +297,23 @@ abstract public class BaseExercisable extends BaseModel
           }
 
         long elapsed = System.currentTimeMillis() - start;
-        long remaining = Math.round((duration - elapsed) / 1000.0);
+        long remaining = Math.round((duration.get() - elapsed) / 1000.0);
 
-        if (props.two_sided && !halftime && duration / elapsed >= 0.5)
+        if (props.two_sided && !halftime && duration.get() / elapsed >= 0.5)
           {
-            SoundManager.play(R.raw.beep_two);
+            Sounds.play(R.raw.beep_two);
             halftime = true;
           }
 
         if (countdown > 0 && countdown >= remaining)
           {
-            SoundManager.play(R.raw.beep_low);
+            Sounds.play(R.raw.beep_low);
             countdown--;
           }
 
         if (remaining <= 0)
           {
-            SoundManager.play(R.raw.beep_four);
+            Sounds.play(R.raw.beep_four);
             finishExercise();
             return 0;
           }
@@ -321,7 +328,7 @@ abstract public class BaseExercisable extends BaseModel
       }
   }
 
-  private class RepsTask extends TaskManager.TimerTask
+  private class RepsTask extends Tasks.TimerTask
   {
     private Reps reps;
     private Reps done;
@@ -354,7 +361,7 @@ abstract public class BaseExercisable extends BaseModel
       {
         if (countdown > 0)
           {
-            SoundManager.play(R.raw.beep_low);
+            Sounds.play(R.raw.beep_low);
             countdown--;
             next_sound = R.raw.beep_four;
             return System.currentTimeMillis() + 1000;
@@ -375,7 +382,7 @@ abstract public class BaseExercisable extends BaseModel
 
             if (done.sets.get(currentSet) >= reps.sets.get(currentSet)) // a set finished
               {
-                SoundManager.play(R.raw.beep_four);
+                Sounds.play(R.raw.beep_four);
                 next_sound = 0;
                 currentSet++;
 
@@ -398,7 +405,7 @@ abstract public class BaseExercisable extends BaseModel
 
         if (next_sound != 0)
           {
-            SoundManager.play(next_sound);
+            Sounds.play(next_sound);
             next_sound = 0;
           }
 
@@ -461,20 +468,20 @@ abstract public class BaseExercisable extends BaseModel
 
         if (pause_countdown > 0 && pause_countdown >= remaining)
           {
-            SoundManager.play(R.raw.beep_low);
+            Sounds.play(R.raw.beep_low);
             pause_countdown--;
           }
 
         if (remaining <= 0)
           {
-            SoundManager.play(R.raw.beep_four);
+            Sounds.play(R.raw.beep_four);
             pause_duration = 0;
             pause_start = 0;
             countdown = 3;
             running = false;
             Button contextButton = (Button)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityContextButton);
             contextButton.setEnabled(true);
-            contextButton.setText(ContextManager.get().getString(R.string.TrainingActivityContextButtonTextStart));
+            contextButton.setText(Context.get().getString(R.string.TrainingActivityContextButtonTextStart));
             return 0;
           }
 
@@ -490,7 +497,7 @@ abstract public class BaseExercisable extends BaseModel
 
   }
 
-  private class PauseTask extends TaskManager.TimerTask
+  private class PauseTask extends Tasks.TimerTask
   {
     private long duration;
 
@@ -512,13 +519,13 @@ abstract public class BaseExercisable extends BaseModel
 
         if (countdown > 0 && countdown >= remaining)
           {
-            SoundManager.play(R.raw.beep_low);
+            Sounds.play(R.raw.beep_low);
             countdown--;
           }
 
         if (remaining <= 0)
           {
-            SoundManager.play(R.raw.beep_four);
+            Sounds.play(R.raw.beep_four);
             afterPause();
             return 0;
           }

@@ -17,35 +17,33 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.models;
+package org.grapentin.apps.exceer.activity;
 
-import org.grapentin.apps.exceer.helpers.XmlNode;
-import org.grapentin.apps.exceer.orm.BaseModel;
-import org.grapentin.apps.exceer.orm.Column;
+import android.app.Activity;
+import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
+import android.widget.TextView;
 
-public class ModelProperty extends BaseModel
+import org.grapentin.apps.exceer.BuildConfig;
+import org.grapentin.apps.exceer.R;
+
+public class AboutActivity extends Activity
 {
 
-  @SuppressWarnings("unused") // accessed by reflection from BaseModel
-  public final static String TABLE_NAME = "properties";
-
-  // database layout
-  public Column key = new Column("key");
-  public Column value = new Column("value");
-
-  public static ModelProperty fromXml (XmlNode root)
+  @Override
+  protected void onCreate (Bundle savedInstanceState)
     {
-      ModelProperty m = new ModelProperty();
+      super.onCreate(savedInstanceState);
+      setContentView(R.layout.activity_about);
 
-      m.key.set(root.getAttribute("name"));
-      m.value.set(root.getValue());
-
-      return m;
-    }
-
-  public static ModelProperty get (long id)
-    {
-      return (ModelProperty)BaseModel.get(ModelProperty.class, id);
+      TextView nickJanvierLabel = (TextView)findViewById(R.id.AboutActivityNickJanvierLabel);
+      nickJanvierLabel.setMovementMethod((LinkMovementMethod.getInstance()));
+      TextView titleLabel = (TextView)findViewById(R.id.AboutActivityTitleLabel);
+      titleLabel.setText(getString(R.string.app_name) + "-" + BuildConfig.VERSION_NAME);
+      TextView iconCopyrightLabel = (TextView)findViewById(R.id.AboutActivityIconCopyrightLabel);
+      iconCopyrightLabel.setMovementMethod((LinkMovementMethod.getInstance()));
+      TextView copyrightLabel = (TextView)findViewById(R.id.AboutActivityLongCopyrightLabel);
+      copyrightLabel.setMovementMethod((LinkMovementMethod.getInstance()));
     }
 
 }

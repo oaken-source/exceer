@@ -19,19 +19,22 @@
 
 package org.grapentin.apps.exceer.models;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.widget.Button;
 import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.TrainingActivity;
+import org.grapentin.apps.exceer.activity.TrainingActivity;
 import org.grapentin.apps.exceer.helpers.XmlNode;
-import org.grapentin.apps.exceer.managers.ContextManager;
+import org.grapentin.apps.exceer.helpers.Context;
 import org.grapentin.apps.exceer.orm.BaseModel;
 import org.grapentin.apps.exceer.orm.Column;
 import org.grapentin.apps.exceer.orm.Relation;
+import org.grapentin.apps.exceer.training.BaseExercisable;
 import org.grapentin.apps.exceer.training.Properties;
 
-public class ModelTraining extends BaseModel
+public class Training extends BaseModel
 {
 
   @SuppressWarnings("unused") // accessed by reflection from BaseModel
@@ -39,40 +42,43 @@ public class ModelTraining extends BaseModel
 
   // database layout
   public Column name = new Column("name");
-  public Relation exercises = makeRelation("exercises", ModelExercise.class);
-  public Relation properties = makeRelation("properties", ModelProperty.class);
+  public Relation exercises = makeRelation("exercises", Exercise.class);
+  public Relation properties = makeRelation("properties", Property.class);
 
   // temporary runtime values
   private int currentExerciseId = 0;
   private boolean finished = false;
 
-  public static ModelTraining fromXml (XmlNode root)
+  public static Training fromXml (@NonNull XmlNode root)
     {
-      ModelTraining m = new ModelTraining();
+      Training m = new Training();
 
       m.name.set(root.getAttribute("name"));
 
       for (XmlNode property : root.getChildren("property"))
-        m.properties.add(ModelProperty.fromXml(property));
+        m.properties.add(Property.fromXml(property));
       for (XmlNode exercise : root.getChildren("exercise"))
-        m.exercises.add(ModelExercise.fromXml(exercise));
+        m.exercises.add(Exercise.fromXml(exercise));
 
       return m;
     }
 
-  public static ModelTraining get (long id)
+  @Nullable
+  public static Training get (long id)
     {
-      return (ModelTraining)BaseModel.get(ModelTraining.class, id);
+      return (Training)BaseModel.get(Training.class, id);
     }
 
-  public ModelExercise getCurrentExercise ()
+  @Nullable
+  public Exercise getCurrentExercise ()
     {
-      return (ModelExercise)exercises.at(currentExerciseId);
+      return (Exercise)exercises.at(currentExerciseId);
     }
 
+  @Nullable
   public BaseExercisable getLeafExercisable ()
     {
-      if (exercises.isEmpty())
+      if (getCurrentExercise() == null)
         return null;
       return getCurrentExercise().getLeafExercisable();
     }
@@ -92,7 +98,7 @@ public class ModelTraining extends BaseModel
       Properties props = new Properties(properties);
 
       for (BaseModel e : exercises.all())
-        ((ModelExercise)e).prepare(props);
+        ((Exercise)e).prepare(props);
 
       currentExerciseId = 0;
       if (getCurrentExercise() == null)
@@ -101,7 +107,7 @@ public class ModelTraining extends BaseModel
           return;
         }
 
-      getLeafExercisable().show();
+      getCurrentExercise().show();
     }
 
   public void show ()
@@ -110,7 +116,7 @@ public class ModelTraining extends BaseModel
       TextView currentExerciseLevelLabel1 = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel1);
       TextView currentExerciseLevelLabel2 = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel2);
 
-      currentExerciseLabel.setText(ContextManager.get().getString(R.string.TrainingActivityNoExercises));
+      currentExerciseLabel.setText(Context.get().getString(R.string.TrainingActivityNoExercises));
       currentExerciseLevelLabel1.setText("");
       currentExerciseLevelLabel2.setText("");
     }
@@ -121,12 +127,12 @@ public class ModelTraining extends BaseModel
       if (getCurrentExercise() == null)
         {
           Button contextButton = (Button)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityContextButton);
-          contextButton.setText(ContextManager.get().getString(R.string.TrainingActivityContextButtonTextFinish));
+          contextButton.setText(Context.get().getString(R.string.TrainingActivityContextButtonTextFinish));
           finished = true;
           return;
         }
 
-      getLeafExercisable().show();
+      getCurrentExercise().getLeafExercisable().show();
     }
 
   public void reset ()
@@ -135,7 +141,7 @@ public class ModelTraining extends BaseModel
       finished = false;
 
       for (BaseModel e : exercises.all())
-        ((ModelExercise)e).reset();
+        ((Exercise)e).reset();
     }
 
   public void start ()
@@ -156,7 +162,7 @@ public class ModelTraining extends BaseModel
       finished = false;
 
       for (BaseModel e : exercises.all())
-        ((ModelExercise)e).wrapUp();
+        ((Exercise)e).wrapUp();
     }
 
 }

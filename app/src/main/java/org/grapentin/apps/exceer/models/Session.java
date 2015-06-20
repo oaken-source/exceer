@@ -17,33 +17,57 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer;
+package org.grapentin.apps.exceer.models;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.text.method.LinkMovementMethod;
-import android.widget.TextView;
+import android.database.Cursor;
+import android.support.annotation.Nullable;
 
-public class AboutActivity extends Activity
+import org.grapentin.apps.exceer.orm.BaseModel;
+import org.grapentin.apps.exceer.orm.Column;
+import org.grapentin.apps.exceer.orm.Database;
+
+public class Session extends BaseModel
 {
 
-  @Override
-  protected void onCreate (Bundle savedInstanceState)
+  @SuppressWarnings("unused") // accessed by reflection from BaseModel
+  public final static String TABLE_NAME = "sessions";
+
+  // database layout
+  public Column date = new Column("date", Column.TYPE_LONG);
+  public Column training_id = new Column("training_id", Column.TYPE_LONG);
+
+  public Session (long training_id)
     {
-      super.onCreate(savedInstanceState);
-      setContentView(R.layout.activity_about);
+      this.date.set(System.currentTimeMillis());
+      this.training_id.set(training_id);
+    }
 
-      TextView nickJanvierLabel = (TextView)findViewById(R.id.AboutActivityNickJanvierLabel);
-      nickJanvierLabel.setMovementMethod((LinkMovementMethod.getInstance()));
+  public Session ()
+    {
 
-      TextView titleLabel = (TextView)findViewById(R.id.AboutActivityTitleLabel);
-      titleLabel.setText(getString(R.string.app_name) + "-" + BuildConfig.VERSION_NAME);
+    }
 
-      TextView iconCopyrightLabel = (TextView)findViewById(R.id.AboutActivityIconCopyrightLabel);
-      iconCopyrightLabel.setMovementMethod((LinkMovementMethod.getInstance()));
+  @Nullable
+  public static Session get (long id)
+    {
+      return (Session)BaseModel.get(Session.class, id);
+    }
 
-      TextView copyrightLabel = (TextView)findViewById(R.id.AboutActivityLongCopyrightLabel);
-      copyrightLabel.setMovementMethod((LinkMovementMethod.getInstance()));
+  @Nullable
+  public static Session getLast ()
+    {
+      Session out = null;
+
+      Session tmp = new Session();
+      Cursor c = Database.getSession().query(TABLE_NAME, new String[]{ tmp._ID.name }, null, null, null, null, tmp.date.name + " DESC", "1");
+      if (c.getCount() == 1)
+        {
+          c.moveToFirst();
+          out = get(c.getLong(c.getColumnIndex(tmp._ID.name)));
+        }
+      c.close();
+
+      return out;
     }
 
 }

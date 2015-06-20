@@ -20,6 +20,8 @@
 package org.grapentin.apps.exceer.helpers;
 
 import android.content.res.XmlResourceParser;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -36,10 +38,9 @@ public class XmlNode implements Serializable
   private String value = "";
 
   private HashMap<String, String> attributes = new HashMap<>();
-
   private ArrayList<XmlNode> children = new ArrayList<>();
 
-  public XmlNode (XmlResourceParser p) throws XmlPullParserException, XmlNodeMalformedException, IOException
+  public XmlNode (@NonNull XmlResourceParser p) throws XmlPullParserException, XmlNodeMalformedException, IOException
     {
       int event = p.getEventType();
       switch (event)
@@ -91,33 +92,38 @@ public class XmlNode implements Serializable
         }
     }
 
+  @NonNull
   public String getName ()
     {
-      return this.name;
+      assert name != null;
+      return name;
     }
 
+  @NonNull
   public String getValue ()
     {
-      return this.value;
+      return value;
     }
 
-  public String getAttribute (String key)
+  @Nullable
+  public String getAttribute (@NonNull String key)
     {
       return attributes.get(key);
     }
 
-  public ArrayList<XmlNode> getChildren (String name)
+  @NonNull
+  public ArrayList<XmlNode> getChildren (@NonNull String name)
     {
       ArrayList<XmlNode> nodes = new ArrayList<>();
       for (XmlNode n : children)
-        if (n.name.equals(name))
+        if (n.getName().equals(name))
           nodes.add(n);
       return nodes;
     }
 
   public static class XmlNodeMalformedException extends Exception
   {
-    public XmlNodeMalformedException (String msg)
+    public XmlNodeMalformedException (@NonNull String msg)
       {
         super(msg);
       }

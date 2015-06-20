@@ -1,9 +1,9 @@
-package org.grapentin.apps.exceer;
+package org.grapentin.apps.exceer.activity.settings;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
-public class SettingsActivity extends PreferenceActivity
+public class MainSettingsActivity extends PreferenceActivity
 {
 
   @Override

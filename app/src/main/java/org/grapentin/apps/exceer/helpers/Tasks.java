@@ -16,37 +16,33 @@
  *    You should have received a copy of the GNU General Public License       *
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
-package org.grapentin.apps.exceer.managers;
+
+package org.grapentin.apps.exceer.helpers;
 
 import android.os.Handler;
+import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
 
-public class TaskManager
+public class Tasks
 {
 
-  private static TaskManager instance = null;
+  private static Tasks instance = new Tasks();
+  private Handler handler = new Handler();
 
-  private Handler handler;
-
-  private TaskManager ()
+  private Tasks ()
     {
-      handler = new Handler();
+
     }
 
-  private static TaskManager getInstance ()
+  @NonNull
+  private static Tasks getInstance ()
     {
-      if (instance == null)
-        instance = new TaskManager();
       return instance;
-    }
-
-  public static void init ()
-    {
-      getInstance();
     }
 
   abstract static public class TimerTask implements Runnable
   {
-    public void run ()
+    final public void run ()
       {
         long next = update();
 
@@ -57,17 +53,20 @@ public class TaskManager
           }
       }
 
+    @CallSuper
     public void start ()
       {
         getInstance().handler.removeCallbacks(this);
         getInstance().handler.post(this);
       }
 
+    @CallSuper
     public void stop ()
       {
         getInstance().handler.removeCallbacks(this);
       }
 
+    @CallSuper
     public void pause ()
       {
         stop();

@@ -17,54 +17,39 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.models;
+package org.grapentin.apps.exceer.helpers;
 
-import android.database.Cursor;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.grapentin.apps.exceer.orm.BaseModel;
-import org.grapentin.apps.exceer.orm.Column;
-import org.grapentin.apps.exceer.orm.DatabaseManager;
-
-public class ModelSession extends BaseModel
+public class Context
 {
 
-  @SuppressWarnings("unused") // accessed by reflection from BaseModel
-  public final static String TABLE_NAME = "sessions";
+  private static Context instance = new Context();
+  @Nullable
+  private android.content.Context context = null;
 
-  // database layout
-  public Column date = new Column("date", Column.TYPE_LONG);
-  public Column training_id = new Column("training_id", Column.TYPE_LONG);
-
-  public ModelSession (long training_id)
-    {
-      this.date.set(System.currentTimeMillis());
-      this.training_id.set(training_id);
-    }
-
-  public ModelSession ()
+  private Context ()
     {
 
     }
 
-  public static ModelSession get (long id)
+  @NonNull
+  private static Context getInstance ()
     {
-      return (ModelSession)BaseModel.get(ModelSession.class, id);
+      return instance;
     }
 
-  public static ModelSession getLast ()
+  public static void set (@NonNull android.content.Context context)
     {
-      ModelSession out = null;
+      getInstance().context = context;
+    }
 
-      ModelSession tmp = new ModelSession();
-      Cursor c = DatabaseManager.getSession().query(TABLE_NAME, new String[]{ tmp._ID.name }, null, null, null, null, tmp.date.name + " DESC", "1");
-      if (c.getCount() == 1)
-        {
-          c.moveToFirst();
-          out = get(c.getLong(c.getColumnIndex(tmp._ID.name)));
-        }
-      c.close();
-
-      return out;
+  @NonNull
+  public static android.content.Context get ()
+    {
+      assert getInstance().context != null;
+      return getInstance().context;
     }
 
 }

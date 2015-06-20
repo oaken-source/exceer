@@ -17,10 +17,12 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.managers;
+package org.grapentin.apps.exceer.helpers;
 
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.support.annotation.NonNull;
+import android.support.annotation.RawRes;
 
 import org.grapentin.apps.exceer.R;
 
@@ -29,50 +31,44 @@ import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class SoundManager extends Thread
+public class Sounds extends Thread
 {
 
-  private static SoundManager instance = null;
+  private static Sounds instance = new Sounds();
 
-  private SoundPool soundPool;
+  @SuppressWarnings("deprecation")
+  private SoundPool soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
 
   private HashMap<Integer, Integer> sounds = new HashMap<>();
   private BlockingQueue<Integer> queue = new LinkedBlockingQueue<>();
 
-  @SuppressWarnings("deprecation")
-  private SoundManager ()
+  private Sounds ()
     {
       start();
-
-      this.soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
-
-      Class raw = R.raw.class;
-      Field[] fields = raw.getFields();
-      for (Field field : fields)
-        {
-          try
-            {
-              int resource = field.getInt(null);
-              int sound = this.soundPool.load(ContextManager.get(), resource, 0);
-              this.sounds.put(resource, sound);
-            }
-          catch (IllegalAccessException e)
-            {
-              // ignore
-            }
-        }
     }
 
-  private static SoundManager getInstance ()
+  @NonNull
+  private static Sounds getInstance ()
     {
-      if (instance == null)
-        instance = new SoundManager();
       return instance;
     }
 
-  public static void init ()
+  public static void load ()
     {
-      getInstance();
+      try
+        {
+          for (Field field : R.raw.class.getFields())
+            getInstance().sounds.put(field.getInt(null), getInstance().soundPool.load(Context.get(), field.getInt(null), 0));
+        }
+      catch (IllegalAccessException e)
+        {
+          throw new Error(e);
+        }
+    }
+
+  public static void play (@RawRes int resource)
+    {
+      getInstance().queue.add(resource);
     }
 
   public void run ()
@@ -89,11 +85,6 @@ public class SoundManager extends Thread
               break;
             }
         }
-    }
-
-  public static void play (int resource)
-    {
-      getInstance().queue.add(resource);
     }
 
 }

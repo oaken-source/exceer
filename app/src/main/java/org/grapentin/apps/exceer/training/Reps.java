@@ -19,6 +19,8 @@
 
 package org.grapentin.apps.exceer.training;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -32,28 +34,28 @@ public class Reps implements Serializable
 
     }
 
-  public Reps (Reps reps)
+  public Reps (@NonNull Reps reps)
     {
       for (long part : reps.sets)
         this.sets.add(part);
     }
 
-  public Reps (String s)
+  public Reps (@NonNull String s)
     {
       for (String part : s.split(","))
         this.sets.add(Long.parseLong(part));
     }
 
+  @NonNull
   public Reps empty ()
     {
       Reps res = new Reps();
       for (int i = 0; i < this.sets.size(); ++i)
         res.sets.add(0L);
-
       return res;
     }
 
-  public boolean greaterOrEqual (Reps reps)
+  public boolean greaterOrEqual (@NonNull Reps reps)
     {
       if (this.sets.size() < reps.sets.size())
         return false;
@@ -65,7 +67,7 @@ public class Reps implements Serializable
       return true;
     }
 
-  public void increment (Properties p)
+  public void increment (@NonNull Properties p)
     {
       for (int i = this.sets.size(); i < p.reps_finish.sets.size(); ++i)
         this.sets.add((p.reps_begin.sets.size() <= i) ? 0 : p.reps_begin.sets.get(i));
@@ -84,7 +86,7 @@ public class Reps implements Serializable
             return;
     }
 
-  private boolean incrementPosition (int i, Properties p)
+  private boolean incrementPosition (int i, @NonNull Properties p)
     {
       if (p.reps_increment_style == Properties.RepsIncrementStyle.fill_sets)
         if (this.sets.get(i) < p.reps_finish.sets.get(i))
@@ -112,6 +114,7 @@ public class Reps implements Serializable
       return min;
     }
 
+  @NonNull
   public String toString ()
     {
       String res = "";

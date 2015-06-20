@@ -19,12 +19,13 @@
 
 package org.grapentin.apps.exceer.training;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.widget.Toast;
 
-import org.grapentin.apps.exceer.helpers.DurationString;
-import org.grapentin.apps.exceer.managers.ContextManager;
+import org.grapentin.apps.exceer.helpers.Context;
+import org.grapentin.apps.exceer.models.Property;
 import org.grapentin.apps.exceer.orm.BaseModel;
-import org.grapentin.apps.exceer.models.ModelProperty;
 import org.grapentin.apps.exceer.orm.Relation;
 
 import java.io.Serializable;
@@ -41,20 +42,29 @@ public class Properties implements Serializable
   public long reps_pause_after_concentric = 1000;
   public long reps_pause_after_eccentric = 0;
 
-  public long duration = 0;
-  public long duration_begin = 0;
-  public long duration_finish = 0;
+  @Nullable
+  public Duration duration = null;
+  @Nullable
+  public Duration duration_begin = null;
+  @Nullable
+  public Duration duration_finish = null;
   public long duration_increment = 5000;
 
+  @NonNull
   public PrimaryMotion primary_motion = PrimaryMotion.concentric;
   public boolean two_sided = false;
 
+  @Nullable
   public Reps reps_begin = null;
+  @Nullable
   public Reps reps_finish = null;
   public long reps_increment = 0;
+  @NonNull
   public RepsIncrementDirection reps_increment_direction = RepsIncrementDirection.front_to_back;
+  @NonNull
   public RepsIncrementStyle reps_increment_style = RepsIncrementStyle.balanced;
 
+  @Nullable
   public String image = null;
 
   public Properties ()
@@ -62,7 +72,7 @@ public class Properties implements Serializable
 
     }
 
-  public Properties (Properties properties)
+  public Properties (@NonNull Properties properties)
     {
       try
         {
@@ -77,21 +87,31 @@ public class Properties implements Serializable
         }
     }
 
-  public Properties (Relation properties)
+  public Properties (@NonNull Relation properties)
     {
       for (BaseModel p : properties.all())
-        set(((ModelProperty)p).key.get(), ((ModelProperty)p).value.get());
+        {
+          String key = ((Property)p).key.get();
+          String val = ((Property)p).value.get();
+          assert key != null && val != null;
+          set(key, val);
+        }
     }
 
-  public Properties (Properties other, Relation properties)
+  public Properties (@NonNull Properties other, @NonNull Relation properties)
     {
       this(other);
 
       for (BaseModel p : properties.all())
-        set(((ModelProperty)p).key.get(), ((ModelProperty)p).value.get());
+        {
+          String key = ((Property)p).key.get();
+          String val = ((Property)p).value.get();
+          assert key != null && val != null;
+          set(key, val);
+        }
     }
 
-  public void set (String key, String value)
+  public void set (@NonNull String key, @NonNull String value)
     {
       switch (key)
         {
@@ -102,11 +122,8 @@ public class Properties implements Serializable
         case "reps_duration_eccentric":
         case "reps_pause_after_concentric":
         case "reps_pause_after_eccentric":
-        case "duration":
-        case "duration_begin":
-        case "duration_finish":
         case "duration_increment":
-          setLong(key, DurationString.parseLong(value));
+          setLong(key, Duration.parseLong(value));
           break;
         case "reps_increment":
           setLong(key, Long.parseLong(value));
@@ -114,6 +131,11 @@ public class Properties implements Serializable
         case "reps_begin":
         case "reps_finish":
           setObject(key, new Reps(value));
+          break;
+        case "duration":
+        case "duration_begin":
+        case "duration_finish":
+          setObject(key, new Duration(value));
           break;
         case "image":
           setObject(key, value);
@@ -128,7 +150,7 @@ public class Properties implements Serializable
             }
           catch (Exception e)
             {
-              Toast.makeText(ContextManager.get(), "invalid value for reps_increment_direction: '" + value + "'", Toast.LENGTH_LONG).show();
+              Toast.makeText(Context.get(), "invalid value for reps_increment_direction: '" + value + "'", Toast.LENGTH_LONG).show();
             }
           break;
         case "reps_increment_style":
@@ -138,7 +160,7 @@ public class Properties implements Serializable
             }
           catch (Exception e)
             {
-              Toast.makeText(ContextManager.get(), "invalid value for reps_increment_style: '" + value + "'", Toast.LENGTH_LONG).show();
+              Toast.makeText(Context.get(), "invalid value for reps_increment_style: '" + value + "'", Toast.LENGTH_LONG).show();
             }
           break;
         case "primary_motion":
@@ -148,16 +170,16 @@ public class Properties implements Serializable
             }
           catch (Exception e)
             {
-              Toast.makeText(ContextManager.get(), "invalid value for primary_motion: '" + value + "'", Toast.LENGTH_LONG).show();
+              Toast.makeText(Context.get(), "invalid value for primary_motion: '" + value + "'", Toast.LENGTH_LONG).show();
             }
           break;
         default:
-          Toast.makeText(ContextManager.get(), "invalid property: '" + key + "'", Toast.LENGTH_LONG).show();
+          Toast.makeText(Context.get(), "invalid property: '" + key + "'", Toast.LENGTH_LONG).show();
           break;
         }
     }
 
-  private void setLong (String key, long value)
+  private void setLong (@NonNull String key, long value)
     {
       try
         {
@@ -169,7 +191,7 @@ public class Properties implements Serializable
         }
     }
 
-  private void setObject (String key, Object value)
+  private void setObject (@NonNull String key, @NonNull Object value)
     {
       try
         {
@@ -181,7 +203,7 @@ public class Properties implements Serializable
         }
     }
 
-  private void setBoolean (String key, boolean value)
+  private void setBoolean (@NonNull String key, boolean value)
     {
       try
         {

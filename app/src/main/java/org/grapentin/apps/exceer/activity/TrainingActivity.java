@@ -17,42 +17,85 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer;
+package org.grapentin.apps.exceer.activity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import org.grapentin.apps.exceer.R;
+import org.grapentin.apps.exceer.activity.base.BaseActivity;
+import org.grapentin.apps.exceer.activity.settings.LevelSettingsActivity;
+import org.grapentin.apps.exceer.activity.settings.ProgressSettingsActivity;
+import org.grapentin.apps.exceer.models.Level;
+import org.grapentin.apps.exceer.training.BaseExercisable;
 import org.grapentin.apps.exceer.training.TrainingManager;
 
 import java.io.InputStream;
 
-public class TrainingActivity extends Activity
+public class TrainingActivity extends BaseActivity
 {
-
-  private static TrainingActivity instance;
-
-  public static TrainingActivity getInstance ()
-    {
-      return instance;
-    }
 
   @Override
   protected void onCreate (Bundle savedInstanceState)
     {
-      instance = this;
-
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_training);
 
       TrainingManager.prepare();
+    }
+
+  @Override
+  public boolean onCreateOptionsMenu (Menu menu)
+    {
+      getMenuInflater().inflate(R.menu.menu_training, menu);
+      return true;
+    }
+
+  @Override
+  public boolean onPrepareOptionsMenu (Menu menu)
+    {
+      BaseExercisable e = TrainingManager.getLeafExercisable();
+
+      // allow setting levels when leaf exercise is level
+      boolean showSettingsLevel = (e != null && e.getClass() == Level.class);
+      menu.findItem(R.id.action_training_settings_level).setVisible(showSettingsLevel);
+      // allow setting progress when leaf exercise knows progress
+      boolean showSettingsProgress = (e != null && e.knowsProgress());
+      menu.findItem(R.id.action_training_settings_progress).setVisible(showSettingsProgress);
+
+      // if we show neither, don't even show the menu
+      return showSettingsLevel || showSettingsProgress;
+    }
+
+  @Override
+  public boolean onOptionsItemSelected (@NonNull MenuItem item)
+    {
+      int id = item.getItemId();
+
+      switch (id)
+        {
+        case R.id.action_training_settings_level:
+          Intent levelSettingsIntent = new Intent(this, LevelSettingsActivity.class);
+          startActivity(levelSettingsIntent);
+          break;
+        case R.id.action_training_settings_progress:
+          Intent progressSettingsIntent = new Intent(this, ProgressSettingsActivity.class);
+          startActivity(progressSettingsIntent);
+          break;
+        }
+
+      return super.onOptionsItemSelected(item);
     }
 
   @Override
@@ -76,7 +119,10 @@ public class TrainingActivity extends Activity
       };
 
       AlertDialog.Builder builder = new AlertDialog.Builder(this);
-      builder.setMessage("Are you sure you want to abort this session?").setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener).show();
+      builder.setMessage(getString(R.string.TrainingActivityAbortConfirmation));
+      builder.setPositiveButton(getString(R.string.Yes), dialogClickListener);
+      builder.setNegativeButton(getString(R.string.No), dialogClickListener);
+      builder.show();
     }
 
   public void onContextButtonClicked (View view)
@@ -94,14 +140,14 @@ public class TrainingActivity extends Activity
 
   public void onCurrentExerciseLevelLabelClicked (View view)
     {
-      String url = (TrainingManager.getLeafExercisable() == null) ? null : TrainingManager.getLeafExercisable().getImage();
-      if (url == null)
+      BaseExercisable ex = TrainingManager.getLeafExercisable();
+      if (ex == null || ex.getImage() == null)
         return;
 
       Bitmap bitmap;
       try
         {
-          InputStream in = new java.net.URL(url).openStream();
+          InputStream in = new java.net.URL(ex.getImage()).openStream();
           bitmap = BitmapFactory.decodeStream(in);
         }
       catch (Exception e)
