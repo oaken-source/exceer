@@ -19,7 +19,7 @@
 
 package org.grapentin.apps.exceer.training;
 
-import org.grapentin.apps.exceer.managers.DatabaseManager;
+import org.grapentin.apps.exceer.orm.DatabaseManager;
 import org.grapentin.apps.exceer.models.BaseExercisable;
 import org.grapentin.apps.exceer.models.ModelSession;
 import org.grapentin.apps.exceer.models.ModelTraining;

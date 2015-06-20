@@ -29,6 +29,7 @@ import org.grapentin.apps.exceer.TrainingActivity;
 import org.grapentin.apps.exceer.managers.ContextManager;
 import org.grapentin.apps.exceer.managers.SoundManager;
 import org.grapentin.apps.exceer.managers.TaskManager;
+import org.grapentin.apps.exceer.orm.BaseModel;
 import org.grapentin.apps.exceer.training.Properties;
 import org.grapentin.apps.exceer.training.Reps;
 import org.grapentin.apps.exceer.training.TrainingManager;

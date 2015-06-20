@@ -20,14 +20,16 @@
 package org.grapentin.apps.exceer.models;
 
 import org.grapentin.apps.exceer.helpers.XmlNode;
-
-import java.util.ArrayList;
+import org.grapentin.apps.exceer.orm.BaseModel;
+import org.grapentin.apps.exceer.orm.Column;
 
 public class ModelProperty extends BaseModel
 {
 
-  protected final static String TABLE_NAME = "properties";
+  @SuppressWarnings("unused") // accessed by reflection from BaseModel
+  public final static String TABLE_NAME = "properties";
 
+  // database layout
   public Column key = new Column("key");
   public Column value = new Column("value");
 
@@ -44,16 +46,6 @@ public class ModelProperty extends BaseModel
   public static ModelProperty get (long id)
     {
       return (ModelProperty)BaseModel.get(ModelProperty.class, id);
-    }
-
-  public static ArrayList<ModelProperty> getAll ()
-    {
-      ArrayList<ModelProperty> out = new ArrayList<>();
-
-      for (long id : BaseModel.getAllIds(ModelProperty.class))
-        out.add(get(id));
-
-      return out;
     }
 
 }

@@ -25,22 +25,25 @@ import android.widget.TextView;
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.TrainingActivity;
 import org.grapentin.apps.exceer.helpers.XmlNode;
+import org.grapentin.apps.exceer.orm.BaseModel;
+import org.grapentin.apps.exceer.orm.Column;
+import org.grapentin.apps.exceer.orm.Relation;
 import org.grapentin.apps.exceer.training.Properties;
 
 public class ModelExercise extends BaseExercisable
 {
 
   @SuppressWarnings("unused") // accessed by reflection from BaseModel
-  protected final static String TABLE_NAME = "exercises";
+  public final static String TABLE_NAME = "exercises";
 
   // database layout
-  protected Column name = new Column("name");
-  protected Column currentExerciseId = new Column("currentExerciseId", TYPE_INT);
-  protected Column currentLevelId = new Column("currentLevelId", TYPE_INT);
-  protected Column progress = new Column("progress");
-  protected Relation levels = makeRelation("levels", ModelLevel.class);
-  protected Relation exercises = makeRelation("exercises", ModelExercise.class);
-  protected Relation properties = makeRelation("properties", ModelProperty.class);
+  public Column name = new Column("name");
+  public Column currentExerciseId = new Column("currentExerciseId", Column.TYPE_INT);
+  public Column currentLevelId = new Column("currentLevelId", Column.TYPE_INT);
+  public Column progress = new Column("progress");
+  public Relation levels = makeRelation("levels", ModelLevel.class);
+  public Relation exercises = makeRelation("exercises", ModelExercise.class);
+  public Relation properties = makeRelation("properties", ModelProperty.class);
 
   public static ModelExercise fromXml (XmlNode root)
     {

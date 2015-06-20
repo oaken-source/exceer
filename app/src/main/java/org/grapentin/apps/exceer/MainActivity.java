@@ -28,7 +28,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import org.grapentin.apps.exceer.managers.ContextManager;
-import org.grapentin.apps.exceer.managers.DatabaseManager;
+import org.grapentin.apps.exceer.orm.DatabaseManager;
 import org.grapentin.apps.exceer.managers.SoundManager;
 import org.grapentin.apps.exceer.managers.TaskManager;
 import org.grapentin.apps.exceer.models.ModelSession;

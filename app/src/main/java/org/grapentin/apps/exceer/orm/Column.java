@@ -17,54 +17,65 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.models;
 
-import android.database.Cursor;
+package org.grapentin.apps.exceer.orm;
 
-import org.grapentin.apps.exceer.orm.BaseModel;
-import org.grapentin.apps.exceer.orm.Column;
-import org.grapentin.apps.exceer.orm.DatabaseManager;
-
-public class ModelSession extends BaseModel
+public class Column
 {
 
-  @SuppressWarnings("unused") // accessed by reflection from BaseModel
-  public final static String TABLE_NAME = "sessions";
+  @SuppressWarnings("unused") // to be used by Models
+  public static final String TYPE_TEXT = "TEXT";
+  @SuppressWarnings("unused") // to be used by Models
+  public static final String TYPE_INT = "INTEGER";
+  @SuppressWarnings("unused") // to be used by Models
+  public static final String TYPE_LONG = "INTEGER";
 
-  // database layout
-  public Column date = new Column("date", Column.TYPE_LONG);
-  public Column training_id = new Column("training_id", Column.TYPE_LONG);
+  public String name;
+  public String type;
+  public String params;
 
-  public ModelSession (long training_id)
+  private String value = null;
+
+  public Column (String name)
     {
-      this.date.set(System.currentTimeMillis());
-      this.training_id.set(training_id);
+      this(name, TYPE_TEXT);
     }
 
-  public ModelSession ()
+  public Column (String name, String type)
     {
-
+      this(name, type, "");
     }
 
-  public static ModelSession get (long id)
+  public Column (String name, String type, String params)
     {
-      return (ModelSession)BaseModel.get(ModelSession.class, id);
+      this.name = name;
+      this.type = type;
+      this.params = params;
     }
 
-  public static ModelSession getLast ()
+  public String get ()
     {
-      ModelSession out = null;
+      return this.value;
+    }
 
-      ModelSession tmp = new ModelSession();
-      Cursor c = DatabaseManager.getSession().query(TABLE_NAME, new String[]{ tmp._ID.name }, null, null, null, null, tmp.date.name + " DESC", "1");
-      if (c.getCount() == 1)
-        {
-          c.moveToFirst();
-          out = get(c.getLong(c.getColumnIndex(tmp._ID.name)));
-        }
-      c.close();
+  public long getLong ()
+    {
+      return Long.parseLong(this.value);
+    }
 
-      return out;
+  public int getInt ()
+    {
+      return Integer.parseInt(this.value);
+    }
+
+  public void set (String value)
+    {
+      this.value = value;
+    }
+
+  public void set (long value)
+    {
+      set(Long.toString(value));
     }
 
 }

@@ -17,7 +17,7 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.managers;
+package org.grapentin.apps.exceer.orm;
 
 import android.app.ProgressDialog;
 import android.database.sqlite.SQLiteDatabase;
@@ -27,7 +27,7 @@ import org.grapentin.apps.exceer.MainActivity;
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.helpers.Reflection;
 import org.grapentin.apps.exceer.helpers.XmlNode;
-import org.grapentin.apps.exceer.models.BaseModel;
+import org.grapentin.apps.exceer.managers.ContextManager;
 import org.grapentin.apps.exceer.models.ModelTraining;
 
 import java.util.HashMap;

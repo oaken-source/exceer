@@ -25,13 +25,17 @@ import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.TrainingActivity;
 import org.grapentin.apps.exceer.helpers.XmlNode;
 import org.grapentin.apps.exceer.managers.ContextManager;
+import org.grapentin.apps.exceer.orm.Backref;
+import org.grapentin.apps.exceer.orm.BaseModel;
+import org.grapentin.apps.exceer.orm.Column;
+import org.grapentin.apps.exceer.orm.Relation;
 import org.grapentin.apps.exceer.training.Properties;
 
 public class ModelLevel extends BaseExercisable
 {
 
   @SuppressWarnings("unused") // accessed by reflection from BaseModel
-  protected final static String TABLE_NAME = "levels";
+  public final static String TABLE_NAME = "levels";
 
   // database layout
   public Column name = new Column("name");

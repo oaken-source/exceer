@@ -17,54 +17,46 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.models;
+package org.grapentin.apps.exceer.orm;
 
 import android.database.Cursor;
 
-import org.grapentin.apps.exceer.orm.BaseModel;
-import org.grapentin.apps.exceer.orm.Column;
-import org.grapentin.apps.exceer.orm.DatabaseManager;
-
-public class ModelSession extends BaseModel
+public class Backref
 {
+  public String name;
+  public Class other;
 
-  @SuppressWarnings("unused") // accessed by reflection from BaseModel
-  public final static String TABLE_NAME = "sessions";
+  public BaseModel left = null;
+  public BaseModel right = null;
 
-  // database layout
-  public Column date = new Column("date", Column.TYPE_LONG);
-  public Column training_id = new Column("training_id", Column.TYPE_LONG);
-
-  public ModelSession (long training_id)
+  public Backref (BaseModel right, String name, Class other)
     {
-      this.date.set(System.currentTimeMillis());
-      this.training_id.set(training_id);
+      this.right = right;
+      this.name = name;
+      this.other = other;
     }
 
-  public ModelSession ()
+  private String getRelationTableName ()
     {
-
+      return "orm_" + BaseModel.getTableName(other) + "_" + BaseModel.getTableName(right.getClass());
     }
 
-  public static ModelSession get (long id)
+  public BaseModel get ()
     {
-      return (ModelSession)BaseModel.get(ModelSession.class, id);
-    }
+      if (left != null)
+        return left;
 
-  public static ModelSession getLast ()
-    {
-      ModelSession out = null;
+      Cursor c = DatabaseManager.getSession().query(getRelationTableName(), new String[]{
+          "left_id"
+      }, "right_id=" + right._ID.get(), null, null, null, null);
 
-      ModelSession tmp = new ModelSession();
-      Cursor c = DatabaseManager.getSession().query(TABLE_NAME, new String[]{ tmp._ID.name }, null, null, null, null, tmp.date.name + " DESC", "1");
-      if (c.getCount() == 1)
-        {
-          c.moveToFirst();
-          out = get(c.getLong(c.getColumnIndex(tmp._ID.name)));
-        }
+      c.moveToFirst();
+      if (!c.isAfterLast())
+        left = BaseModel.get(other, c.getLong(c.getColumnIndex("left_id")));
+
       c.close();
-
-      return out;
+      return left;
     }
 
 }
+
