@@ -41,9 +41,9 @@ public class Training extends BaseModel
   public final static String TABLE_NAME = "trainings";
 
   // database layout
-  public Column name = new Column("name");
-  public Relation exercises = makeRelation("exercises", Exercise.class);
-  public Relation properties = makeRelation("properties", Property.class);
+  private final Column name = new Column("name");
+  private final Relation exercises = makeRelation(Exercise.class);
+  private final Relation properties = makeRelation(Property.class);
 
   // temporary runtime values
   private int currentExerciseId = 0;
@@ -70,7 +70,7 @@ public class Training extends BaseModel
     }
 
   @Nullable
-  public Exercise getCurrentExercise ()
+  private Exercise getCurrentExercise ()
     {
       return (Exercise)exercises.at(currentExerciseId);
     }
@@ -110,7 +110,7 @@ public class Training extends BaseModel
       getCurrentExercise().show();
     }
 
-  public void show ()
+  private void show ()
     {
       TextView currentExerciseLabel = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLabel);
       TextView currentExerciseLevelLabel1 = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel1);

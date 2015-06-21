@@ -21,7 +21,6 @@ package org.grapentin.apps.exceer.helpers;
 
 import android.media.AudioManager;
 import android.media.SoundPool;
-import android.support.annotation.NonNull;
 import android.support.annotation.RawRes;
 
 import org.grapentin.apps.exceer.R;
@@ -34,23 +33,17 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class Sounds extends Thread
 {
 
-  private static Sounds instance = new Sounds();
+  private final static Sounds instance = new Sounds();
 
   @SuppressWarnings("deprecation")
-  private SoundPool soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
+  private final SoundPool soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
 
-  private HashMap<Integer, Integer> sounds = new HashMap<>();
-  private BlockingQueue<Integer> queue = new LinkedBlockingQueue<>();
+  private final HashMap<Integer, Integer> sounds = new HashMap<>();
+  private final BlockingQueue<Integer> queue = new LinkedBlockingQueue<>();
 
   private Sounds ()
     {
       start();
-    }
-
-  @NonNull
-  private static Sounds getInstance ()
-    {
-      return instance;
     }
 
   public static void load ()
@@ -58,7 +51,7 @@ public class Sounds extends Thread
       try
         {
           for (Field field : R.raw.class.getFields())
-            getInstance().sounds.put(field.getInt(null), getInstance().soundPool.load(Context.get(), field.getInt(null), 0));
+            instance.sounds.put(field.getInt(null), instance.soundPool.load(Context.get(), field.getInt(null), 0));
         }
       catch (IllegalAccessException e)
         {
@@ -68,7 +61,7 @@ public class Sounds extends Thread
 
   public static void play (@RawRes int resource)
     {
-      getInstance().queue.add(resource);
+      instance.queue.add(resource);
     }
 
   public void run ()

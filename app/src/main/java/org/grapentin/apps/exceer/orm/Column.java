@@ -17,7 +17,6 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-
 package org.grapentin.apps.exceer.orm;
 
 import android.support.annotation.NonNull;
@@ -26,17 +25,16 @@ import android.support.annotation.Nullable;
 public class Column
 {
 
-  @SuppressWarnings("unused") // to be used by Models
+  @SuppressWarnings("WeakerAccess")
   public static final String TYPE_TEXT = "TEXT";
-  @SuppressWarnings("unused") // to be used by Models
   public static final String TYPE_INT = "INTEGER";
-  @SuppressWarnings("unused") // to be used by Models
   public static final String TYPE_LONG = "INTEGER";
 
-  public String name;
-  public String type;
-  public String params;
+  public final String name;
+  public final String type;
+  public final String params;
 
+  @Nullable
   private String value = null;
 
   public Column (@NonNull String name)

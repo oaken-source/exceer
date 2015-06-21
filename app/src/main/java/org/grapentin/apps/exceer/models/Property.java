@@ -33,8 +33,8 @@ public class Property extends BaseModel
   public final static String TABLE_NAME = "properties";
 
   // database layout
-  public Column key = new Column("key");
-  public Column value = new Column("value");
+  public final Column key = new Column("key");
+  public final Column value = new Column("value");
 
   public static Property fromXml (@NonNull XmlNode root)
     {
@@ -47,6 +47,7 @@ public class Property extends BaseModel
     }
 
   @Nullable
+  @SuppressWarnings("unused")
   public static Property get (long id)
     {
       return (Property)BaseModel.get(Property.class, id);

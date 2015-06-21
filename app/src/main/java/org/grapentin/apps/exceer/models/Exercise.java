@@ -40,13 +40,13 @@ public class Exercise extends BaseExercisable
   public final static String TABLE_NAME = "exercises";
 
   // database layout
-  public Column name = new Column("name");
-  public Column currentExerciseId = new Column("currentExerciseId", Column.TYPE_INT);
-  public Column currentLevelId = new Column("currentLevelId", Column.TYPE_INT);
-  public Column progress = new Column("progress");
-  public Relation levels = makeRelation("levels", Level.class);
-  public Relation exercises = makeRelation("exercises", Exercise.class);
-  public Relation properties = makeRelation("properties", Property.class);
+  private final Column name = new Column("name");
+  private final Column currentExerciseId = new Column("currentExerciseId", Column.TYPE_INT);
+  private final Column currentLevelId = new Column("currentLevelId", Column.TYPE_INT);
+  private final Column progress = new Column("progress");
+  private final Relation levels = makeRelation(Level.class);
+  private final Relation exercises = makeRelation(Exercise.class);
+  private final Relation properties = makeRelation(Property.class);
 
   public static Exercise fromXml (@NonNull XmlNode root)
     {
@@ -67,12 +67,12 @@ public class Exercise extends BaseExercisable
     }
 
   @Nullable
+  @SuppressWarnings("unused")
   public static Exercise get (long id)
     {
       return (Exercise)BaseModel.get(Exercise.class, id);
     }
 
-  @Override
   @NonNull
   public BaseExercisable getLeafExercisable ()
     {
@@ -84,13 +84,13 @@ public class Exercise extends BaseExercisable
     }
 
   @Nullable
-  public Exercise getCurrentExercise ()
+  private Exercise getCurrentExercise ()
     {
       return (Exercise)exercises.at(currentExerciseId.getInt());
     }
 
   @Nullable
-  public Level getCurrentLevel ()
+  private Level getCurrentLevel ()
     {
       return (Level)levels.at(currentLevelId.getInt());
     }
@@ -132,6 +132,7 @@ public class Exercise extends BaseExercisable
         getCurrentExercise().reset();
       else if (getCurrentLevel() != null)
         getCurrentLevel().reset();
+      super.reset();
     }
 
   @Override
@@ -166,6 +167,11 @@ public class Exercise extends BaseExercisable
         ((Level)l).wrapUp();
 
       commit();
+    }
+
+  public String getName ()
+    {
+      return name.get();
     }
 
 }

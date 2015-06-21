@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="org.grapentin.apps.exceer"
-          xmlns:android="http://schemas.android.com/apk/res/android">
-
-  <uses-sdk
-      android:minSdkVersion="8"
-      android:targetSdkVersion="22" />
+<manifest
+    package="org.grapentin.apps.exceer"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
   <uses-permission android:name="android.permission.WAKE_LOCK" />
   <uses-permission android:name="android.permission.INTERNET" />
@@ -22,14 +19,12 @@
         android:screenOrientation="portrait">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
-
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
     <activity
         android:name=".activity.TrainingActivity"
         android:label="@string/title_activity_training"
-        android:parentActivityName=".activity.MainActivity"
         android:screenOrientation="portrait">
       <meta-data
           android:name="android.support.PARENT_ACTIVITY"
@@ -38,7 +33,6 @@
     <activity
         android:name=".activity.AboutActivity"
         android:label="@string/title_activity_about"
-        android:parentActivityName=".activity.MainActivity"
         android:screenOrientation="portrait">
       <meta-data
           android:name="android.support.PARENT_ACTIVITY"
@@ -47,10 +41,26 @@
     <activity
         android:name=".activity.settings.MainSettingsActivity"
         android:label="@string/title_activity_settings"
-        android:parentActivityName=".activity.MainActivity">
+        android:screenOrientation="portrait">
       <meta-data
           android:name="android.support.PARENT_ACTIVITY"
           android:value=".activity.MainActivity" />
+    </activity>
+    <activity
+        android:name=".activity.settings.LevelSettingsActivity"
+        android:label="@string/title_activity_settings"
+        android:screenOrientation="portrait">
+      <meta-data
+          android:name="android.support.PARENT_ACTIVITY"
+          android:value=".activity.TrainingActivity" />
+    </activity>
+    <activity
+        android:name=".activity.settings.ProgressSettingsActivity"
+        android:label="@string/title_activity_settings"
+        android:screenOrientation="portrait">
+      <meta-data
+          android:name="android.support.PARENT_ACTIVITY"
+          android:value=".activity.TrainingActivity" />
     </activity>
   </application>
 

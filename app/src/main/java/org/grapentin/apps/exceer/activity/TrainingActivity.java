@@ -125,6 +125,7 @@ public class TrainingActivity extends BaseActivity
       builder.show();
     }
 
+  @SuppressWarnings("UnusedParameters")
   public void onContextButtonClicked (View view)
     {
       if (TrainingManager.isRunning())
@@ -138,6 +139,7 @@ public class TrainingActivity extends BaseActivity
         TrainingManager.start();
     }
 
+  @SuppressWarnings("UnusedParameters")
   public void onCurrentExerciseLevelLabelClicked (View view)
     {
       BaseExercisable ex = TrainingManager.getLeafExercisable();

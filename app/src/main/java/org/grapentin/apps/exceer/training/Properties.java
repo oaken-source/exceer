@@ -31,6 +31,7 @@ import org.grapentin.apps.exceer.orm.Relation;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 
+@SuppressWarnings("CanBeFinal")
 public class Properties implements Serializable
 {
 
@@ -72,14 +73,13 @@ public class Properties implements Serializable
 
     }
 
+  @SuppressWarnings("WeakerAccess")
   public Properties (@NonNull Properties properties)
     {
       try
         {
           for (Field f : this.getClass().getFields())
-            {
-              f.set(this, f.get(properties));
-            }
+            f.set(this, f.get(properties));
         }
       catch (Exception e)
         {
@@ -111,7 +111,7 @@ public class Properties implements Serializable
         }
     }
 
-  public void set (@NonNull String key, @NonNull String value)
+  private void set (@NonNull String key, @NonNull String value)
     {
       switch (key)
         {

@@ -19,19 +19,18 @@
 
 package org.grapentin.apps.exceer.training;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.grapentin.apps.exceer.orm.Database;
 import org.grapentin.apps.exceer.models.Session;
 import org.grapentin.apps.exceer.models.Training;
+import org.grapentin.apps.exceer.orm.Database;
 
 import java.io.Serializable;
 
 public class TrainingManager implements Serializable
 {
 
-  private static TrainingManager instance = new TrainingManager();
+  private final static TrainingManager instance = new TrainingManager();
 
   @Nullable
   private Training currentTraining = null;
@@ -42,74 +41,68 @@ public class TrainingManager implements Serializable
 
     }
 
-  @NonNull
-  private static TrainingManager getInstance ()
-    {
-      return instance;
-    }
-
   @Nullable
   public static BaseExercisable getLeafExercisable ()
     {
-      assert getInstance().currentTraining != null;
-      return getInstance().currentTraining.getLeafExercisable();
+      assert instance.currentTraining != null;
+      return instance.currentTraining.getLeafExercisable();
     }
 
   public static boolean isRunning ()
     {
-      assert getInstance().currentTraining != null;
-      return getInstance().currentTraining.isRunning();
+      assert instance.currentTraining != null;
+      return instance.currentTraining.isRunning();
     }
 
   public static boolean isFinished ()
     {
-      assert getInstance().currentTraining != null;
-      return getInstance().currentTraining.isFinished();
+      assert instance.currentTraining != null;
+      return instance.currentTraining.isFinished();
     }
 
   public static void prepare ()
     {
-      if (getInstance().currentTraining != null)
+      if (instance.currentTraining != null)
         return;
 
       // TODO: get currentTrainingId from settings
-      getInstance().currentTrainingId = 1;
-      getInstance().currentTraining = Training.get(getInstance().currentTrainingId);
+      instance.currentTrainingId = 1;
+      instance.currentTraining = Training.get(instance.currentTrainingId);
       // TODO: handle edge case where currentTrainingId is not valid
-      getInstance().currentTraining.prepare();
+      instance.currentTraining.prepare();
     }
 
   public static void next ()
     {
-      assert getInstance().currentTraining != null;
-      getInstance().currentTraining.next();
+      assert instance.currentTraining != null;
+      instance.currentTraining.next();
     }
 
   public static void reset ()
     {
-      assert getInstance().currentTraining != null;
-      getInstance().currentTraining.reset();
-      getInstance().currentTraining = null;
+      assert instance.currentTraining != null;
+      instance.currentTraining.reset();
+      instance.currentTraining = null;
     }
 
   public static void start ()
     {
-      assert getInstance().currentTraining != null;
-      getInstance().currentTraining.start();
+      assert instance.currentTraining != null;
+      instance.currentTraining.start();
     }
 
   public static void pause ()
     {
-      assert getInstance().currentTraining != null;
-      getInstance().currentTraining.pause();
+      assert instance.currentTraining != null;
+      instance.currentTraining.pause();
     }
 
   public static void wrapUp ()
     {
-      assert getInstance().currentTraining != null;
-      getInstance().currentTraining.wrapUp();
-      Database.add(new Session(getInstance().currentTraining.getId()));
-      getInstance().currentTraining = null;
+      assert instance.currentTraining != null;
+      instance.currentTraining.wrapUp();
+      Database.add(new Session(instance.currentTraining.getId()));
+      instance.currentTraining = null;
     }
 
 }

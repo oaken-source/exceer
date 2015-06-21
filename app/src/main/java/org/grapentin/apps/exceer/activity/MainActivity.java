@@ -103,6 +103,7 @@ public class MainActivity extends BaseActivity
       return super.onOptionsItemSelected(item);
     }
 
+  @SuppressWarnings("UnusedParameters")
   public void onTrainButtonClicked (View view)
     {
       Intent intent = new Intent(this, TrainingActivity.class);
@@ -117,7 +118,7 @@ public class MainActivity extends BaseActivity
         TextView lastSessionTextView = (TextView)findViewById(R.id.MainActivityLastSessionDate);
 
         Session lastSession = Session.getLast();
-        long last = (lastSession == null ? System.currentTimeMillis() : lastSession.date.getLong());
+        long last = (lastSession == null ? System.currentTimeMillis() : lastSession.getDate());
         long elapsed = System.currentTimeMillis() - last;
 
         elapsed = Math.round(elapsed / 1000.0);

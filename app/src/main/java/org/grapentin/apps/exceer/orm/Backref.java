@@ -25,16 +25,15 @@ import android.support.annotation.Nullable;
 
 public class Backref
 {
-  public String name;
-  public Class other;
+  private final Class other;
 
-  public BaseModel left = null;
-  public BaseModel right = null;
+  @Nullable
+  private BaseModel left = null;
+  private final BaseModel right;
 
-  public Backref (@NonNull BaseModel right, @NonNull String name, @NonNull Class other)
+  public Backref (@NonNull BaseModel right, @NonNull Class other)
     {
       this.right = right;
-      this.name = name;
       this.other = other;
     }
 
@@ -44,7 +43,7 @@ public class Backref
       return "orm_" + BaseModel.getTableName(other) + "_" + BaseModel.getTableName(right.getClass());
     }
 
-  @Nullable
+  @NonNull
   public BaseModel get ()
     {
       if (left != null)
@@ -59,6 +58,8 @@ public class Backref
         left = BaseModel.get(other, c.getLong(c.getColumnIndex("left_id")));
 
       c.close();
+
+      assert left != null;
       return left;
     }
 

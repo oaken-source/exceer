@@ -21,23 +21,16 @@ package org.grapentin.apps.exceer.helpers;
 
 import android.os.Handler;
 import android.support.annotation.CallSuper;
-import android.support.annotation.NonNull;
 
 public class Tasks
 {
 
-  private static Tasks instance = new Tasks();
-  private Handler handler = new Handler();
+  private final static Tasks instance = new Tasks();
+  private final Handler handler = new Handler();
 
   private Tasks ()
     {
 
-    }
-
-  @NonNull
-  private static Tasks getInstance ()
-    {
-      return instance;
     }
 
   abstract static public class TimerTask implements Runnable
@@ -49,21 +42,21 @@ public class Tasks
         if (next > 0)
           {
             next -= System.currentTimeMillis();
-            getInstance().handler.postDelayed(this, next);
+            instance.handler.postDelayed(this, next);
           }
       }
 
     @CallSuper
     public void start ()
       {
-        getInstance().handler.removeCallbacks(this);
-        getInstance().handler.post(this);
+        instance.handler.removeCallbacks(this);
+        instance.handler.post(this);
       }
 
     @CallSuper
     public void stop ()
       {
-        getInstance().handler.removeCallbacks(this);
+        instance.handler.removeCallbacks(this);
       }
 
     @CallSuper

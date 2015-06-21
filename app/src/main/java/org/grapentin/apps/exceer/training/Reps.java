@@ -27,8 +27,9 @@ import java.util.ArrayList;
 public class Reps implements Serializable
 {
 
-  public ArrayList<Long> sets = new ArrayList<>();
+  public final ArrayList<Long> sets = new ArrayList<>();
 
+  @SuppressWarnings("WeakerAccess")
   public Reps ()
     {
 
@@ -69,6 +70,8 @@ public class Reps implements Serializable
 
   public void increment (@NonNull Properties p)
     {
+      assert p.reps_begin != null && p.reps_finish != null;
+
       for (int i = this.sets.size(); i < p.reps_finish.sets.size(); ++i)
         this.sets.add((p.reps_begin.sets.size() <= i) ? 0 : p.reps_begin.sets.get(i));
 
@@ -88,6 +91,8 @@ public class Reps implements Serializable
 
   private boolean incrementPosition (int i, @NonNull Properties p)
     {
+      assert p.reps_finish != null;
+
       if (p.reps_increment_style == Properties.RepsIncrementStyle.fill_sets)
         if (this.sets.get(i) < p.reps_finish.sets.get(i))
           {

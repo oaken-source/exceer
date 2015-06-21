@@ -25,7 +25,7 @@ import android.support.annotation.Nullable;
 public class Context
 {
 
-  private static Context instance = new Context();
+  private final static Context instance = new Context();
   @Nullable
   private android.content.Context context = null;
 
@@ -34,22 +34,16 @@ public class Context
 
     }
 
-  @NonNull
-  private static Context getInstance ()
-    {
-      return instance;
-    }
-
   public static void set (@NonNull android.content.Context context)
     {
-      getInstance().context = context;
+      instance.context = context;
     }
 
   @NonNull
   public static android.content.Context get ()
     {
-      assert getInstance().context != null;
-      return getInstance().context;
+      assert instance.context != null;
+      return instance.context;
     }
 
 }

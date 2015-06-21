@@ -35,8 +35,8 @@ import org.grapentin.apps.exceer.orm.BaseModel;
 abstract public class BaseExercisable extends BaseModel
 {
 
-  @SuppressWarnings("unused") // accessed by reflection from BaseModel
-  protected static final String TABLE_NAME = null;
+  @SuppressWarnings("unused")
+  public static final String TABLE_NAME = null;
 
   protected Properties props = new Properties();
 
@@ -45,18 +45,9 @@ abstract public class BaseExercisable extends BaseModel
 
   private boolean running = false;
 
-  protected BaseExercisable ()
-    {
-
-    }
-
-  abstract public BaseExercisable getLeafExercisable ();
-
-  abstract public void levelUp ();
-
-  abstract public String getCurrentProgress ();
-
-  abstract public void setCurrentProgress (String progress);
+  abstract protected void levelUp ();
+  abstract protected String getCurrentProgress ();
+  abstract protected void setCurrentProgress (String progress);
 
   public boolean isRunning ()
     {
@@ -69,7 +60,7 @@ abstract public class BaseExercisable extends BaseModel
       return props.image;
     }
 
-  public void prepare ()
+  protected void prepare ()
     {
       if (props.reps_begin != null)
         {
@@ -91,6 +82,13 @@ abstract public class BaseExercisable extends BaseModel
         {
           task = new DurationTask(props.duration);
         }
+    }
+
+  @SuppressWarnings("WeakerAccess")
+  public void reset ()
+    {
+      if (task != null)
+        task.stop();
     }
 
   public void show ()
@@ -140,7 +138,7 @@ abstract public class BaseExercisable extends BaseModel
       running = false;
     }
 
-  public void finishExercise ()
+  private void finishExercise ()
     {
       running = false;
 
@@ -215,7 +213,7 @@ abstract public class BaseExercisable extends BaseModel
 
   private void increment ()
     {
-      if (props.reps_begin != null)
+      if (props.reps_begin != null && props.reps_finish != null)
         {
           Reps reps = new Reps(getCurrentProgress());
 
@@ -229,7 +227,7 @@ abstract public class BaseExercisable extends BaseModel
             reps.increment(props);
           setCurrentProgress(reps.toString());
         }
-      else if (props.duration_begin != null)
+      else if (props.duration_begin != null && props.duration_finish != null)
         {
           Duration duration = new Duration(getCurrentProgress());
 
@@ -251,7 +249,7 @@ abstract public class BaseExercisable extends BaseModel
 
   private class DurationTask extends Tasks.TimerTask
   {
-    private Duration duration;
+    private final Duration duration;
 
     private long start = 0;
     private long paused = 0;
@@ -330,8 +328,8 @@ abstract public class BaseExercisable extends BaseModel
 
   private class RepsTask extends Tasks.TimerTask
   {
-    private Reps reps;
-    private Reps done;
+    private final Reps reps;
+    private final Reps done;
 
     private int currentSet = 0;
     private int phase = 0;
@@ -499,7 +497,7 @@ abstract public class BaseExercisable extends BaseModel
 
   private class PauseTask extends Tasks.TimerTask
   {
-    private long duration;
+    private final long duration;
 
     private long start = 0;
     private long countdown = 3;

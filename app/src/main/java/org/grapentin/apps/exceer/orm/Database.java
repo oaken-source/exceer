@@ -19,18 +19,18 @@
 
 package org.grapentin.apps.exceer.orm;
 
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.LongSparseArray;
 
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.activity.MainActivity;
+import org.grapentin.apps.exceer.helpers.Context;
 import org.grapentin.apps.exceer.helpers.Reflection;
 import org.grapentin.apps.exceer.helpers.XmlNode;
-import org.grapentin.apps.exceer.helpers.Context;
 import org.grapentin.apps.exceer.models.Training;
 
 import java.util.HashMap;
@@ -38,12 +38,13 @@ import java.util.HashMap;
 public class Database extends SQLiteOpenHelper
 {
 
-  private static final int DATABASE_VERSION = 1;
-  private static final String DATABASE_NAME = "TrainingStorage.db";
-  private static final Revision revisions[] = new Revision[]{
+  private final static int DATABASE_VERSION = 1;
+  private final static String DATABASE_NAME = "TrainingStorage.db";
+  private final static Revision revisions[] = new Revision[]{
       new Revision("", "")
   };
-  private static HashMap<Class, HashMap<Long, BaseModel>> cache = new HashMap<>();
+  private final static HashMap<Class, LongSparseArray<BaseModel>> cache = new HashMap<>();
+  @Nullable
   private static Database instance = null;
 
   private boolean deferCallback = false;
@@ -80,11 +81,10 @@ public class Database extends SQLiteOpenHelper
       b.onInsert();
     }
 
-  @SuppressLint("UseSparseArrays")
   public static void addToCache (@NonNull BaseModel b)
     {
       if (!cache.containsKey(b.getClass()))
-        cache.put(b.getClass(), new HashMap<Long, BaseModel>());
+        cache.put(b.getClass(), new LongSparseArray<BaseModel>());
       cache.get(b.getClass()).put(b.getId(), b);
     }
 
@@ -93,7 +93,7 @@ public class Database extends SQLiteOpenHelper
     {
       if (!cache.containsKey(c))
         return null;
-      if (!cache.get(c).containsKey(id))
+      if (cache.get(c).get(id, null) == null)
         return null;
       return cache.get(c).get(id);
     }
@@ -188,12 +188,18 @@ public class Database extends SQLiteOpenHelper
       new Thread(runnable).start();
     }
 
+  public void onDrop ()
+    {
+      for (Class model : Reflection.getSubclassesOf(BaseModel.class))
+        BaseModel.onDrop(model);
+    }
+
   private static class Revision
   {
-    private String upgradeSql;
-    private String downgradeSql;
+    private final String upgradeSql;
+    private final String downgradeSql;
 
-    public Revision (String upgradeSql, String downgradeSql)
+    public Revision (@SuppressWarnings("SameParameterValue") String upgradeSql, @SuppressWarnings("SameParameterValue") String downgradeSql)
       {
         this.upgradeSql = upgradeSql;
         this.downgradeSql = downgradeSql;

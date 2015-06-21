@@ -41,10 +41,10 @@ public class Level extends BaseExercisable
   public final static String TABLE_NAME = "levels";
 
   // database layout
-  public Column name = new Column("name");
-  public Column progress = new Column("progress");
-  public Relation properties = makeRelation("properties", Property.class);
-  public Backref exercise = makeBackref("exercise", Exercise.class);
+  private final Column name = new Column("name");
+  private final Column progress = new Column("progress");
+  private final Relation properties = makeRelation(Property.class);
+  private final Backref exercise = makeBackref(Exercise.class);
 
   public static Level fromXml (@NonNull XmlNode root)
     {
@@ -59,6 +59,7 @@ public class Level extends BaseExercisable
     }
 
   @Nullable
+  @SuppressWarnings("unused")
   public static Level get (long id)
     {
       return (Level)BaseModel.get(Level.class, id);
@@ -84,16 +85,11 @@ public class Level extends BaseExercisable
       TextView currentExerciseLevelLabel1 = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel1);
       TextView currentExerciseLevelLabel2 = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel2);
 
-      currentExerciseLabel.setText(((Exercise)exercise.get()).name.get());
+      currentExerciseLabel.setText(((Exercise)exercise.get()).getName());
       currentExerciseLevelLabel1.setText(Context.get().getString(R.string.TrainingActivityCurrentExerciseLevelInt) + ((Exercise)exercise.get()).getCurrentLevelId());
       currentExerciseLevelLabel2.setText(name.get());
 
       super.show();
-    }
-
-  public void reset ()
-    {
-
     }
 
   @Override

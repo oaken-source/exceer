@@ -29,6 +29,7 @@ public class Duration
     }
 
   @NonNull
+  @SuppressWarnings("WeakerAccess")
   public static String toString (@NonNull Duration d)
     {
       if (d.duration == 0)

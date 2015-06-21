@@ -26,12 +26,10 @@ import android.support.annotation.Nullable;
 
 import org.grapentin.apps.exceer.helpers.Reflection;
 
-import java.util.ArrayList;
-
 public abstract class BaseModel
 {
 
-  protected Column _ID = new Column("id", Column.TYPE_INT, "PRIMARY KEY");
+  protected final Column _ID = new Column("id", Column.TYPE_INT, "PRIMARY KEY");
 
   public BaseModel ()
     {
@@ -115,34 +113,6 @@ public abstract class BaseModel
         }
     }
 
-  public static ArrayList<Long> getAllIds (@NonNull Class model)
-    {
-      ArrayList<Long> out = new ArrayList<>();
-
-      String TABLE_NAME = getTableName(model);
-      assert TABLE_NAME != null;
-
-      try
-        {
-          BaseModel m = (BaseModel)model.newInstance();
-
-          Cursor c = Database.getSession().query(TABLE_NAME, new String[]{ m._ID.name }, null, null, null, null, null);
-          c.moveToFirst();
-          while (!c.isAfterLast())
-            {
-              out.add(c.getLong(c.getColumnIndex(m._ID.name)));
-              c.moveToNext();
-            }
-          c.close();
-
-          return out;
-        }
-      catch (Exception e)
-        {
-          throw new Error(e);
-        }
-    }
-
   public void onInsert ()
     {
       if (_ID.get() != null)
@@ -165,7 +135,7 @@ public abstract class BaseModel
         ((Relation)o).onInsert();
     }
 
-  public void commit ()
+  protected void commit ()
     {
       if (_ID.get() == null)
         {
@@ -185,15 +155,15 @@ public abstract class BaseModel
     }
 
   @NonNull
-  public Relation makeRelation (@NonNull String name, @NonNull Class other)
+  protected Relation makeRelation (@NonNull Class other)
     {
-      return new Relation(this, name, other);
+      return new Relation(this, other);
     }
 
   @NonNull
-  public Backref makeBackref (@NonNull String name, @NonNull Class other)
+  protected Backref makeBackref (@NonNull Class other)
     {
-      return new Backref(this, name, other);
+      return new Backref(this, other);
     }
 
   public long getId ()

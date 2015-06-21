@@ -28,16 +28,14 @@ import java.util.ArrayList;
 
 public class Relation
 {
-  public String name;
-  public Class other;
+  private final Class other;
 
-  public BaseModel left = null;
-  public ArrayList<BaseModel> right = null;
+  private final BaseModel left;
+  private ArrayList<BaseModel> right = null;
 
-  public Relation (BaseModel left, String name, Class other)
+  public Relation (BaseModel left, Class other)
     {
       this.left = left;
-      this.name = name;
       this.other = other;
     }
 
@@ -95,7 +93,7 @@ public class Relation
     }
 
   @NonNull
-  public ArrayList<BaseModel> getRight ()
+  private ArrayList<BaseModel> getRight ()
     {
       if (right != null)
         return right;

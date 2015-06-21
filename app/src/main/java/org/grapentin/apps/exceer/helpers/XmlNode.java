@@ -34,11 +34,12 @@ import java.util.HashMap;
 public class XmlNode implements Serializable
 {
 
+  @Nullable
   private String name = null;
   private String value = "";
 
-  private HashMap<String, String> attributes = new HashMap<>();
-  private ArrayList<XmlNode> children = new ArrayList<>();
+  private final HashMap<String, String> attributes = new HashMap<>();
+  private final ArrayList<XmlNode> children = new ArrayList<>();
 
   public XmlNode (@NonNull XmlResourceParser p) throws XmlPullParserException, XmlNodeMalformedException, IOException
     {
@@ -93,7 +94,7 @@ public class XmlNode implements Serializable
     }
 
   @NonNull
-  public String getName ()
+  private String getName ()
     {
       assert name != null;
       return name;
@@ -106,7 +107,7 @@ public class XmlNode implements Serializable
     }
 
   @Nullable
-  public String getAttribute (@NonNull String key)
+  public String getAttribute (@SuppressWarnings("SameParameterValue") @NonNull String key)
     {
       return attributes.get(key);
     }

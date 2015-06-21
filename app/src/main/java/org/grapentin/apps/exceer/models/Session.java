@@ -33,8 +33,8 @@ public class Session extends BaseModel
   public final static String TABLE_NAME = "sessions";
 
   // database layout
-  public Column date = new Column("date", Column.TYPE_LONG);
-  public Column training_id = new Column("training_id", Column.TYPE_LONG);
+  private final Column date = new Column("date", Column.TYPE_LONG);
+  private final Column training_id = new Column("training_id", Column.TYPE_LONG);
 
   public Session (long training_id)
     {
@@ -42,13 +42,13 @@ public class Session extends BaseModel
       this.training_id.set(training_id);
     }
 
-  public Session ()
+  private Session ()
     {
 
     }
 
   @Nullable
-  public static Session get (long id)
+  private static Session get (long id)
     {
       return (Session)BaseModel.get(Session.class, id);
     }
@@ -68,6 +68,11 @@ public class Session extends BaseModel
       c.close();
 
       return out;
+    }
+
+  public long getDate ()
+    {
+      return date.getLong();
     }
 
 }
