@@ -35,13 +35,13 @@ import java.lang.reflect.Field;
 public class Properties implements Serializable
 {
 
-  public long pause_after_set = 90000;
-  public long pause_after_exercise = 90000;
+  public Duration pause_after_set = Duration.fromString("90s");
+  public Duration pause_after_exercise = Duration.fromString("90s");
 
-  public long reps_duration_concentric = 2000;
-  public long reps_duration_eccentric = 3000;
-  public long reps_pause_after_concentric = 1000;
-  public long reps_pause_after_eccentric = 0;
+  public Duration reps_duration_concentric = Duration.fromString("2s");
+  public Duration reps_duration_eccentric = Duration.fromString("3s");
+  public Duration reps_pause_after_concentric = Duration.fromString("1s");
+  public Duration reps_pause_after_eccentric = Duration.fromString("0");
 
   @Nullable
   public Duration duration = null;
@@ -49,7 +49,7 @@ public class Properties implements Serializable
   public Duration duration_begin = null;
   @Nullable
   public Duration duration_finish = null;
-  public long duration_increment = 5000;
+  public Duration duration_increment = Duration.fromString("5s");
 
   @NonNull
   public PrimaryMotion primary_motion = PrimaryMotion.concentric;
@@ -61,9 +61,9 @@ public class Properties implements Serializable
   public Reps reps_finish = null;
   public long reps_increment = 0;
   @NonNull
-  public RepsIncrementDirection reps_increment_direction = RepsIncrementDirection.front_to_back;
+  public Reps.IncrementDirection reps_increment_direction = Reps.IncrementDirection.front_to_back;
   @NonNull
-  public RepsIncrementStyle reps_increment_style = RepsIncrementStyle.balanced;
+  public Reps.IncrementStyle reps_increment_style = Reps.IncrementStyle.balanced;
 
   @Nullable
   public String image = null;
@@ -123,19 +123,17 @@ public class Properties implements Serializable
         case "reps_pause_after_concentric":
         case "reps_pause_after_eccentric":
         case "duration_increment":
-          setLong(key, Duration.parseLong(value));
+        case "duration":
+        case "duration_begin":
+        case "duration_finish":
+          setObject(key, Duration.fromString(value));
           break;
         case "reps_increment":
           setLong(key, Long.parseLong(value));
           break;
         case "reps_begin":
         case "reps_finish":
-          setObject(key, new Reps(value));
-          break;
-        case "duration":
-        case "duration_begin":
-        case "duration_finish":
-          setObject(key, new Duration(value));
+          setObject(key, Reps.fromString(value));
           break;
         case "image":
           setObject(key, value);
@@ -146,7 +144,7 @@ public class Properties implements Serializable
         case "reps_increment_direction":
           try
             {
-              setObject(key, RepsIncrementDirection.valueOf(value));
+              setObject(key, Reps.IncrementDirection.valueOf(value));
             }
           catch (Exception e)
             {
@@ -156,7 +154,7 @@ public class Properties implements Serializable
         case "reps_increment_style":
           try
             {
-              setObject(key, RepsIncrementStyle.valueOf(value));
+              setObject(key, Reps.IncrementStyle.valueOf(value));
             }
           catch (Exception e)
             {
@@ -214,18 +212,6 @@ public class Properties implements Serializable
           throw new Error(e);
         }
     }
-
-  public enum RepsIncrementDirection
-  {
-    front_to_back,
-    back_to_front
-  }
-
-  public enum RepsIncrementStyle
-  {
-    balanced,
-    fill_sets
-  }
 
   public enum PrimaryMotion
   {

@@ -65,7 +65,7 @@ abstract public class BaseExercisable extends BaseModel
       if (props.reps_begin != null)
         {
           String progress = getCurrentProgress();
-          Reps reps = ((progress == null) ? new Reps(props.reps_begin) : new Reps(progress));
+          Reps reps = ((progress == null) ? new Reps(props.reps_begin) : Reps.fromString(progress));
           setCurrentProgress(reps.toString());
 
           task = new RepsTask(reps);
@@ -73,7 +73,7 @@ abstract public class BaseExercisable extends BaseModel
       else if (props.duration_begin != null)
         {
           String progress = getCurrentProgress();
-          Duration duration = ((progress == null) ? props.duration_begin : new Duration(progress));
+          Duration duration = ((progress == null) ? props.duration_begin : Duration.fromString(progress));
           setCurrentProgress(duration.toString());
 
           task = new DurationTask(duration);
@@ -95,14 +95,14 @@ abstract public class BaseExercisable extends BaseModel
     {
       if (props.reps_begin != null)
         {
-          Reps reps = new Reps(getCurrentProgress());
+          Reps reps = Reps.fromString(getCurrentProgress());
 
           TextView progressLabel = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityProgressLabel);
           progressLabel.setText("1:0/" + reps.sets.get(0));
         }
       else if (props.duration_begin != null)
         {
-          Duration duration = new Duration(getCurrentProgress());
+          Duration duration = Duration.fromString(getCurrentProgress());
 
           long min = duration.get() / 60000;
           long sec = (duration.get() % 60000) / 1000;
@@ -193,9 +193,9 @@ abstract public class BaseExercisable extends BaseModel
           progressLabel.setText("00:00");
         }
 
-      if (props.pause_after_exercise > 0)
+      if (props.pause_after_exercise.get() > 0)
         {
-          task = new PauseTask(props.pause_after_exercise);
+          task = new PauseTask(props.pause_after_exercise.get());
           task.start();
         }
       else
@@ -215,23 +215,22 @@ abstract public class BaseExercisable extends BaseModel
     {
       if (props.reps_begin != null && props.reps_finish != null)
         {
-          Reps reps = new Reps(getCurrentProgress());
+          Reps reps = Reps.fromString(getCurrentProgress());
 
-          if (props.reps_finish != null && reps.greaterOrEqual(props.reps_finish))
+          if (props.reps_finish != null && reps.compareTo(props.reps_finish) >= 0)
             {
               levelUp();
               return;
             }
 
-          for (int i = 0; i < props.reps_increment; ++i)
-            reps.increment(props);
+          reps.increment(props.reps_increment, props.reps_finish, props.reps_increment_direction, props.reps_increment_style);
           setCurrentProgress(reps.toString());
         }
       else if (props.duration_begin != null && props.duration_finish != null)
         {
-          Duration duration = new Duration(getCurrentProgress());
+          Duration duration = Duration.fromString(getCurrentProgress());
 
-          if (props.duration_finish != null && duration.greaterOrEqual(props.duration_finish))
+          if (props.duration_finish != null && duration.compareTo(props.duration_finish) >= 0)
             {
               levelUp();
               return;
@@ -392,9 +391,9 @@ abstract public class BaseExercisable extends BaseModel
 
                 progressLabel.setText("" + (currentSet + 1) + ":" + done.sets.get(currentSet) + "/" + reps.sets.get(currentSet));
 
-                if (props.pause_after_set > 0)
+                if (props.pause_after_set.get() > 0)
                   {
-                    pause_duration = props.pause_after_set;
+                    pause_duration = props.pause_after_set.get();
                     return System.currentTimeMillis();
                   }
               }
@@ -411,10 +410,10 @@ abstract public class BaseExercisable extends BaseModel
         if (phase == 1)
           {
             next_sound = (props.primary_motion == Properties.PrimaryMotion.concentric ? R.raw.beep_high : R.raw.beep_low);
-            if (props.primary_motion == Properties.PrimaryMotion.concentric && props.reps_duration_concentric > 0)
-              return System.currentTimeMillis() + props.reps_duration_concentric;
-            if (props.primary_motion == Properties.PrimaryMotion.eccentric && props.reps_duration_eccentric > 0)
-              return System.currentTimeMillis() + props.reps_duration_eccentric;
+            if (props.primary_motion == Properties.PrimaryMotion.concentric && props.reps_duration_concentric.get() > 0)
+              return System.currentTimeMillis() + props.reps_duration_concentric.get();
+            if (props.primary_motion == Properties.PrimaryMotion.eccentric && props.reps_duration_eccentric.get() > 0)
+              return System.currentTimeMillis() + props.reps_duration_eccentric.get();
             phase++; // skip phase if no time set
           }
 
@@ -422,10 +421,10 @@ abstract public class BaseExercisable extends BaseModel
         if (phase == 2)
           {
             next_sound = (props.primary_motion == Properties.PrimaryMotion.concentric ? R.raw.beep_high : R.raw.beep_low);
-            if (props.primary_motion == Properties.PrimaryMotion.concentric && props.reps_pause_after_concentric > 0)
-              return System.currentTimeMillis() + props.reps_pause_after_concentric;
-            if (props.primary_motion == Properties.PrimaryMotion.eccentric && props.reps_pause_after_eccentric > 0)
-              return System.currentTimeMillis() + props.reps_pause_after_eccentric;
+            if (props.primary_motion == Properties.PrimaryMotion.concentric && props.reps_pause_after_concentric.get() > 0)
+              return System.currentTimeMillis() + props.reps_pause_after_concentric.get();
+            if (props.primary_motion == Properties.PrimaryMotion.eccentric && props.reps_pause_after_eccentric.get() > 0)
+              return System.currentTimeMillis() + props.reps_pause_after_eccentric.get();
             phase++; // skip phase if no time set
           }
 
@@ -433,10 +432,10 @@ abstract public class BaseExercisable extends BaseModel
         if (phase == 3)
           {
             next_sound = (props.primary_motion == Properties.PrimaryMotion.concentric ? R.raw.beep_low : R.raw.beep_high);
-            if (props.primary_motion == Properties.PrimaryMotion.concentric && props.reps_duration_eccentric > 0)
-              return System.currentTimeMillis() + props.reps_duration_eccentric;
-            if (props.primary_motion == Properties.PrimaryMotion.eccentric && props.reps_duration_concentric > 0)
-              return System.currentTimeMillis() + props.reps_duration_concentric;
+            if (props.primary_motion == Properties.PrimaryMotion.concentric && props.reps_duration_eccentric.get() > 0)
+              return System.currentTimeMillis() + props.reps_duration_eccentric.get();
+            if (props.primary_motion == Properties.PrimaryMotion.eccentric && props.reps_duration_concentric.get() > 0)
+              return System.currentTimeMillis() + props.reps_duration_concentric.get();
             phase++; // skip phase if no time set
           }
 
@@ -444,10 +443,10 @@ abstract public class BaseExercisable extends BaseModel
         if (phase == 4)
           {
             next_sound = (props.primary_motion == Properties.PrimaryMotion.concentric ? R.raw.beep_low : R.raw.beep_high);
-            if (props.primary_motion == Properties.PrimaryMotion.concentric && props.reps_pause_after_eccentric > 0)
-              return System.currentTimeMillis() + props.reps_pause_after_eccentric;
-            if (props.primary_motion == Properties.PrimaryMotion.eccentric && props.reps_pause_after_concentric > 0)
-              return System.currentTimeMillis() + props.reps_pause_after_concentric;
+            if (props.primary_motion == Properties.PrimaryMotion.concentric && props.reps_pause_after_eccentric.get() > 0)
+              return System.currentTimeMillis() + props.reps_pause_after_eccentric.get();
+            if (props.primary_motion == Properties.PrimaryMotion.eccentric && props.reps_pause_after_concentric.get() > 0)
+              return System.currentTimeMillis() + props.reps_pause_after_concentric.get();
           }
 
         return System.currentTimeMillis();

@@ -2,34 +2,50 @@ package org.grapentin.apps.exceer.training;
 
 import android.support.annotation.NonNull;
 
-public class Duration
+import java.io.Serializable;
+
+public class Duration implements Serializable, Comparable
 {
 
   private long duration;
 
-  public Duration (String value)
+  public Duration ()
     {
-      duration = parseLong(value);
+      duration = 0;
     }
 
-  public static long parseLong (@NonNull String s)
+  public static Duration fromString (@NonNull String s)
     {
-      long l = Long.parseLong(s.replaceAll("[\\D]", ""));
-      String extension = s.replaceAll("[^a-zA-Z]", "");
+      Duration d = new Duration();
 
+      try
+        {
+          d.duration = Long.parseLong(s.trim().replaceFirst("[\\D]*$", ""));
+        }
+      catch (NumberFormatException e)
+        {
+          throw new DurationFormatException("Invalid format: '" + s + "'", e);
+        }
+
+      String extension = s.trim().replaceFirst("^[^\\D]*", "").trim();
       switch (extension)
         {
+        case "":
+          break;
         case "s":
-          return l * 1000;
+          d.duration *= 1000;
+          break;
         case "min":
-          return l * 60 * 1000;
+          d.duration *= 60 * 1000;
+          break;
         default:
-          return l;
+          throw new DurationFormatException("Invalid format: '" + s + "'");
         }
+
+      return d;
     }
 
   @NonNull
-  @SuppressWarnings("WeakerAccess")
   public static String toString (@NonNull Duration d)
     {
       if (d.duration == 0)
@@ -52,14 +68,28 @@ public class Duration
       return duration;
     }
 
-  public boolean greaterOrEqual (@NonNull Duration other)
+  public void increment (Duration diff)
     {
-      return this.duration >= other.duration;
+      duration += diff.duration;
     }
 
-  public void increment (long diff)
+  @Override
+  public int compareTo (@NonNull Object another)
     {
-      duration += diff;
+      Duration d = (Duration)another;
+      return (int)(duration - d.duration);
     }
+
+  public static class DurationFormatException extends RuntimeException
+  {
+    public DurationFormatException (String msg)
+      {
+        super(msg);
+      }
+    public DurationFormatException (String msg, Exception e)
+      {
+        super(msg, e);
+      }
+  }
 
 }

@@ -23,13 +23,13 @@ import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 
-public class Reps implements Serializable
+public class Reps implements Serializable, Comparable
 {
 
   public final ArrayList<Long> sets = new ArrayList<>();
 
-  @SuppressWarnings("WeakerAccess")
   public Reps ()
     {
 
@@ -41,10 +41,32 @@ public class Reps implements Serializable
         this.sets.add(part);
     }
 
-  public Reps (@NonNull String s)
+  @NonNull
+  public static Reps fromString (@NonNull String s) throws RepsFormatException
     {
-      for (String part : s.split(","))
-        this.sets.add(Long.parseLong(part));
+      Reps r = new Reps();
+      if (s.trim().length() == 0)
+        return r;
+
+      try
+        {
+          for (String part : s.split(",", -1))
+            r.sets.add(Long.parseLong(part));
+        }
+      catch (NumberFormatException e)
+        {
+          throw new RepsFormatException("Invalid format: '" + s + "'", e);
+        }
+      return r;
+    }
+
+  @NonNull
+  public static String toString (Reps r)
+    {
+      String res = "";
+      for (long part : r.sets)
+        res += (res.equals("") ? "" : ",") + part;
+      return res;
     }
 
   @NonNull
@@ -56,76 +78,67 @@ public class Reps implements Serializable
       return res;
     }
 
-  public boolean greaterOrEqual (@NonNull Reps reps)
+  public void increment (long increment, @NonNull Reps finish, @NonNull IncrementDirection incrementDirection, @NonNull IncrementStyle incrementStyle)
     {
-      if (this.sets.size() < reps.sets.size())
-        return false;
+      int start = (incrementDirection == IncrementDirection.front_to_back) ? 0 : sets.size() - 1;
+      int end = (incrementDirection == IncrementDirection.front_to_back) ? sets.size() : -1;
+      int inc = (incrementDirection == IncrementDirection.front_to_back) ? 1 : -1;
 
-      for (int i = 0; i < this.sets.size(); ++i)
-        if (this.sets.get(i) < reps.sets.get(i))
-          return false;
-
-      return true;
-    }
-
-  public void increment (@NonNull Properties p)
-    {
-      assert p.reps_begin != null && p.reps_finish != null;
-
-      for (int i = this.sets.size(); i < p.reps_finish.sets.size(); ++i)
-        this.sets.add((p.reps_begin.sets.size() <= i) ? 0 : p.reps_begin.sets.get(i));
-
-      for (int i = this.sets.size(); i > p.reps_finish.sets.size(); --i)
-        this.sets.remove(i);
-
-      if (p.reps_increment_direction == Properties.RepsIncrementDirection.front_to_back)
-        for (int i = 0; i < this.sets.size(); ++i)
-          if (incrementPosition(i, p))
-            return;
-
-      if (p.reps_increment_direction == Properties.RepsIncrementDirection.back_to_front)
-        for (int i = this.sets.size() - 1; i >= 0; ++i)
-          if (incrementPosition(i, p))
-            return;
-    }
-
-  private boolean incrementPosition (int i, @NonNull Properties p)
-    {
-      assert p.reps_finish != null;
-
-      if (p.reps_increment_style == Properties.RepsIncrementStyle.fill_sets)
-        if (this.sets.get(i) < p.reps_finish.sets.get(i))
-          {
-            this.sets.set(i, this.sets.get(i) + 1);
-            return true;
-          }
-
-      if (p.reps_increment_style == Properties.RepsIncrementStyle.balanced)
-        if (this.sets.get(i) < p.reps_finish.sets.get(i) && this.sets.get(i) == getMin())
-          {
-            this.sets.set(i, this.sets.get(i) + 1);
-            return true;
-          }
-
-      return false;
-    }
-
-  private long getMin ()
-    {
-      long min = this.sets.get(0);
-      for (long part : sets)
-        if (part < min)
-          min = part;
-      return min;
+      for (int i = 0; i < increment; ++i)
+        for (int pos = start; pos != end; pos = pos + inc)
+          if (sets.get(pos) < finish.sets.get(pos) && (incrementStyle == IncrementStyle.fill_sets || sets.get(pos) <= Collections.min(sets)))
+            {
+              sets.set(pos, sets.get(pos) + 1);
+              break;
+            }
     }
 
   @NonNull
   public String toString ()
     {
-      String res = "";
-      for (long part : sets)
-        res += (res.equals("") ? "" : ",") + part;
-      return res;
+      return toString(this);
     }
+
+  @Override
+  public int compareTo (@NonNull Object another) throws RepsMismatchException
+    {
+      Reps r = (Reps)another;
+      if (sets.size() != r.sets.size())
+        throw new RepsMismatchException("Reps of size " + sets.size() + " can not be compared to reps of size " + r.sets.size());
+
+      for (int i = 0; i != sets.size(); ++i)
+        if (!sets.get(i).equals(r.sets.get(i)))
+          return (int)(sets.get(i) - r.sets.get(i));
+
+      return 0;
+    }
+
+  public enum IncrementDirection
+  {
+    front_to_back,
+    back_to_front
+  }
+
+  public enum IncrementStyle
+  {
+    balanced,
+    fill_sets
+  }
+
+  public static class RepsFormatException extends RuntimeException
+  {
+    public RepsFormatException (String msg, Exception inner)
+      {
+        super(msg, inner);
+      }
+  }
+
+  public static class RepsMismatchException extends RuntimeException
+  {
+    public RepsMismatchException (String msg)
+      {
+        super(msg);
+      }
+  }
 
 }
