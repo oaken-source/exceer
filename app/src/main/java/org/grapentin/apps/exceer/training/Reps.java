@@ -61,7 +61,7 @@ public class Reps implements Serializable, Comparable
     }
 
   @NonNull
-  public static String toString (Reps r)
+  public static String toString (@NonNull Reps r)
     {
       String res = "";
       for (long part : r.sets)
@@ -127,7 +127,7 @@ public class Reps implements Serializable, Comparable
 
   public static class RepsFormatException extends RuntimeException
   {
-    public RepsFormatException (String msg, Exception inner)
+    public RepsFormatException (@NonNull String msg, @NonNull Exception inner)
       {
         super(msg, inner);
       }
@@ -135,7 +135,7 @@ public class Reps implements Serializable, Comparable
 
   public static class RepsMismatchException extends RuntimeException
   {
-    public RepsMismatchException (String msg)
+    public RepsMismatchException (@NonNull String msg)
       {
         super(msg);
       }

@@ -31,7 +31,6 @@ import org.grapentin.apps.exceer.orm.Relation;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 
-@SuppressWarnings("CanBeFinal")
 public class Properties implements Serializable
 {
 

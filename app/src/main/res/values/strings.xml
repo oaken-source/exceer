@@ -14,9 +14,8 @@
   <string name="action_training_settings_progress">Set Progress</string>
 
   <string name="MainActivityWelcomeLabelText">Exceer</string>
-  <string name="MainActivityLastSessionLabel1Text">last session was</string>
   <string name="MainActivityLastSessionDateText">0 sec</string>
-  <string name="MainActivityLastSessionLabel2Text">ago</string>
+  <string name="MainActivityLastSessionLabelText">since last session</string>
   <string name="MainActivityTrainButtonText">Train Now!</string>
 
   <string name="TrainingActivityNoExercises">(no exercises)</string>
