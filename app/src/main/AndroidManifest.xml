@@ -31,32 +31,21 @@
     </activity>
     <activity
         android:name=".activity.AboutActivity"
-        android:label="@string/title_activity_about"
-        android:screenOrientation="portrait">
+        android:label="@string/title_activity_about">
       <meta-data
           android:name="android.support.PARENT_ACTIVITY"
           android:value=".activity.MainActivity" />
     </activity>
     <activity
         android:name=".activity.settings.MainSettingsActivity"
-        android:label="@string/title_activity_settings"
-        android:screenOrientation="portrait">
+        android:label="@string/title_activity_settings">
       <meta-data
           android:name="android.support.PARENT_ACTIVITY"
           android:value=".activity.MainActivity" />
     </activity>
     <activity
-        android:name=".activity.settings.LevelSettingsActivity"
-        android:label="@string/title_activity_settings"
-        android:screenOrientation="portrait">
-      <meta-data
-          android:name="android.support.PARENT_ACTIVITY"
-          android:value=".activity.TrainingActivity" />
-    </activity>
-    <activity
-        android:name=".activity.settings.ProgressSettingsActivity"
-        android:label="@string/title_activity_settings"
-        android:screenOrientation="portrait">
+        android:name=".activity.settings.TrainingSettingsActivity"
+        android:label="@string/title_activity_settings">
       <meta-data
           android:name="android.support.PARENT_ACTIVITY"
           android:value=".activity.TrainingActivity" />

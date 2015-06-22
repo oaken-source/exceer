@@ -35,8 +35,7 @@ import android.widget.Toast;
 
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.activity.base.BaseActivity;
-import org.grapentin.apps.exceer.activity.settings.LevelSettingsActivity;
-import org.grapentin.apps.exceer.activity.settings.ProgressSettingsActivity;
+import org.grapentin.apps.exceer.activity.settings.TrainingSettingsActivity;
 import org.grapentin.apps.exceer.models.Level;
 import org.grapentin.apps.exceer.training.BaseExercisable;
 import org.grapentin.apps.exceer.training.TrainingManager;
@@ -69,12 +68,10 @@ public class TrainingActivity extends BaseActivity
 
       // allow setting levels when leaf exercise is level
       boolean showSettingsLevel = (e != null && e.getClass() == Level.class);
-      menu.findItem(R.id.action_training_settings_level).setVisible(showSettingsLevel);
       // allow setting progress when leaf exercise knows progress
       boolean showSettingsProgress = (e != null && e.knowsProgress());
-      menu.findItem(R.id.action_training_settings_progress).setVisible(showSettingsProgress);
 
-      // if we show neither, don't even show the menu
+      // if we allow neither, don't show the menu
       return showSettingsLevel || showSettingsProgress;
     }
 
@@ -85,12 +82,8 @@ public class TrainingActivity extends BaseActivity
 
       switch (id)
         {
-        case R.id.action_training_settings_level:
-          Intent levelSettingsIntent = new Intent(this, LevelSettingsActivity.class);
-          startActivity(levelSettingsIntent);
-          break;
-        case R.id.action_training_settings_progress:
-          Intent progressSettingsIntent = new Intent(this, ProgressSettingsActivity.class);
+        case R.id.action_training_settings:
+          Intent progressSettingsIntent = new Intent(this, TrainingSettingsActivity.class);
           startActivity(progressSettingsIntent);
           break;
         }
