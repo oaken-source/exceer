@@ -60,10 +60,7 @@ public class MainActivity extends Activity
 
       DatabaseManager.init();
       TrainingManager.init();
-    }
 
-  public void afterDatabaseInit ()
-    {
       task = new UpdateTimerTask();
       task.start();
     }
