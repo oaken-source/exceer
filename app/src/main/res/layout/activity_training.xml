@@ -19,11 +19,12 @@
       android:enabled="true"
       android:onClick="onCurrentExerciseLevelLabelClicked"
       android:singleLine="true"
+      android:freezesText="true"
       android:textSize="30sp" />
 
   <TextView
       android:id="@+id/TrainingActivityCurrentExerciseLevelLabel1"
-      android:layout_width="fill_parent"
+      android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_below="@+id/TrainingActivityCurrentExerciseLabel"
       android:layout_centerHorizontal="true"
@@ -32,6 +33,7 @@
       android:onClick="onCurrentExerciseLevelLabelClicked"
       android:singleLine="true"
       android:textSize="20sp"
+      android:freezesText="true"
       android:textStyle="bold" />
 
   <TextView
@@ -44,8 +46,8 @@
       android:enabled="true"
       android:onClick="onCurrentExerciseLevelLabelClicked"
       android:singleLine="true"
+      android:freezesText="true"
       android:textSize="20sp" />
-
 
   <ProgressBar
       style="?android:attr/progressBarStyleHorizontal"
@@ -63,7 +65,7 @@
       android:layout_above="@+id/TrainingActivityContextButton"
       android:singleLine="true"
       android:textSize="30sp"
-      android:text="10:00"
+      android:freezesText="true"
       android:textStyle="bold"
       android:typeface="monospace" />
 
@@ -76,6 +78,7 @@
       android:onClick="onContextButtonClicked"
       android:singleLine="true"
       android:text="@string/TrainingActivityContextButtonTextStart"
+      android:freezesText="true"
       android:textSize="40sp" />
 
 </RelativeLayout>

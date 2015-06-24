@@ -23,6 +23,7 @@
         android:singleLine="true"
         android:text="@string/MainActivityLastSessionDateText"
         android:textSize="60sp"
+        android:freezesText="true"
         android:textStyle="bold" />
 
     <TextView
