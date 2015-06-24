@@ -47,8 +47,6 @@ public class Database extends SQLiteOpenHelper
   @Nullable
   private static Database instance = null;
 
-  private boolean deferCallback = false;
-
   private Database ()
     {
       super(Context.get(), DATABASE_NAME, null, DATABASE_VERSION);
@@ -66,8 +64,10 @@ public class Database extends SQLiteOpenHelper
     {
       getInstance();
 
-      if (!getInstance().deferCallback)
-        ((MainActivity)MainActivity.getInstance()).afterDatabaseInit();
+      // TODO: remove this, once database schema is stable
+      //for (Class model : Reflection.getSubclassesOf(BaseModel.class))
+      //  BaseModel.onDrop(model);
+      //getInstance().onCreate(getSession());
     }
 
   @NonNull
@@ -116,8 +116,6 @@ public class Database extends SQLiteOpenHelper
 
   public void onCreate (@NonNull SQLiteDatabase db)
     {
-      deferCallback = true;
-
       final ProgressDialog progress = new ProgressDialog(MainActivity.getInstance());
       progress.setTitle("Updating Database");
       progress.setMessage("Please wait while the database is updated...");
@@ -134,7 +132,6 @@ public class Database extends SQLiteOpenHelper
             importDefaults();
 
             progress.dismiss();
-            ((MainActivity)MainActivity.getInstance()).afterDatabaseInit();
           }
       };
       new Thread(runnable).start();
@@ -142,8 +139,6 @@ public class Database extends SQLiteOpenHelper
 
   public void onUpgrade (@NonNull final SQLiteDatabase db, final int oldVersion, final int newVersion)
     {
-      deferCallback = true;
-
       final ProgressDialog progress = new ProgressDialog(MainActivity.getInstance());
       progress.setTitle("Updating Database");
       progress.setMessage("Please wait while the database is updated...");
@@ -158,7 +153,6 @@ public class Database extends SQLiteOpenHelper
               revisions[i - 2].runUpgrade(db);
 
             progress.dismiss();
-            ((MainActivity)MainActivity.getInstance()).afterDatabaseInit();
           }
       };
       new Thread(runnable).start();
@@ -166,8 +160,6 @@ public class Database extends SQLiteOpenHelper
 
   public void onDowngrade (@NonNull final SQLiteDatabase db, final int oldVersion, final int newVersion)
     {
-      deferCallback = true;
-
       final ProgressDialog progress = new ProgressDialog(MainActivity.getInstance());
       progress.setTitle("Updating Database");
       progress.setMessage("Please wait while the database is updated...");
@@ -182,7 +174,6 @@ public class Database extends SQLiteOpenHelper
               revisions[i - 2].runDowngrade(db);
 
             progress.dismiss();
-            ((MainActivity)MainActivity.getInstance()).afterDatabaseInit();
           }
       };
       new Thread(runnable).start();

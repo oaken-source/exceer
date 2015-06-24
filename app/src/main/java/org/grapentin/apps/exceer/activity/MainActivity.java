@@ -52,10 +52,7 @@ public class MainActivity extends BaseActivity
       Context.set(getApplicationContext());
       Sounds.load();
       Database.init();
-    }
 
-  public void afterDatabaseInit ()
-    {
       task = new UpdateTimerTask();
       task.start();
     }

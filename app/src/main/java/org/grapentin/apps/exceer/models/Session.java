@@ -59,13 +59,20 @@ public class Session extends BaseModel
       Session out = null;
 
       Session tmp = new Session();
-      Cursor c = Database.getSession().query(TABLE_NAME, new String[]{ tmp._ID.name }, null, null, null, null, tmp.date.name + " DESC", "1");
-      if (c.getCount() == 1)
+      try
         {
-          c.moveToFirst();
-          out = get(c.getLong(c.getColumnIndex(tmp._ID.name)));
+          Cursor c = Database.getSession().query(TABLE_NAME, new String[]{ tmp._ID.name }, null, null, null, null, tmp.date.name + " DESC", "1");
+          if (c.getCount() == 1)
+            {
+              c.moveToFirst();
+              out = get(c.getLong(c.getColumnIndex(tmp._ID.name)));
+            }
+          c.close();
         }
-      c.close();
+      catch (Exception e)
+        {
+          // nothing here
+        }
 
       return out;
     }
