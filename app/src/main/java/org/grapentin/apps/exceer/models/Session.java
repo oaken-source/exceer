@@ -38,13 +38,13 @@ public class Session extends BaseModel
 
   public Session (long training_id)
     {
-      this.date.set(System.currentTimeMillis());
+      this();
       this.training_id.set(training_id);
     }
 
-  private Session ()
+  public Session ()
     {
-
+      this.date.set(System.currentTimeMillis());
     }
 
   @Nullable

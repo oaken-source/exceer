@@ -23,6 +23,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import org.grapentin.apps.exceer.helpers.Reflection;
 
@@ -52,6 +53,7 @@ public abstract class BaseModel
   public static void onCreate (@NonNull Class model)
     {
       String TABLE_NAME = getTableName(model);
+      Log.d("onCreate", model.getName() + ":" + TABLE_NAME);
       if (TABLE_NAME == null)
         return;
 
