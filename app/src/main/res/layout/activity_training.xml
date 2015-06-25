@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -17,9 +18,9 @@
       android:layout_centerHorizontal="true"
       android:clickable="true"
       android:enabled="true"
+      android:freezesText="true"
       android:onClick="onCurrentExerciseLevelLabelClicked"
       android:singleLine="true"
-      android:freezesText="true"
       android:textSize="30sp" />
 
   <TextView
@@ -30,10 +31,10 @@
       android:layout_centerHorizontal="true"
       android:clickable="true"
       android:enabled="true"
+      android:freezesText="true"
       android:onClick="onCurrentExerciseLevelLabelClicked"
       android:singleLine="true"
       android:textSize="20sp"
-      android:freezesText="true"
       android:textStyle="bold" />
 
   <TextView
@@ -44,28 +45,28 @@
       android:layout_centerHorizontal="true"
       android:clickable="true"
       android:enabled="true"
+      android:freezesText="true"
       android:onClick="onCurrentExerciseLevelLabelClicked"
       android:singleLine="true"
-      android:freezesText="true"
       android:textSize="20sp" />
 
   <ProgressBar
-      style="?android:attr/progressBarStyleHorizontal"
+      android:id="@+id/TrainingActivityProgressBar"
+      style="@android:style/Widget.ProgressBar.Horizontal"
       android:layout_width="match_parent"
       android:layout_height="40dp"
-      android:id="@+id/TrainingActivityProgressBar"
-      android:layout_centerHorizontal="true"
-      android:layout_above="@+id/TrainingActivityContextButton"/>
+      android:layout_above="@+id/TrainingActivityContextButton"
+      android:layout_centerHorizontal="true" />
 
   <TextView
       android:id="@+id/TrainingActivityProgressLabel"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_centerHorizontal="true"
       android:layout_above="@+id/TrainingActivityContextButton"
+      android:layout_centerHorizontal="true"
+      android:freezesText="true"
       android:singleLine="true"
       android:textSize="30sp"
-      android:freezesText="true"
       android:textStyle="bold"
       android:typeface="monospace" />
 
@@ -75,10 +76,10 @@
       android:layout_height="80dp"
       android:layout_alignParentBottom="true"
       android:layout_centerHorizontal="true"
+      android:freezesText="true"
       android:onClick="onContextButtonClicked"
       android:singleLine="true"
       android:text="@string/TrainingActivityContextButtonTextStart"
-      android:freezesText="true"
       android:textSize="40sp" />
 
 </RelativeLayout>
