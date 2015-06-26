@@ -20,7 +20,6 @@
       android:textSize="25sp"
       android:textStyle="bold" />
 
-
   <ScrollView
       android:id="@+id/scrollView"
       android:layout_width="match_parent"
