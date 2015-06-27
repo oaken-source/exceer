@@ -21,8 +21,6 @@ package org.grapentin.apps.exceer.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,46 +29,33 @@ import android.widget.TextView;
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.activity.base.BaseActivity;
 import org.grapentin.apps.exceer.activity.settings.MainSettingsActivity;
-import org.grapentin.apps.exceer.helpers.Context;
-import org.grapentin.apps.exceer.helpers.Sounds;
 import org.grapentin.apps.exceer.helpers.Tasks;
 import org.grapentin.apps.exceer.models.Session;
-import org.grapentin.apps.exceer.orm.Database;
 
 public class MainActivity extends BaseActivity
 {
 
-  @Nullable
-  private Tasks.TimerTask task = null;
+  private Tasks.TimerTask task = new UpdateTimerTask();
 
   @Override
   protected void onCreate (Bundle savedInstanceState)
     {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_main);
-
-      Context.set(getApplicationContext());
-      Sounds.load();
-      Database.init();
-
-      task = new UpdateTimerTask();
-      task.start();
-    }
-
-  @Override
-  protected void onStop ()
-    {
-      super.onStop();
-      if (task != null)
-        task.stop();
     }
 
   @Override
   protected void onResume ()
     {
       super.onResume();
-      if (task != null)
-        task.start();
+      task.start();
+    }
+
+  @Override
+  protected void onPause ()
+    {
+      super.onPause();
+      task.stop();
     }
 
   @Override
@@ -81,7 +66,7 @@ public class MainActivity extends BaseActivity
     }
 
   @Override
-  public boolean onOptionsItemSelected (@NonNull MenuItem item)
+  public boolean onOptionsItemSelected (MenuItem item)
     {
       int id = item.getItemId();
 
@@ -100,7 +85,6 @@ public class MainActivity extends BaseActivity
       return super.onOptionsItemSelected(item);
     }
 
-  @SuppressWarnings("UnusedParameters")
   public void onTrainButtonClicked (View view)
     {
       Intent intent = new Intent(this, TrainingActivity.class);

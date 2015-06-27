@@ -23,11 +23,12 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.support.annotation.Nullable;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.activity.TrainingActivity;
-import org.grapentin.apps.exceer.helpers.Context;
+import org.grapentin.apps.exceer.activity.base.BaseActivity;
 import org.grapentin.apps.exceer.helpers.Sounds;
 import org.grapentin.apps.exceer.helpers.Tasks;
 import org.grapentin.apps.exceer.orm.BaseModel;
@@ -125,7 +126,7 @@ abstract public class BaseExercisable extends BaseModel
       assert task != null;
       task.start();
       Button contextButton = (Button)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityContextButton);
-      contextButton.setText(Context.get().getString(R.string.TrainingActivityContextButtonTextPause));
+      contextButton.setText(BaseActivity.getContext().getString(R.string.TrainingActivityContextButtonTextPause));
       running = true;
     }
 
@@ -134,7 +135,7 @@ abstract public class BaseExercisable extends BaseModel
       assert task != null;
       task.pause();
       Button contextButton = (Button)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityContextButton);
-      contextButton.setText(Context.get().getString(R.string.TrainingActivityContextButtonTextStart));
+      contextButton.setText(BaseActivity.getContext().getString(R.string.TrainingActivityContextButtonTextStart));
       running = false;
     }
 
@@ -206,7 +207,7 @@ abstract public class BaseExercisable extends BaseModel
     {
       Button contextButton = (Button)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityContextButton);
       contextButton.setEnabled(true);
-      contextButton.setText(Context.get().getString(R.string.TrainingActivityContextButtonTextStart));
+      contextButton.setText(BaseActivity.getContext().getString(R.string.TrainingActivityContextButtonTextStart));
 
       TrainingManager.next();
     }
@@ -320,6 +321,9 @@ abstract public class BaseExercisable extends BaseModel
 
         TextView progressLabel = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityProgressLabel);
         progressLabel.setText((min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec);
+        ProgressBar progressBar = (ProgressBar)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityProgressBar);
+        progressBar.setMax((int)duration.get());
+        progressBar.setProgress((int)(duration.get() - remaining));
 
         return start + (Math.round(elapsed / 1000.0) + 1) * 1000;
       }
@@ -478,7 +482,7 @@ abstract public class BaseExercisable extends BaseModel
             running = false;
             Button contextButton = (Button)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityContextButton);
             contextButton.setEnabled(true);
-            contextButton.setText(Context.get().getString(R.string.TrainingActivityContextButtonTextStart));
+            contextButton.setText(BaseActivity.getContext().getString(R.string.TrainingActivityContextButtonTextStart));
             return 0;
           }
 

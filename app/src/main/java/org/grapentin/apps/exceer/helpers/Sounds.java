@@ -22,62 +22,71 @@ package org.grapentin.apps.exceer.helpers;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.support.annotation.RawRes;
+import android.util.Log;
 
 import org.grapentin.apps.exceer.R;
+import org.grapentin.apps.exceer.activity.base.BaseActivity;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class Sounds extends Thread
+public class Sounds
 {
 
-  private final static Sounds instance = new Sounds();
+  private static final BlockingQueue<Integer> queue = new LinkedBlockingQueue<>();
 
-  @SuppressWarnings("deprecation")
-  private final SoundPool soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
-
-  private final HashMap<Integer, Integer> sounds = new HashMap<>();
-  private final BlockingQueue<Integer> queue = new LinkedBlockingQueue<>();
-
-  private Sounds ()
+  static
     {
-      start();
+      new Thread(new Runnable()
+      {
+        public void run ()
+          {
+            Log.d("Sounds", "starting Initialization");
+
+            // initialize
+            SoundPool soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
+            HashMap<Integer, Integer> sounds = new HashMap<>();
+
+            for (Field field : R.raw.class.getFields())
+              try
+                {
+                  sounds.put(field.getInt(null), soundPool.load(BaseActivity.getContext(), field.getInt(null), 0));
+                }
+              catch (IllegalAccessException e)
+                {
+                  throw new Error(e);
+                }
+
+            BaseActivity.initLock.countDown();
+            Log.d("Sounds", "finished Initialization");
+
+            // process queue
+            while (true)
+              {
+                try
+                  {
+                    int resource = queue.take();
+                    soundPool.play(sounds.get(resource), 1, 1, 1, 0, 1);
+                  }
+                catch (InterruptedException e)
+                  {
+                    break;
+                  }
+              }
+          }
+      }).start();
     }
 
-  public static void load ()
+  public static void init ()
     {
-      try
-        {
-          for (Field field : R.raw.class.getFields())
-            instance.sounds.put(field.getInt(null), instance.soundPool.load(Context.get(), field.getInt(null), 0));
-        }
-      catch (IllegalAccessException e)
-        {
-          throw new Error(e);
-        }
+      // nothing here. go look elsewhere.
     }
 
   public static void play (@RawRes int resource)
     {
-      instance.queue.add(resource);
-    }
-
-  public void run ()
-    {
-      while (true)
-        {
-          try
-            {
-              int resource = queue.take();
-              soundPool.play(sounds.get(resource), 1, 1, 1, 0, 1);
-            }
-          catch (InterruptedException e)
-            {
-              break;
-            }
-        }
+      queue.add(resource);
     }
 
 }

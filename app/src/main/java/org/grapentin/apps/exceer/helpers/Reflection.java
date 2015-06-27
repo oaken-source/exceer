@@ -22,6 +22,7 @@ package org.grapentin.apps.exceer.helpers;
 import android.support.annotation.NonNull;
 
 import org.grapentin.apps.exceer.R;
+import org.grapentin.apps.exceer.activity.base.BaseActivity;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -40,11 +41,11 @@ public class Reflection
 
       try
         {
-          DexFile df = new DexFile(Context.get().getPackageCodePath());
+          DexFile df = new DexFile(BaseActivity.getContext().getPackageCodePath());
           for (Enumeration<String> i = df.entries(); i.hasMoreElements(); )
             {
               String s = i.nextElement();
-              if (s.startsWith(Context.get().getString(R.string.ReflectionBasePackage)) && Class.forName(s).getSuperclass() == base)
+              if (s.startsWith(BaseActivity.getContext().getString(R.string.ReflectionBasePackage)) && Class.forName(s).getSuperclass() == base)
                 {
                   derived.add(Class.forName(s));
                   derived.addAll(getSubclassesOf(Class.forName(s)));

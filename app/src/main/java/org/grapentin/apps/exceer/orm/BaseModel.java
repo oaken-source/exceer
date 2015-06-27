@@ -21,6 +21,7 @@ package org.grapentin.apps.exceer.orm;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -50,7 +51,7 @@ public abstract class BaseModel
         }
     }
 
-  public static void onCreate (@NonNull Class model)
+  public static void onCreate (@NonNull Class model, @NonNull SQLiteDatabase db)
     {
       String TABLE_NAME = getTableName(model);
       Log.d("onCreate", model.getName() + ":" + TABLE_NAME);
@@ -62,10 +63,10 @@ public abstract class BaseModel
         columns += (columns.equals("") ? "" : ", ") + ((Column)o).name + " " + ((Column)o).type + (((Column)o).params.equals("") ? "" : " " + ((Column)o).params);
 
       String query = "CREATE TABLE " + TABLE_NAME + " (" + columns + ")";
-      Database.getSession().execSQL(query);
+      db.execSQL(query);
 
       for (Object o : Reflection.getDeclaredFieldsOfType(model, Relation.class))
-        ((Relation)o).onCreate();
+        ((Relation)o).onCreate(db);
     }
 
   public static void onDrop (@NonNull Class model)

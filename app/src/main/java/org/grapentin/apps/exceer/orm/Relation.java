@@ -21,6 +21,7 @@ package org.grapentin.apps.exceer.orm;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -45,10 +46,10 @@ public class Relation
       return "orm_" + BaseModel.getTableName(left.getClass()) + "_" + BaseModel.getTableName(other);
     }
 
-  public void onCreate ()
+  public void onCreate (@NonNull SQLiteDatabase db)
     {
       String query = "CREATE TABLE " + getRelationTableName() + " (" + "left_id " + Column.TYPE_INT + ", right_id " + Column.TYPE_INT + ", PRIMARY KEY (left_id, right_id))";
-      Database.getSession().execSQL(query);
+      db.execSQL(query);
     }
 
   public void onDrop ()

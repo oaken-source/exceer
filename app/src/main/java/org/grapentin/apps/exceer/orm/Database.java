@@ -19,61 +19,63 @@
 
 package org.grapentin.apps.exceer.orm;
 
-import android.app.ProgressDialog;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
+import android.util.Log;
 
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.activity.MainActivity;
-import org.grapentin.apps.exceer.helpers.Context;
+import org.grapentin.apps.exceer.activity.base.BaseActivity;
 import org.grapentin.apps.exceer.helpers.Reflection;
 import org.grapentin.apps.exceer.helpers.XmlNode;
 import org.grapentin.apps.exceer.models.Training;
 
 import java.util.HashMap;
 
-public class Database extends SQLiteOpenHelper
+public class Database
 {
 
-  private final static int DATABASE_VERSION = 1;
-  private final static String DATABASE_NAME = "TrainingStorage.db";
-  private final static Revision revisions[] = new Revision[]{
-      new Revision("", "")
+  // database version and name
+  private static final int DATABASE_VERSION = 1;
+  private static final String DATABASE_NAME = "TrainingStorage.db";
+
+  // database wrapper and revisions
+  private static DatabaseWrapper database;
+  private static final DatabaseRevision revisions[] = new DatabaseRevision[]{
+      new DatabaseRevision("", "")
   };
-  private final static HashMap<Class, LongSparseArray<BaseModel>> cache = new HashMap<>();
-  @Nullable
-  private static Database instance = null;
+  // object cache
+  private static final HashMap<Class, LongSparseArray<BaseModel>> cache = new HashMap<>();
 
-  private Database ()
+  private static boolean newly_created = false;
+
+  static
     {
-      super(Context.get(), DATABASE_NAME, null, DATABASE_VERSION);
-    }
+      new Thread(new Runnable()
+      {
+        public void run ()
+          {
+            Log.d("Database", "starting Initialization");
 
-  @NonNull
-  private static Database getInstance ()
-    {
-      if (instance == null)
-        instance = new Database();
-      return instance;
-    }
+            database = new DatabaseWrapper();
 
-  public static void init ()
-    {
-      getInstance();
+            // trigger database migrations
+            database.getWritableDatabase();
+            if (newly_created)
+              DatabaseWrapper.importDefaults();
 
-      // TODO: remove this, once database schema is stable
-      //for (Class model : Reflection.getSubclassesOf(BaseModel.class))
-      //  BaseModel.onDrop(model);
-      //getInstance().onCreate(getSession());
+            BaseActivity.initLock.countDown();
+            Log.d("Database", "finished Initialization");
+          }
+      }).start();
     }
 
   @NonNull
   public static SQLiteDatabase getSession ()
     {
-      return getInstance().getWritableDatabase();
+      return database.getWritableDatabase();
     }
 
   public static void add (@NonNull BaseModel b)
@@ -98,99 +100,17 @@ public class Database extends SQLiteOpenHelper
       return cache.get(c).get(id);
     }
 
-  private static void importDefaults ()
+  public static void init ()
     {
-      XmlNode root;
-      try
-        {
-          root = new XmlNode(Context.get().getResources().getXml(R.xml.trainings_default));
-        }
-      catch (Exception e)
-        {
-          throw new Error(e);
-        }
-
-      for (XmlNode n : root.getChildren("training"))
-        add(Training.fromXml(n));
+      // nothing here. go look elsewhere.
     }
 
-  public void onCreate (@NonNull SQLiteDatabase db)
-    {
-      final ProgressDialog progress = new ProgressDialog(MainActivity.getInstance());
-      progress.setTitle("Updating Database");
-      progress.setMessage("Please wait while the database is updated...");
-      progress.show();
-
-      Runnable runnable = new Runnable()
-      {
-        @Override
-        public void run ()
-          {
-            for (Class model : Reflection.getSubclassesOf(BaseModel.class))
-              BaseModel.onCreate(model);
-
-            importDefaults();
-
-            progress.dismiss();
-          }
-      };
-      new Thread(runnable).start();
-    }
-
-  public void onUpgrade (@NonNull final SQLiteDatabase db, final int oldVersion, final int newVersion)
-    {
-      final ProgressDialog progress = new ProgressDialog(MainActivity.getInstance());
-      progress.setTitle("Updating Database");
-      progress.setMessage("Please wait while the database is updated...");
-      progress.show();
-
-      Runnable runnable = new Runnable()
-      {
-        @Override
-        public void run ()
-          {
-            for (int i = oldVersion + 1; i <= newVersion; ++i)
-              revisions[i - 2].runUpgrade(db);
-
-            progress.dismiss();
-          }
-      };
-      new Thread(runnable).start();
-    }
-
-  public void onDowngrade (@NonNull final SQLiteDatabase db, final int oldVersion, final int newVersion)
-    {
-      final ProgressDialog progress = new ProgressDialog(MainActivity.getInstance());
-      progress.setTitle("Updating Database");
-      progress.setMessage("Please wait while the database is updated...");
-      progress.show();
-
-      Runnable runnable = new Runnable()
-      {
-        @Override
-        public void run ()
-          {
-            for (int i = oldVersion; i > newVersion; --i)
-              revisions[i - 2].runDowngrade(db);
-
-            progress.dismiss();
-          }
-      };
-      new Thread(runnable).start();
-    }
-
-  public void onDrop ()
-    {
-      for (Class model : Reflection.getSubclassesOf(BaseModel.class))
-        BaseModel.onDrop(model);
-    }
-
-  private static class Revision
+  private static class DatabaseRevision
   {
     private final String upgradeSql;
     private final String downgradeSql;
 
-    public Revision (@SuppressWarnings("SameParameterValue") String upgradeSql, @SuppressWarnings("SameParameterValue") String downgradeSql)
+    public DatabaseRevision (String upgradeSql, String downgradeSql)
       {
         this.upgradeSql = upgradeSql;
         this.downgradeSql = downgradeSql;
@@ -204,6 +124,63 @@ public class Database extends SQLiteOpenHelper
     public void runDowngrade (@NonNull SQLiteDatabase db)
       {
         db.execSQL(this.downgradeSql);
+      }
+  }
+
+  private static class DatabaseWrapper extends SQLiteOpenHelper
+  {
+    public DatabaseWrapper ()
+      {
+        super(BaseActivity.getContext(), DATABASE_NAME, null, DATABASE_VERSION);
+      }
+
+    @Override
+    public void onCreate (@NonNull SQLiteDatabase db)
+      {
+        Log.d("Database", "onCreate entered");
+        for (Class model : Reflection.getSubclassesOf(BaseModel.class))
+          BaseModel.onCreate(model, db);
+        newly_created = true;
+      }
+
+    @Override
+    public void onUpgrade (@NonNull final SQLiteDatabase db, final int oldVersion, final int newVersion)
+      {
+        Log.d("Database", "onUpgrade entered");
+        for (int i = oldVersion + 1; i <= newVersion; ++i)
+          revisions[i - 2].runUpgrade(db);
+      }
+
+    @Override
+    public void onDowngrade (@NonNull final SQLiteDatabase db, final int oldVersion, final int newVersion)
+      {
+        Log.d("Database", "onDowngrade entered");
+        for (int i = oldVersion; i > newVersion; --i)
+          revisions[i - 2].runDowngrade(db);
+      }
+
+    public void onDrop ()
+      {
+        Log.d("Database", "onDrop entered");
+        for (Class model : Reflection.getSubclassesOf(BaseModel.class))
+          BaseModel.onDrop(model);
+      }
+
+    private static void importDefaults ()
+      {
+        Log.d("Database", "importDefaults entered");
+        XmlNode root;
+        try
+          {
+            root = new XmlNode(BaseActivity.getContext().getResources().getXml(R.xml.trainings_default));
+          }
+        catch (Exception e)
+          {
+            throw new Error(e);
+          }
+
+        for (XmlNode n : root.getChildren("training"))
+          add(Training.fromXml(n));
       }
   }
 

@@ -19,15 +19,15 @@
 
 package org.grapentin.apps.exceer.activity;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.widget.TextView;
 
 import org.grapentin.apps.exceer.BuildConfig;
 import org.grapentin.apps.exceer.R;
+import org.grapentin.apps.exceer.activity.base.BaseActivity;
 
-public class AboutActivity extends Activity
+public class AboutActivity extends BaseActivity
 {
 
   @Override

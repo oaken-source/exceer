@@ -26,8 +26,8 @@ import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.activity.TrainingActivity;
+import org.grapentin.apps.exceer.activity.base.BaseActivity;
 import org.grapentin.apps.exceer.helpers.XmlNode;
-import org.grapentin.apps.exceer.helpers.Context;
 import org.grapentin.apps.exceer.orm.BaseModel;
 import org.grapentin.apps.exceer.orm.Column;
 import org.grapentin.apps.exceer.orm.Relation;
@@ -116,7 +116,7 @@ public class Training extends BaseModel
       TextView currentExerciseLevelLabel1 = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel1);
       TextView currentExerciseLevelLabel2 = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel2);
 
-      currentExerciseLabel.setText(Context.get().getString(R.string.TrainingActivityNoExercises));
+      currentExerciseLabel.setText(BaseActivity.getContext().getString(R.string.TrainingActivityNoExercises));
       currentExerciseLevelLabel1.setText("");
       currentExerciseLevelLabel2.setText("");
     }
@@ -127,7 +127,7 @@ public class Training extends BaseModel
       if (getCurrentExercise() == null)
         {
           Button contextButton = (Button)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityContextButton);
-          contextButton.setText(Context.get().getString(R.string.TrainingActivityContextButtonTextFinish));
+          contextButton.setText(BaseActivity.getContext().getString(R.string.TrainingActivityContextButtonTextFinish));
           finished = true;
           return;
         }

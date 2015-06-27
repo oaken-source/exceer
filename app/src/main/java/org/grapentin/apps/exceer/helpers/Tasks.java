@@ -25,12 +25,11 @@ import android.support.annotation.CallSuper;
 public class Tasks
 {
 
-  private final static Tasks instance = new Tasks();
-  private final Handler handler = new Handler();
+  private static final Handler handler = new Handler();
 
-  private Tasks ()
+  public static void init ()
     {
-
+      // nothing here. go look elsewhere.
     }
 
   abstract static public class TimerTask implements Runnable
@@ -42,21 +41,21 @@ public class Tasks
         if (next > 0)
           {
             next -= System.currentTimeMillis();
-            instance.handler.postDelayed(this, next);
+            handler.postDelayed(this, next);
           }
       }
 
     @CallSuper
     public void start ()
       {
-        instance.handler.removeCallbacks(this);
-        instance.handler.post(this);
+        handler.removeCallbacks(this);
+        handler.post(this);
       }
 
     @CallSuper
     public void stop ()
       {
-        instance.handler.removeCallbacks(this);
+        handler.removeCallbacks(this);
       }
 
     @CallSuper

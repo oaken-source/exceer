@@ -23,7 +23,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
 
-import org.grapentin.apps.exceer.helpers.Context;
+import org.grapentin.apps.exceer.activity.base.BaseActivity;
 import org.grapentin.apps.exceer.models.Property;
 import org.grapentin.apps.exceer.orm.BaseModel;
 import org.grapentin.apps.exceer.orm.Relation;
@@ -147,7 +147,7 @@ public class Properties implements Serializable
             }
           catch (Exception e)
             {
-              Toast.makeText(Context.get(), "invalid value for reps_increment_direction: '" + value + "'", Toast.LENGTH_LONG).show();
+              Toast.makeText(BaseActivity.getContext(), "invalid value for reps_increment_direction: '" + value + "'", Toast.LENGTH_LONG).show();
             }
           break;
         case "reps_increment_style":
@@ -157,7 +157,7 @@ public class Properties implements Serializable
             }
           catch (Exception e)
             {
-              Toast.makeText(Context.get(), "invalid value for reps_increment_style: '" + value + "'", Toast.LENGTH_LONG).show();
+              Toast.makeText(BaseActivity.getContext(), "invalid value for reps_increment_style: '" + value + "'", Toast.LENGTH_LONG).show();
             }
           break;
         case "primary_motion":
@@ -167,11 +167,11 @@ public class Properties implements Serializable
             }
           catch (Exception e)
             {
-              Toast.makeText(Context.get(), "invalid value for primary_motion: '" + value + "'", Toast.LENGTH_LONG).show();
+              Toast.makeText(BaseActivity.getContext(), "invalid value for primary_motion: '" + value + "'", Toast.LENGTH_LONG).show();
             }
           break;
         default:
-          Toast.makeText(Context.get(), "invalid property: '" + key + "'", Toast.LENGTH_LONG).show();
+          Toast.makeText(BaseActivity.getContext(), "invalid property: '" + key + "'", Toast.LENGTH_LONG).show();
           break;
         }
     }

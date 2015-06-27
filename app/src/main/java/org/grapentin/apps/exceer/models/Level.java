@@ -25,7 +25,7 @@ import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.activity.TrainingActivity;
-import org.grapentin.apps.exceer.helpers.Context;
+import org.grapentin.apps.exceer.activity.base.BaseActivity;
 import org.grapentin.apps.exceer.helpers.XmlNode;
 import org.grapentin.apps.exceer.orm.Backref;
 import org.grapentin.apps.exceer.orm.BaseModel;
@@ -86,7 +86,7 @@ public class Level extends BaseExercisable
       TextView currentExerciseLevelLabel2 = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel2);
 
       currentExerciseLabel.setText(((Exercise)exercise.get()).getName());
-      currentExerciseLevelLabel1.setText(Context.get().getString(R.string.TrainingActivityCurrentExerciseLevelInt) + ((Exercise)exercise.get()).getCurrentLevelId());
+      currentExerciseLevelLabel1.setText(BaseActivity.getContext().getString(R.string.TrainingActivityCurrentExerciseLevelInt) + ((Exercise)exercise.get()).getCurrentLevelId());
       currentExerciseLevelLabel2.setText(name.get());
 
       super.show();

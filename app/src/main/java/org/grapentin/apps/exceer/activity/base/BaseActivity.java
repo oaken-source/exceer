@@ -20,16 +20,30 @@
 package org.grapentin.apps.exceer.activity.base;
 
 import android.app.Activity;
-import android.os.Bundle;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.util.Log;
 
-public abstract class BaseActivity extends Activity
+import org.grapentin.apps.exceer.helpers.Sounds;
+import org.grapentin.apps.exceer.helpers.Tasks;
+import org.grapentin.apps.exceer.orm.Database;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+public class BaseActivity extends Activity
 {
 
-  @Nullable
-  private static BaseActivity instance = null;
+  public static final CountDownLatch initLock = new CountDownLatch(2);
+  private static volatile BaseActivity instance = null;
+
+  @NonNull
+  public static Context getContext ()
+    {
+      return getInstance();
+    }
 
   @NonNull
   public static BaseActivity getInstance ()
@@ -40,18 +54,53 @@ public abstract class BaseActivity extends Activity
 
   @CallSuper
   @Override
-  protected void onCreate (Bundle savedInstanceState)
+  protected void onResume ()
     {
+      super.onResume();
       instance = this;
-      super.onCreate(savedInstanceState);
-    }
 
-  @CallSuper
-  @Override
-  protected void onDestroy ()
-    {
-      instance = null;
-      super.onDestroy();
+      if (initLock.getCount() == 0)
+        return;
+
+      Tasks.init();
+      Sounds.init();
+      Database.init();
+
+      try
+        {
+          initLock.await(1, TimeUnit.SECONDS);
+        }
+      catch (InterruptedException e)
+        {
+          // nothing here.
+        }
+
+      if (initLock.getCount() > 0)
+        {
+          final ProgressDialog progress = new ProgressDialog(instance);
+          progress.setTitle("Updating Database");
+          progress.setMessage("Please wait while the database is updated...");
+          progress.show();
+
+          Runnable runnable = new Runnable()
+          {
+            @Override
+            public void run ()
+              {
+                while (initLock.getCount() > 0)
+                  try
+                    {
+                      initLock.await();
+                    }
+                  catch (InterruptedException e)
+                    {
+                      // just retry...
+                    }
+                progress.dismiss();
+              }
+          };
+          new Thread(runnable).start();
+        }
     }
 
 }
