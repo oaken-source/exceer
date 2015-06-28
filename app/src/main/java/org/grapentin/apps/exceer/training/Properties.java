@@ -23,7 +23,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
 
-import org.grapentin.apps.exceer.activity.base.BaseActivity;
+import org.grapentin.apps.exceer.gui.base.BaseActivity;
 import org.grapentin.apps.exceer.models.Property;
 import org.grapentin.apps.exceer.orm.BaseModel;
 import org.grapentin.apps.exceer.orm.Relation;

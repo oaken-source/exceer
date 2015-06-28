@@ -17,7 +17,7 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.activity;
+package org.grapentin.apps.exceer.gui;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -34,8 +34,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.activity.base.BaseActivity;
-import org.grapentin.apps.exceer.activity.settings.TrainingSettingsActivity;
+import org.grapentin.apps.exceer.gui.base.BaseActivity;
+import org.grapentin.apps.exceer.gui.settings.TrainingSettingsActivity;
 import org.grapentin.apps.exceer.models.Level;
 import org.grapentin.apps.exceer.training.BaseExercisable;
 import org.grapentin.apps.exceer.training.TrainingManager;
@@ -50,8 +50,20 @@ public class TrainingActivity extends BaseActivity
     {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_training);
+    }
 
-      TrainingManager.prepare();
+  @Override
+  protected void onResume ()
+    {
+      super.onResume();
+
+    }
+
+  @Override
+  protected void onPause ()
+    {
+      super.onPause();
+
     }
 
   @Override
@@ -118,7 +130,6 @@ public class TrainingActivity extends BaseActivity
       builder.show();
     }
 
-  @SuppressWarnings("UnusedParameters")
   public void onContextButtonClicked (View view)
     {
       if (TrainingManager.isRunning())
@@ -132,7 +143,6 @@ public class TrainingActivity extends BaseActivity
         TrainingManager.start();
     }
 
-  @SuppressWarnings("UnusedParameters")
   public void onCurrentExerciseLevelLabelClicked (View view)
     {
       BaseExercisable ex = TrainingManager.getLeafExercisable();

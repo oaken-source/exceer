@@ -22,7 +22,7 @@ package org.grapentin.apps.exceer.helpers;
 import android.support.annotation.NonNull;
 
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.activity.base.BaseActivity;
+import org.grapentin.apps.exceer.gui.base.BaseActivity;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;

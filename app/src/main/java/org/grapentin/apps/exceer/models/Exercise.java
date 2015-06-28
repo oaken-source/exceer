@@ -25,7 +25,7 @@ import android.support.annotation.Nullable;
 import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.activity.TrainingActivity;
+import org.grapentin.apps.exceer.gui.TrainingActivity;
 import org.grapentin.apps.exceer.helpers.XmlNode;
 import org.grapentin.apps.exceer.orm.BaseModel;
 import org.grapentin.apps.exceer.orm.Column;

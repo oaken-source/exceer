@@ -27,7 +27,7 @@ import android.support.v4.util.LongSparseArray;
 import android.util.Log;
 
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.activity.base.BaseActivity;
+import org.grapentin.apps.exceer.gui.base.BaseActivity;
 import org.grapentin.apps.exceer.helpers.Reflection;
 import org.grapentin.apps.exceer.helpers.XmlNode;
 import org.grapentin.apps.exceer.models.Training;

@@ -13,7 +13,7 @@
       android:theme="@style/AppTheme">
 
     <activity
-        android:name=".activity.MainActivity"
+        android:name=".gui.MainActivity"
         android:label="@string/app_name">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -22,35 +22,35 @@
     </activity>
 
     <activity
-        android:name=".activity.TrainingActivity"
+        android:name=".gui.TrainingActivity"
         android:label="@string/title_activity_training">
       <meta-data
           android:name="android.support.PARENT_ACTIVITY"
-          android:value=".activity.MainActivity" />
+          android:value=".gui.MainActivity" />
     </activity>
 
     <activity
-        android:name=".activity.AboutActivity"
+        android:name=".gui.AboutActivity"
         android:label="@string/title_activity_about">
       <meta-data
           android:name="android.support.PARENT_ACTIVITY"
-          android:value=".activity.MainActivity" />
+          android:value=".gui.MainActivity" />
     </activity>
 
     <activity
-        android:name=".activity.settings.MainSettingsActivity"
+        android:name=".gui.settings.MainSettingsActivity"
         android:label="@string/title_activity_settings">
       <meta-data
           android:name="android.support.PARENT_ACTIVITY"
-          android:value=".activity.MainActivity" />
+          android:value=".gui.MainActivity" />
     </activity>
 
     <activity
-        android:name=".activity.settings.TrainingSettingsActivity"
+        android:name=".gui.settings.TrainingSettingsActivity"
         android:label="@string/title_activity_settings">
       <meta-data
           android:name="android.support.PARENT_ACTIVITY"
-          android:value=".activity.TrainingActivity" />
+          android:value=".gui.TrainingActivity" />
     </activity>
 
   </application>

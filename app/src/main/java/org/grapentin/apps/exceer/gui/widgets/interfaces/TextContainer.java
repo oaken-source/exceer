@@ -17,18 +17,16 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.activity.settings;
+package org.grapentin.apps.exceer.gui.widgets.interfaces;
 
-import android.os.Bundle;
-import android.preference.PreferenceActivity;
+import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 
-public class TrainingSettingsActivity extends PreferenceActivity
+public interface TextContainer
 {
 
-  @Override
-  protected void onCreate (Bundle savedInstanceState)
-    {
-      super.onCreate(savedInstanceState);
-    }
+  void setText (@NonNull CharSequence s);
+
+  void setText (@StringRes int res);
 
 }

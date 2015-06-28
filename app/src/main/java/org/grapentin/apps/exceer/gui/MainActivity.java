@@ -17,7 +17,7 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.activity;
+package org.grapentin.apps.exceer.gui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,8 +27,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.activity.base.BaseActivity;
-import org.grapentin.apps.exceer.activity.settings.MainSettingsActivity;
+import org.grapentin.apps.exceer.gui.base.BaseActivity;
+import org.grapentin.apps.exceer.gui.settings.MainSettingsActivity;
 import org.grapentin.apps.exceer.helpers.Tasks;
 import org.grapentin.apps.exceer.models.Session;
 

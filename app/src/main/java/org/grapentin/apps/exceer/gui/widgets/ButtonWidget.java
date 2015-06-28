@@ -17,33 +17,30 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.activity;
+package org.grapentin.apps.exceer.gui.widgets;
 
-import android.os.Bundle;
-import android.text.method.LinkMovementMethod;
-import android.widget.TextView;
+import android.content.Context;
+import android.util.AttributeSet;
+import android.widget.Button;
 
-import org.grapentin.apps.exceer.BuildConfig;
-import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.activity.base.BaseActivity;
+import org.grapentin.apps.exceer.gui.widgets.interfaces.TextContainer;
 
-public class AboutActivity extends BaseActivity
+public class ButtonWidget extends Button implements TextContainer
 {
 
-  @Override
-  protected void onCreate (Bundle savedInstanceState)
+  public ButtonWidget (Context context)
     {
-      super.onCreate(savedInstanceState);
-      setContentView(R.layout.activity_about);
+      super(context);
+    }
 
-      TextView nickJanvierLabel = (TextView)findViewById(R.id.AboutActivityNickJanvierLabel);
-      nickJanvierLabel.setMovementMethod((LinkMovementMethod.getInstance()));
-      TextView titleLabel = (TextView)findViewById(R.id.AboutActivityTitleLabel);
-      titleLabel.setText(getString(R.string.app_name) + "-" + BuildConfig.VERSION_NAME);
-      TextView iconCopyrightLabel = (TextView)findViewById(R.id.AboutActivityIconCopyrightLabel);
-      iconCopyrightLabel.setMovementMethod((LinkMovementMethod.getInstance()));
-      TextView copyrightLabel = (TextView)findViewById(R.id.AboutActivityLongCopyrightLabel);
-      copyrightLabel.setMovementMethod((LinkMovementMethod.getInstance()));
+  public ButtonWidget (Context context, AttributeSet attrs)
+    {
+      super(context, attrs);
+    }
+
+  public ButtonWidget (Context context, AttributeSet attrs, int defStyleAttr)
+    {
+      super(context, attrs, defStyleAttr);
     }
 
 }

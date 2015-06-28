@@ -25,7 +25,7 @@ import android.support.annotation.RawRes;
 import android.util.Log;
 
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.activity.base.BaseActivity;
+import org.grapentin.apps.exceer.gui.base.BaseActivity;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;

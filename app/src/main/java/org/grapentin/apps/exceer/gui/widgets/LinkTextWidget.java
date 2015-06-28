@@ -17,18 +17,31 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.activity.settings;
+package org.grapentin.apps.exceer.gui.widgets;
 
-import android.os.Bundle;
-import android.preference.PreferenceActivity;
+import android.content.Context;
+import android.text.method.LinkMovementMethod;
+import android.util.AttributeSet;
 
-public class MainSettingsActivity extends PreferenceActivity
+public class LinkTextWidget extends TextWidget
 {
 
-  @Override
-  protected void onCreate (Bundle savedInstanceState)
+  public LinkTextWidget (Context context)
     {
-      super.onCreate(savedInstanceState);
+      super(context);
+      setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+  public LinkTextWidget (Context context, AttributeSet attrs)
+    {
+      super(context, attrs);
+      setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+  public LinkTextWidget (Context context, AttributeSet attrs, int defStyleAttr)
+    {
+      super(context, attrs, defStyleAttr);
+      setMovementMethod(LinkMovementMethod.getInstance());
     }
 
 }

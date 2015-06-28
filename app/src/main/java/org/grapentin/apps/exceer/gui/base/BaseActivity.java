@@ -17,15 +17,17 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.activity.base;
+package org.grapentin.apps.exceer.gui.base;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.support.annotation.CallSuper;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
-import android.util.Log;
+import android.support.annotation.StringRes;
 
+import org.grapentin.apps.exceer.gui.widgets.interfaces.TextContainer;
 import org.grapentin.apps.exceer.helpers.Sounds;
 import org.grapentin.apps.exceer.helpers.Tasks;
 import org.grapentin.apps.exceer.orm.Database;
@@ -101,6 +103,20 @@ public class BaseActivity extends Activity
           };
           new Thread(runnable).start();
         }
+    }
+
+  public static void setText (@IdRes int res, @StringRes int string)
+    {
+      TextContainer c = (TextContainer)getInstance().findViewById(res);
+      if (c != null)
+        c.setText(string);
+    }
+
+  public static void setText (@IdRes int res, @NonNull CharSequence string)
+    {
+      TextContainer c = (TextContainer)getInstance().findViewById(res);
+      if (c != null)
+        c.setText(string);
     }
 
 }
