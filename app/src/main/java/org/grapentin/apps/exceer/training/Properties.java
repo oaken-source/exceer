@@ -25,11 +25,10 @@ import android.widget.Toast;
 
 import org.grapentin.apps.exceer.gui.base.BaseActivity;
 import org.grapentin.apps.exceer.models.Property;
-import org.grapentin.apps.exceer.orm.BaseModel;
-import org.grapentin.apps.exceer.orm.Relation;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.List;
 
 public class Properties implements Serializable
 {
@@ -86,26 +85,24 @@ public class Properties implements Serializable
         }
     }
 
-  public Properties (@NonNull Relation properties)
+  public Properties (@NonNull List<Property> properties)
     {
-      for (BaseModel p : properties.all())
+      for (Property p : properties)
         {
-          String key = ((Property)p).key.get();
-          String val = ((Property)p).value.get();
-          assert key != null && val != null;
+          String key = p.getKey();
+          String val = p.getValue();
           set(key, val);
         }
     }
 
-  public Properties (@NonNull Properties other, @NonNull Relation properties)
+  public Properties (@NonNull Properties other, @NonNull List<Property> properties)
     {
       this(other);
 
-      for (BaseModel p : properties.all())
+      for (Property p : properties)
         {
-          String key = ((Property)p).key.get();
-          String val = ((Property)p).value.get();
-          assert key != null && val != null;
+          String key = p.getKey();
+          String val = p.getValue();
           set(key, val);
         }
     }

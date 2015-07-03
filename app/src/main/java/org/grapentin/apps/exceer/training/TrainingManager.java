@@ -21,6 +21,8 @@ package org.grapentin.apps.exceer.training;
 
 import android.support.annotation.Nullable;
 
+import org.grapentin.apps.exceer.R;
+import org.grapentin.apps.exceer.gui.base.BaseActivity;
 import org.grapentin.apps.exceer.models.Session;
 import org.grapentin.apps.exceer.models.Training;
 import org.grapentin.apps.exceer.orm.Database;
@@ -30,79 +32,135 @@ import java.io.Serializable;
 public class TrainingManager implements Serializable
 {
 
-  private final static TrainingManager instance = new TrainingManager();
-
   @Nullable
-  private Training currentTraining = null;
-  private int currentTrainingId = 0;
+  private static Training currentTraining = null;
+  private static int currentTrainingId = 0;
 
-  private TrainingManager ()
+  private static TrainingState state = TrainingState.NOT_SET;
+
+  public static TrainingState getState ()
     {
+      return state;
+    }
 
+  private static void setState (TrainingState s)
+    {
+      state = s;
+      switch (state)
+        {
+        case PREPARED:
+          BaseActivity.setText(R.id.TrainingActivityContextButton, R.string.TrainingActivityContextButtonTextStart);
+          break;
+        case RUNNING:
+          BaseActivity.setText(R.id.TrainingActivityContextButton, R.string.TrainingActivityContextButtonTextPause);
+          break;
+        case PAUSED:
+          BaseActivity.setText(R.id.TrainingActivityContextButton, R.string.TrainingActivityContextButtonTextResume);
+          break;
+        case FINISHED:
+          BaseActivity.setText(R.id.TrainingActivityContextButton, R.string.TrainingActivityContextButtonTextFinish);
+          break;
+        }
     }
 
   @Nullable
   public static BaseExercisable getLeafExercisable ()
     {
-      assert instance.currentTraining != null;
-      return instance.currentTraining.getLeafExercisable();
+      assert currentTraining != null;
+      return currentTraining.getLeafExercisable();
     }
 
-  public static boolean isRunning ()
+  public static void onCreate ()
     {
-      assert instance.currentTraining != null;
-      return instance.currentTraining.isRunning();
-    }
-
-  public static boolean isFinished ()
-    {
-      assert instance.currentTraining != null;
-      return instance.currentTraining.isFinished();
-    }
-
-  public static void prepare ()
-    {
-      if (instance.currentTraining != null)
+      if (state != TrainingState.NOT_SET)
         return;
 
       // TODO: get currentTrainingId from settings
-      instance.currentTrainingId = 1;
-      instance.currentTraining = Training.get(instance.currentTrainingId);
+      currentTrainingId = 1;
+      currentTraining = Training.get(currentTrainingId);
       // TODO: handle edge case where currentTrainingId is not valid
-      instance.currentTraining.prepare();
     }
 
-  public static void next ()
+  public static void onResume ()
     {
-      assert instance.currentTraining != null;
-      instance.currentTraining.next();
+      if (currentTraining == null)
+        return;
+
+      currentTraining.prepare();
+      setState(TrainingState.PREPARED);
     }
 
-  public static void reset ()
+  public static void onPause ()
     {
-      assert instance.currentTraining != null;
-      instance.currentTraining.reset();
-      instance.currentTraining = null;
+      // just keep running
+    }
+
+  public static void onAbort ()
+    {
+      if (currentTraining == null)
+        return;
+
+      currentTraining.reset();
+      currentTraining = null;
+      setState(TrainingState.NOT_SET);
     }
 
   public static void start ()
     {
-      assert instance.currentTraining != null;
-      instance.currentTraining.start();
+      if (currentTraining == null)
+        return;
+
+      currentTraining.start();
+      setState(TrainingState.RUNNING);
     }
 
   public static void pause ()
     {
-      assert instance.currentTraining != null;
-      instance.currentTraining.pause();
+      if (currentTraining == null)
+        return;
+
+      currentTraining.pause();
+      setState(TrainingState.PAUSED);
+    }
+
+  public static void resume ()
+    {
+      if (currentTraining == null)
+        return;
+
+      currentTraining.resume();
+      setState(TrainingState.RUNNING);
     }
 
   public static void wrapUp ()
     {
-      assert instance.currentTraining != null;
-      instance.currentTraining.wrapUp();
-      Database.add(new Session(instance.currentTraining.getId()));
-      instance.currentTraining = null;
+      if (currentTraining == null)
+        return;
+
+      currentTraining.wrapUp();
+      Database.add(new Session(currentTraining));
+      currentTraining = null;
+      setState(TrainingState.NOT_SET);
     }
+
+  public static void next ()
+    {
+      if (currentTraining == null)
+        return;
+
+      if (currentTraining.next())
+        setState(TrainingState.PREPARED);
+      else
+        setState(TrainingState.FINISHED);
+    }
+
+  public enum TrainingState
+  {
+    NOT_SET,
+    PREPARED,
+    RUNNING,
+    PAUSED,
+    FINISHED
+  }
 
 }

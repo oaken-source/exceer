@@ -37,7 +37,7 @@ public class Sounds
 
   private static final BlockingQueue<Integer> queue = new LinkedBlockingQueue<>();
 
-  static
+  public static void init ()
     {
       new Thread(new Runnable()
       {
@@ -77,11 +77,6 @@ public class Sounds
               }
           }
       }).start();
-    }
-
-  public static void init ()
-    {
-      // nothing here. go look elsewhere.
     }
 
   public static void play (@RawRes int resource)

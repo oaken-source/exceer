@@ -31,13 +31,9 @@ import org.grapentin.apps.exceer.gui.TrainingActivity;
 import org.grapentin.apps.exceer.gui.base.BaseActivity;
 import org.grapentin.apps.exceer.helpers.Sounds;
 import org.grapentin.apps.exceer.helpers.Tasks;
-import org.grapentin.apps.exceer.orm.BaseModel;
 
-abstract public class BaseExercisable extends BaseModel
+abstract public class BaseExercisable
 {
-
-  @SuppressWarnings("unused")
-  public static final String TABLE_NAME = null;
 
   protected Properties props = new Properties();
 
@@ -47,7 +43,9 @@ abstract public class BaseExercisable extends BaseModel
   private boolean running = false;
 
   abstract protected void levelUp ();
+
   abstract protected String getCurrentProgress ();
+
   abstract protected void setCurrentProgress (String progress);
 
   public boolean isRunning ()

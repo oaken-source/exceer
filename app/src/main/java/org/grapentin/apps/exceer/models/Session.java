@@ -19,67 +19,36 @@
 
 package org.grapentin.apps.exceer.models;
 
-import android.database.Cursor;
 import android.support.annotation.Nullable;
 
-import org.grapentin.apps.exceer.orm.BaseModel;
-import org.grapentin.apps.exceer.orm.Column;
 import org.grapentin.apps.exceer.orm.Database;
+import org.grapentin.apps.exceer.orm.annotations.DatabaseColumn;
+import org.grapentin.apps.exceer.orm.annotations.DatabaseTable;
 
-public class Session extends BaseModel
+@DatabaseTable
+public class Session
 {
 
-  @SuppressWarnings("unused") // accessed by reflection from BaseModel
-  public final static String TABLE_NAME = "sessions";
+  @DatabaseColumn
+  private long date;
+  @DatabaseColumn
+  private Training training;
 
-  // database layout
-  private final Column date = new Column("date", Column.TYPE_LONG);
-  private final Column training_id = new Column("training_id", Column.TYPE_LONG);
-
-  public Session (long training_id)
+  public Session (Training training)
     {
-      this();
-      this.training_id.set(training_id);
-    }
-
-  public Session ()
-    {
-      this.date.set(System.currentTimeMillis());
-    }
-
-  @Nullable
-  private static Session get (long id)
-    {
-      return (Session)BaseModel.get(Session.class, id);
+      this.date = System.currentTimeMillis();
+      this.training = training;
     }
 
   @Nullable
   public static Session getLast ()
     {
-      Session out = null;
-
-      Session tmp = new Session();
-      try
-        {
-          Cursor c = Database.getSession().query(TABLE_NAME, new String[]{ tmp._ID.name }, null, null, null, null, tmp.date.name + " DESC", "1");
-          if (c.getCount() == 1)
-            {
-              c.moveToFirst();
-              out = get(c.getLong(c.getColumnIndex(tmp._ID.name)));
-            }
-          c.close();
-        }
-      catch (Exception e)
-        {
-          // nothing here
-        }
-
-      return out;
+      return (Session)Database.query(Session.class).orderBy("date DESC").first();
     }
 
   public long getDate ()
     {
-      return date.getLong();
+      return date;
     }
 
 }

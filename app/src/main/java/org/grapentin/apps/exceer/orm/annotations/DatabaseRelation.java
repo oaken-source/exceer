@@ -17,52 +17,18 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.models;
+package org.grapentin.apps.exceer.orm.annotations;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.grapentin.apps.exceer.helpers.XmlNode;
-import org.grapentin.apps.exceer.orm.Database;
-import org.grapentin.apps.exceer.orm.annotations.DatabaseColumn;
-import org.grapentin.apps.exceer.orm.annotations.DatabaseTable;
-
-@DatabaseTable
-public class Property
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface DatabaseRelation
 {
 
-  @DatabaseColumn(id = true)
-  private int id;
 
-  @DatabaseColumn
-  private String key;
-  @DatabaseColumn
-  private String value;
-
-  public static Property fromXml (@NonNull XmlNode root)
-    {
-      Property m = new Property();
-
-      m.key = root.getAttribute("name");
-      m.value = root.getValue();
-
-      return m;
-    }
-
-  @Nullable
-  public static Property get (int id)
-    {
-      return (Property)Database.query(Property.class).get(id);
-    }
-
-  public String getKey ()
-    {
-      return key;
-    }
-
-  public String getValue ()
-    {
-      return value;
-    }
 
 }

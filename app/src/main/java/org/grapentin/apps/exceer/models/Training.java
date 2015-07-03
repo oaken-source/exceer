@@ -21,42 +21,46 @@ package org.grapentin.apps.exceer.models;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.widget.Button;
-import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.gui.TrainingActivity;
 import org.grapentin.apps.exceer.gui.base.BaseActivity;
 import org.grapentin.apps.exceer.helpers.XmlNode;
-import org.grapentin.apps.exceer.orm.BaseModel;
-import org.grapentin.apps.exceer.orm.Column;
-import org.grapentin.apps.exceer.orm.Relation;
+import org.grapentin.apps.exceer.orm.Database;
+import org.grapentin.apps.exceer.orm.annotations.DatabaseColumn;
+import org.grapentin.apps.exceer.orm.annotations.DatabaseRelation;
+import org.grapentin.apps.exceer.orm.annotations.DatabaseTable;
 import org.grapentin.apps.exceer.training.BaseExercisable;
 import org.grapentin.apps.exceer.training.Properties;
 
-public class Training extends BaseModel
+import java.util.ArrayList;
+import java.util.List;
+
+@DatabaseTable
+public class Training
 {
 
-  @SuppressWarnings("unused") // accessed by reflection from BaseModel
-  public final static String TABLE_NAME = "trainings";
+  @DatabaseColumn(id = true)
+  private int id;
 
-  // database layout
-  private final Column name = new Column("name");
-  private final Relation exercises = makeRelation(Exercise.class);
-  private final Relation properties = makeRelation(Property.class);
+  @DatabaseColumn
+  private String name;
+  @DatabaseRelation
+  private List<Exercise> exercises;
+  @DatabaseRelation
+  private List<Property> properties;
 
-  // temporary runtime values
   private int currentExerciseId = 0;
-  private boolean finished = false;
 
   public static Training fromXml (@NonNull XmlNode root)
     {
       Training m = new Training();
 
-      m.name.set(root.getAttribute("name"));
+      m.name = root.getAttribute("name");
 
+      m.properties = new ArrayList<>();
       for (XmlNode property : root.getChildren("property"))
         m.properties.add(Property.fromXml(property));
+      m.exercises = new ArrayList<>();
       for (XmlNode exercise : root.getChildren("exercise"))
         m.exercises.add(Exercise.fromXml(exercise));
 
@@ -64,15 +68,17 @@ public class Training extends BaseModel
     }
 
   @Nullable
-  public static Training get (long id)
+  public static Training get (int id)
     {
-      return (Training)BaseModel.get(Training.class, id);
+      return (Training)Database.query(Training.class).get(id);
     }
 
   @Nullable
   private Exercise getCurrentExercise ()
     {
-      return (Exercise)exercises.at(currentExerciseId);
+      if (exercises.size() <= currentExerciseId)
+        return null;
+      return exercises.get(currentExerciseId);
     }
 
   @Nullable
@@ -83,65 +89,42 @@ public class Training extends BaseModel
       return getCurrentExercise().getLeafExercisable();
     }
 
-  public boolean isRunning ()
-    {
-      return (getCurrentExercise() != null && getCurrentExercise().isRunning());
-    }
-
-  public boolean isFinished ()
-    {
-      return finished;
-    }
-
   public void prepare ()
     {
       Properties props = new Properties(properties);
 
-      for (BaseModel e : exercises.all())
-        ((Exercise)e).prepare(props);
+      for (Exercise e : exercises)
+        e.prepare(props);
 
-      currentExerciseId = 0;
-      if (getCurrentExercise() == null)
-        {
-          show();
-          return;
-        }
-
-      getCurrentExercise().show();
+      if (getLeafExercisable() != null)
+        getLeafExercisable().show();
+      else
+        show();
     }
 
   private void show ()
     {
-      TextView currentExerciseLabel = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLabel);
-      TextView currentExerciseLevelLabel1 = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel1);
-      TextView currentExerciseLevelLabel2 = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel2);
-
-      currentExerciseLabel.setText(BaseActivity.getContext().getString(R.string.TrainingActivityNoExercises));
-      currentExerciseLevelLabel1.setText("");
-      currentExerciseLevelLabel2.setText("");
+      BaseActivity.setText(R.id.TrainingActivityCurrentExerciseLabel, R.string.TrainingActivityNoExercises);
+      BaseActivity.setText(R.id.TrainingActivityCurrentExerciseLevelLabel1, "");
+      BaseActivity.setText(R.id.TrainingActivityCurrentExerciseLevelLabel2, "");
     }
 
-  public void next ()
+  public boolean next ()
     {
       currentExerciseId++;
       if (getCurrentExercise() == null)
-        {
-          Button contextButton = (Button)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityContextButton);
-          contextButton.setText(BaseActivity.getContext().getString(R.string.TrainingActivityContextButtonTextFinish));
-          finished = true;
-          return;
-        }
+        return false;
 
       getCurrentExercise().getLeafExercisable().show();
+      return true;
     }
 
   public void reset ()
     {
       currentExerciseId = 0;
-      finished = false;
 
-      for (BaseModel e : exercises.all())
-        ((Exercise)e).reset();
+      for (Exercise e : exercises)
+        e.reset();
     }
 
   public void start ()
@@ -156,13 +139,18 @@ public class Training extends BaseModel
         getLeafExercisable().pause();
     }
 
+  public void resume ()
+    {
+      if (getLeafExercisable() != null)
+        getLeafExercisable().start();
+    }
+
   public void wrapUp ()
     {
       currentExerciseId = 0;
-      finished = false;
 
-      for (BaseModel e : exercises.all())
-        ((Exercise)e).wrapUp();
+      for (Exercise e : exercises)
+        e.wrapUp();
     }
 
 }

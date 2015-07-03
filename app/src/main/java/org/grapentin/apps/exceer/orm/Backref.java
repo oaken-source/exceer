@@ -19,49 +19,44 @@
 
 package org.grapentin.apps.exceer.orm;
 
-import android.database.Cursor;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.util.Log;
+
+import org.grapentin.apps.exceer.orm.annotations.DatabaseTable;
+
+import java.lang.reflect.Field;
 
 public class Backref
 {
-  private final Class other;
 
-  @Nullable
-  private BaseModel left = null;
-  private final BaseModel right;
+  protected Field field;
+  protected Model model;
+  protected String name;
 
-  public Backref (@NonNull BaseModel right, @NonNull Class other)
+  protected Model other;
+
+  protected Backref (Field field, Model model)
     {
-      this.right = right;
-      this.other = other;
+      Log.d("Column", "creating backref '" + field.getName() + "' for model '" + model.name + "'");
+      this.field = field;
+      this.model = model;
+      this.name = field.getName();
+
+      if (!field.getType().isAnnotationPresent(DatabaseTable.class))
+        throw new Database.DatabaseAccessException(model.name + "." + name + ": backref foreign type is not a model");
     }
 
-  @NonNull
-  private String getRelationTableName ()
+  public void link ()
     {
-      return "orm_" + BaseModel.getTableName(other) + "_" + BaseModel.getTableName(right.getClass());
+      other = Database.models.get(field.getType());
+
+      if (model.id == null)
+        throw new Database.DatabaseAccessException(model.name + "." + name + ": model has no primary key");
+      if (other.id == null)
+        throw new Database.DatabaseAccessException(model.name + "." + name + ": foreign model has no primary key");
     }
 
-  @NonNull
-  public BaseModel get ()
+  public void materialize (Object o)
     {
-      if (left != null)
-        return left;
 
-      Cursor c = Database.getSession().query(getRelationTableName(), new String[]{
-          "left_id"
-      }, "right_id=" + right._ID.get(), null, null, null, null);
-
-      c.moveToFirst();
-      if (!c.isAfterLast())
-        left = BaseModel.get(other, c.getLong(c.getColumnIndex("left_id")));
-
-      c.close();
-
-      assert left != null;
-      return left;
     }
-
 }
-

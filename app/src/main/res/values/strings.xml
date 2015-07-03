@@ -39,12 +39,11 @@
   <string name="TrainingActivityNoExercises">(no exercises)</string>
   <string name="TrainingActivityContextButtonTextStart">Start</string>
   <string name="TrainingActivityContextButtonTextPause">Pause</string>
+  <string name="TrainingActivityContextButtonTextResume">Resume</string>
   <string name="TrainingActivityContextButtonTextFinish">Finish</string>
   <string name="TrainingActivityCurrentExerciseLevelInt">Level </string>
 
   <string name="TrainingActivityAbortConfirmation">"Are you sure you want to abort this session?"</string>
-
-  <string name="ReflectionBasePackage">org.grapentin.apps.exceer</string>
 
   <string name="AboutActivityShortCopyrightLabelText">Copyright 2015 Andreas Grapentin\nSee below for Copying Conditions.</string>
   <string name="AboutActivityNickJanvierLabelText">Exceer has been inspired by <a href="http://www.nickjanvier.com">Nick Janvier</a>, and his <a href="http://www.startbodyweight.com">bodyweight training programme</a>. All exercises and illustrations have been generously made available by Nick.</string>

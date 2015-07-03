@@ -19,122 +19,58 @@
 
 package org.grapentin.apps.exceer.orm;
 
-import android.content.ContentValues;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.util.Log;
 
-import java.util.ArrayList;
+import org.grapentin.apps.exceer.orm.annotations.DatabaseTable;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.util.List;
 
 public class Relation
 {
-  private final Class other;
 
-  private final BaseModel left;
-  private ArrayList<BaseModel> right = null;
+  protected Field field;
+  protected Model model;
+  protected String name;
 
-  public Relation (BaseModel left, Class other)
+  protected Model other;
+
+  protected Relation (Field field, Model model)
     {
-      this.left = left;
-      this.other = other;
+      Log.d("Column", "creating relation '" + field.getName() + "' for model '" + model.name + "'");
+      this.field = field;
+      this.model = model;
+      this.name = field.getName();
+
+      if (!field.getType().isAssignableFrom(List.class))
+        throw new Database.DatabaseAccessException(model.name + "." + name + ": relation incompatible with a List");
+      if (!((Class)((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0]).isAnnotationPresent(DatabaseTable.class))
+        throw new Database.DatabaseAccessException(model.name + "." + name + ": foreign type is not a model");
     }
 
-  @NonNull
-  private String getRelationTableName ()
+  public void link ()
     {
-      return "orm_" + BaseModel.getTableName(left.getClass()) + "_" + BaseModel.getTableName(other);
+      Class c = (Class)((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
+      other = Database.models.get(c);
+
+      if (model.id == null)
+        throw new Database.DatabaseAccessException(model.name + "." + name + ": model has no primary key");
+      if (other.id == null)
+        throw new Database.DatabaseAccessException(model.name + "." + name + ": foreign model has no primary key");
     }
 
-  public void onCreate (@NonNull SQLiteDatabase db)
+  public void onCreate (SQLiteDatabase db)
     {
-      String query = "CREATE TABLE " + getRelationTableName() + " (" + "left_id " + Column.TYPE_INT + ", right_id " + Column.TYPE_INT + ", PRIMARY KEY (left_id, right_id))";
+      String query = "CREATE TABLE '" + model.table + "_" + other.table + "' ('left_id' " + model.id.datatype.toSql() + ", 'right_id' " + other.id.datatype.toSql() + ")";
+      Log.d("Relation", model.name + "." + name + ": " + query);
       db.execSQL(query);
     }
 
-  public void onDrop ()
+  public void materialize (Object o)
     {
-      String query = "DROP TABLE IF EXISTS " + getRelationTableName();
-      Database.getSession().execSQL(query);
+
     }
 
-  public void onInsert ()
-    {
-      if (right == null)
-        return;
-
-      for (BaseModel m : right)
-        {
-          m.onInsert();
-          ContentValues values = new ContentValues();
-          values.put("left_id", left._ID.get());
-          values.put("right_id", m._ID.get());
-          Database.getSession().insert(getRelationTableName(), null, values);
-        }
-    }
-
-  public void add (@NonNull BaseModel m)
-    {
-      if (left._ID.get() != null)
-        {
-          getRight().add(m);
-
-          m.onInsert();
-          ContentValues values = new ContentValues();
-          values.put("left_id", left._ID.get());
-          values.put("right_id", m._ID.get());
-          Database.getSession().insert(getRelationTableName(), null, values);
-        }
-      else
-        {
-          if (right == null)
-            right = new ArrayList<>();
-          right.add(m);
-        }
-    }
-
-  @NonNull
-  private ArrayList<BaseModel> getRight ()
-    {
-      if (right != null)
-        return right;
-
-      right = new ArrayList<>();
-
-      Cursor c = Database.getSession().query(getRelationTableName(), new String[]{
-          "right_id"
-      }, "left_id=" + left._ID.get(), null, null, null, null);
-
-      c.moveToFirst();
-      while (!c.isAfterLast())
-        {
-          right.add(BaseModel.get(other, c.getLong(c.getColumnIndex("right_id"))));
-          c.moveToNext();
-        }
-
-      c.close();
-      return right;
-    }
-
-  @Nullable
-  public BaseModel at (int id)
-    {
-      return (id >= getRight().size() ? null : getRight().get(id));
-    }
-
-  @NonNull
-  public ArrayList<BaseModel> all ()
-    {
-      return getRight();
-    }
-
-  public boolean isEmpty ()
-    {
-      return getRight().isEmpty();
-    }
-
-  public int size ()
-    {
-      return getRight().size();
-    }
 }

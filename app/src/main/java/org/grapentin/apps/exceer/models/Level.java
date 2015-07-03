@@ -21,37 +21,44 @@ package org.grapentin.apps.exceer.models;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.gui.TrainingActivity;
 import org.grapentin.apps.exceer.gui.base.BaseActivity;
 import org.grapentin.apps.exceer.helpers.XmlNode;
-import org.grapentin.apps.exceer.orm.Backref;
-import org.grapentin.apps.exceer.orm.BaseModel;
-import org.grapentin.apps.exceer.orm.Column;
-import org.grapentin.apps.exceer.orm.Relation;
+import org.grapentin.apps.exceer.orm.Database;
+import org.grapentin.apps.exceer.orm.annotations.DatabaseBackref;
+import org.grapentin.apps.exceer.orm.annotations.DatabaseColumn;
+import org.grapentin.apps.exceer.orm.annotations.DatabaseRelation;
+import org.grapentin.apps.exceer.orm.annotations.DatabaseTable;
 import org.grapentin.apps.exceer.training.BaseExercisable;
 import org.grapentin.apps.exceer.training.Properties;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@DatabaseTable
 public class Level extends BaseExercisable
 {
 
-  @SuppressWarnings("unused") // accessed by reflection from BaseModel
-  public final static String TABLE_NAME = "levels";
+  @DatabaseColumn(id = true)
+  private int id;
 
-  // database layout
-  private final Column name = new Column("name");
-  private final Column progress = new Column("progress");
-  private final Relation properties = makeRelation(Property.class);
-  private final Backref exercise = makeBackref(Exercise.class);
+  @DatabaseColumn
+  private String name;
+  @DatabaseColumn
+  private String progress;
+  @DatabaseRelation
+  private List<Property> properties;
+  @DatabaseBackref
+  private Exercise exercise;
 
   public static Level fromXml (@NonNull XmlNode root)
     {
       Level m = new Level();
 
-      m.name.set(root.getAttribute("name"));
+      m.name = root.getAttribute("name");
 
+      m.properties = new ArrayList<>();
       for (XmlNode property : root.getChildren("property"))
         m.properties.add(Property.fromXml(property));
 
@@ -59,10 +66,9 @@ public class Level extends BaseExercisable
     }
 
   @Nullable
-  @SuppressWarnings("unused")
-  public static Level get (long id)
+  public static Level get (int id)
     {
-      return (Level)BaseModel.get(Level.class, id);
+      return (Level)Database.query(Level.class).get(id);
     }
 
   @NonNull
@@ -81,13 +87,9 @@ public class Level extends BaseExercisable
   @Override
   public void show ()
     {
-      TextView currentExerciseLabel = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLabel);
-      TextView currentExerciseLevelLabel1 = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel1);
-      TextView currentExerciseLevelLabel2 = (TextView)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityCurrentExerciseLevelLabel2);
-
-      currentExerciseLabel.setText(((Exercise)exercise.get()).getName());
-      currentExerciseLevelLabel1.setText(BaseActivity.getContext().getString(R.string.TrainingActivityCurrentExerciseLevelInt) + ((Exercise)exercise.get()).getCurrentLevelId());
-      currentExerciseLevelLabel2.setText(name.get());
+      BaseActivity.setText(R.id.TrainingActivityCurrentExerciseLabel, exercise.getName());
+      BaseActivity.setText(R.id.TrainingActivityCurrentExerciseLevelLabel1, BaseActivity.getContext().getString(R.string.TrainingActivityCurrentExerciseLevelInt) + exercise.getCurrentLevelId());
+      BaseActivity.setText(R.id.TrainingActivityCurrentExerciseLevelLabel2, name);
 
       super.show();
     }
@@ -95,23 +97,23 @@ public class Level extends BaseExercisable
   @Override
   public void levelUp ()
     {
-      ((Exercise)exercise.get()).levelUp();
+      exercise.levelUp();
     }
 
   @Nullable
   public String getCurrentProgress ()
     {
-      return progress.get();
+      return progress;
     }
 
   public void setCurrentProgress (@NonNull String s)
     {
-      progress.set(s);
+      progress = s;
     }
 
   public void wrapUp ()
     {
-      commit();
+
     }
 
 }

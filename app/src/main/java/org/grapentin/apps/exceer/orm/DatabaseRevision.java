@@ -17,52 +17,32 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.models;
+package org.grapentin.apps.exceer.orm;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import org.grapentin.apps.exceer.helpers.XmlNode;
-import org.grapentin.apps.exceer.orm.Database;
-import org.grapentin.apps.exceer.orm.annotations.DatabaseColumn;
-import org.grapentin.apps.exceer.orm.annotations.DatabaseTable;
-
-@DatabaseTable
-public class Property
+public class DatabaseRevision
 {
 
-  @DatabaseColumn(id = true)
-  private int id;
+  private final String upgradeSql;
+  private final String downgradeSql;
 
-  @DatabaseColumn
-  private String key;
-  @DatabaseColumn
-  private String value;
-
-  public static Property fromXml (@NonNull XmlNode root)
+  public DatabaseRevision (String upgradeSql, String downgradeSql)
     {
-      Property m = new Property();
-
-      m.key = root.getAttribute("name");
-      m.value = root.getValue();
-
-      return m;
+      this.upgradeSql = upgradeSql;
+      this.downgradeSql = downgradeSql;
     }
 
-  @Nullable
-  public static Property get (int id)
+  public void runUpgrade (@NonNull SQLiteDatabase db)
     {
-      return (Property)Database.query(Property.class).get(id);
+      db.execSQL(this.upgradeSql);
     }
 
-  public String getKey ()
+  public void runDowngrade (@NonNull SQLiteDatabase db)
     {
-      return key;
+      db.execSQL(this.downgradeSql);
     }
 
-  public String getValue ()
-    {
-      return value;
-    }
 
 }

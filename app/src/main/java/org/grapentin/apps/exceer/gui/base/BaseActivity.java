@@ -33,7 +33,6 @@ import org.grapentin.apps.exceer.helpers.Tasks;
 import org.grapentin.apps.exceer.orm.Database;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 public class BaseActivity extends Activity
 {
@@ -54,6 +53,20 @@ public class BaseActivity extends Activity
       return instance;
     }
 
+  public static void setText (@IdRes int res, @StringRes int string)
+    {
+      TextContainer c = (TextContainer)getInstance().findViewById(res);
+      if (c != null)
+        c.setText(string);
+    }
+
+  public static void setText (@IdRes int res, @NonNull CharSequence string)
+    {
+      TextContainer c = (TextContainer)getInstance().findViewById(res);
+      if (c != null)
+        c.setText(string);
+    }
+
   @CallSuper
   @Override
   protected void onResume ()
@@ -68,55 +81,29 @@ public class BaseActivity extends Activity
       Sounds.init();
       Database.init();
 
-      try
-        {
-          initLock.await(1, TimeUnit.SECONDS);
-        }
-      catch (InterruptedException e)
-        {
-          // nothing here.
-        }
+      final ProgressDialog progress = new ProgressDialog(instance);
+      progress.setTitle("Updating Database");
+      progress.setMessage("Please wait while the database is updated...");
+      progress.show();
 
-      if (initLock.getCount() > 0)
-        {
-          final ProgressDialog progress = new ProgressDialog(instance);
-          progress.setTitle("Updating Database");
-          progress.setMessage("Please wait while the database is updated...");
-          progress.show();
-
-          Runnable runnable = new Runnable()
+      Runnable runnable = new Runnable()
+      {
+        @Override
+        public void run ()
           {
-            @Override
-            public void run ()
-              {
-                while (initLock.getCount() > 0)
-                  try
-                    {
-                      initLock.await();
-                    }
-                  catch (InterruptedException e)
-                    {
-                      // just retry...
-                    }
-                progress.dismiss();
-              }
-          };
-          new Thread(runnable).start();
-        }
-    }
-
-  public static void setText (@IdRes int res, @StringRes int string)
-    {
-      TextContainer c = (TextContainer)getInstance().findViewById(res);
-      if (c != null)
-        c.setText(string);
-    }
-
-  public static void setText (@IdRes int res, @NonNull CharSequence string)
-    {
-      TextContainer c = (TextContainer)getInstance().findViewById(res);
-      if (c != null)
-        c.setText(string);
+            while (initLock.getCount() > 0)
+              try
+                {
+                  initLock.await();
+                }
+              catch (InterruptedException e)
+                {
+                  // just retry...
+                }
+            progress.dismiss();
+          }
+      };
+      new Thread(runnable).start();
     }
 
 }

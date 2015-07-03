@@ -19,65 +19,106 @@
 
 package org.grapentin.apps.exceer.orm;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.util.Log;
+
+import org.grapentin.apps.exceer.orm.annotations.DatabaseColumn;
+import org.grapentin.apps.exceer.orm.annotations.DatabaseTable;
+
+import java.lang.reflect.Field;
 
 public class Column
 {
 
-  @SuppressWarnings("WeakerAccess")
-  public static final String TYPE_TEXT = "TEXT";
-  public static final String TYPE_INT = "INTEGER";
-  public static final String TYPE_LONG = "INTEGER";
+  protected Field field;
+  protected Model model;
+  protected String name;
 
-  public final String name;
-  public final String type;
-  public final String params;
+  protected DataType datatype;
 
-  @Nullable
-  private String value = null;
-
-  public Column (@NonNull String name)
+  protected Column (Field field, Model model)
     {
-      this(name, TYPE_TEXT);
+      Log.d("Column", "creating column '" + field.getName() + "' for model '" + model.name + "'");
+      this.field = field;
+      this.model = model;
+      this.name = field.getName();
+
+      if (field.getAnnotation(DatabaseColumn.class).id())
+        model.id = this;
     }
 
-  public Column (@NonNull String name, @NonNull String type)
+  protected void link ()
     {
-      this(name, type, "");
+      Class type = field.getType();
+      if (type.isAnnotationPresent(DatabaseTable.class))
+        {
+          final Model m = Database.models.get(type);
+          if (m.id == null)
+            throw new Database.DatabaseAccessException(model.name + "." + name + ": foreign model has no primary key");
+
+          datatype = new DataType<Object>()
+          {
+            @Override
+            public String toSql ()
+              {
+                return m.id.datatype.toSql();
+              }
+
+            @Override
+            public void set (Object o, String string) throws IllegalAccessException
+              {
+                field.set(o, Database.query(m.model).get(string));
+              }
+          };
+        }
+      else if (type == int.class || type == long.class)
+        datatype = new DataType<Integer>()
+        {
+          @Override
+          public String toSql ()
+            {
+              return "INTEGER";
+            }
+
+          @Override
+          public void set (Object o, String string) throws IllegalAccessException
+            {
+              field.setInt(o, Integer.parseInt(string));
+            }
+        };
+      else if (type == String.class)
+        datatype = new DataType<String>()
+        {
+          @Override
+          public String toSql ()
+            {
+              return "TEXT";
+            }
+
+          @Override
+          public void set (Object o, String string) throws IllegalAccessException
+            {
+              field.set(o, string);
+            }
+        };
+      else
+        throw new Database.DatabaseAccessException("incompatible type on column '" + name + "': " + type.getSimpleName());
     }
 
-  public Column (@NonNull String name, @NonNull String type, @NonNull String params)
+  protected String toSql ()
     {
-      this.name = name;
-      this.type = type;
-      this.params = params;
+      String out = "'" + name + "' " + datatype.toSql();
+
+      if (field.getAnnotation(DatabaseColumn.class).id())
+        out += " PRIMARY KEY";
+
+      return out;
     }
 
-  @Nullable
-  public String get ()
-    {
-      return this.value;
-    }
+  protected interface DataType<T>
+  {
+    String toSql ();
 
-  public long getLong ()
-    {
-      return Long.parseLong(this.value);
-    }
-
-  public int getInt ()
-    {
-      return Integer.parseInt(this.value);
-    }
-
-  public void set (@Nullable String value)
-    {
-      this.value = value;
-    }
-
-  public void set (long value)
-    {
-      set(Long.toString(value));
-    }
+    void set (Object o, String string) throws IllegalAccessException;
+  }
 
 }

@@ -50,20 +50,21 @@ public class TrainingActivity extends BaseActivity
     {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_training);
+      TrainingManager.onCreate();
     }
 
   @Override
   protected void onResume ()
     {
       super.onResume();
-
+      TrainingManager.onResume();
     }
 
   @Override
   protected void onPause ()
     {
       super.onPause();
-
+      TrainingManager.onPause();
     }
 
   @Override
@@ -114,7 +115,7 @@ public class TrainingActivity extends BaseActivity
             switch (which)
               {
               case DialogInterface.BUTTON_POSITIVE:
-                TrainingManager.reset();
+                TrainingManager.onAbort();
                 TrainingActivity.super.onBackPressed();
                 break;
               case DialogInterface.BUTTON_NEGATIVE:
@@ -132,15 +133,24 @@ public class TrainingActivity extends BaseActivity
 
   public void onContextButtonClicked (View view)
     {
-      if (TrainingManager.isRunning())
-        TrainingManager.pause();
-      else if (TrainingManager.isFinished())
+      switch (TrainingManager.getState())
         {
+        case PREPARED:
+          TrainingManager.start();
+          break;
+        case RUNNING:
+          TrainingManager.pause();
+          break;
+        case PAUSED:
+          TrainingManager.resume();
+          break;
+        case FINISHED:
           TrainingManager.wrapUp();
           super.onBackPressed();
+          break;
+        default:
+          throw new Error("Training Manager in indeterminate state");
         }
-      else
-        TrainingManager.start();
     }
 
   public void onCurrentExerciseLevelLabelClicked (View view)
@@ -163,7 +173,7 @@ public class TrainingActivity extends BaseActivity
       ImageView imageView = new ImageView(this);
       imageView.setImageBitmap(bitmap);
 
-      Toast toast = new Toast(getApplicationContext());
+      Toast toast = new Toast(this);
       toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
       toast.setView(imageView);
       toast.show();

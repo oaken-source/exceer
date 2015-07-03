@@ -22,15 +22,17 @@ package org.grapentin.apps.exceer.orm;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.util.LongSparseArray;
 import android.util.Log;
 
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.gui.base.BaseActivity;
-import org.grapentin.apps.exceer.helpers.Reflection;
 import org.grapentin.apps.exceer.helpers.XmlNode;
+import org.grapentin.apps.exceer.models.Exercise;
+import org.grapentin.apps.exceer.models.Level;
+import org.grapentin.apps.exceer.models.Property;
+import org.grapentin.apps.exceer.models.Session;
 import org.grapentin.apps.exceer.models.Training;
+import org.grapentin.apps.exceer.orm.annotations.DatabaseTable;
 
 import java.util.HashMap;
 
@@ -38,38 +40,57 @@ public class Database
 {
 
   // database version and name
-  private static final int DATABASE_VERSION = 1;
-  private static final String DATABASE_NAME = "TrainingStorage.db";
+  public static final int DATABASE_VERSION = 1;
+  public static final String DATABASE_NAME = "Exceer.db";
+  // database structure
+  public static final HashMap<Class, Model> models = new HashMap<>();
 
-  // database wrapper and revisions
-  private static DatabaseWrapper database;
-  private static final DatabaseRevision revisions[] = new DatabaseRevision[]{
-      new DatabaseRevision("", "")
-  };
-  // object cache
-  private static final HashMap<Class, LongSparseArray<BaseModel>> cache = new HashMap<>();
+  // revisions
+  private static final DatabaseRevision revisions[] = new DatabaseRevision[]{ new DatabaseRevision("", "") };
 
-  private static boolean newly_created = false;
-
-  static
-    {
-      new Thread(new Runnable()
+  // database wrapper
+  private static SQLiteOpenHelper database = new SQLiteOpenHelper(BaseActivity.getContext(), DATABASE_NAME, null, DATABASE_VERSION)
+  {
+    @Override
+    public void onCreate (@NonNull SQLiteDatabase db)
       {
-        public void run ()
-          {
-            Log.d("Database", "starting Initialization");
+        for (Model m : models.values())
+          m.onCreate(db);
+        importDefaults(db);
+      }
 
-            database = new DatabaseWrapper();
+    @Override
+    public void onUpgrade (@NonNull final SQLiteDatabase db, final int oldVersion, final int newVersion)
+      {
+        for (int i = oldVersion + 1; i <= newVersion; ++i)
+          revisions[i - 2].runUpgrade(db);
+      }
 
-            // trigger database migrations
-            database.getWritableDatabase();
-            if (newly_created)
-              DatabaseWrapper.importDefaults();
+    @Override
+    public void onDowngrade (@NonNull final SQLiteDatabase db, final int oldVersion, final int newVersion)
+      {
+        for (int i = oldVersion; i > newVersion; --i)
+          revisions[i - 2].runDowngrade(db);
+      }
+  };
 
-            BaseActivity.initLock.countDown();
-            Log.d("Database", "finished Initialization");
-          }
-      }).start();
+  private static void reflectModels ()
+    {
+      try
+        {
+          models.put(Exercise.class, new Model(Exercise.class));
+          models.put(Level.class, new Model(Level.class));
+          models.put(Property.class, new Model(Property.class));
+          models.put(Session.class, new Model(Session.class));
+          models.put(Training.class, new Model(Training.class));
+
+          for (Model model : models.values())
+            model.link();
+        }
+      catch (Exception e)
+        {
+          throw new DatabaseAccessException("failed to reflect models", e);
+        }
     }
 
   @NonNull
@@ -78,109 +99,75 @@ public class Database
       return database.getWritableDatabase();
     }
 
-  public static void add (@NonNull BaseModel b)
+  public static void add (@NonNull Object o)
     {
-      b.onInsert();
+      add(o, getSession());
     }
 
-  public static void addToCache (@NonNull BaseModel b)
+  private static void add (@NonNull Object o, SQLiteDatabase db)
     {
-      if (!cache.containsKey(b.getClass()))
-        cache.put(b.getClass(), new LongSparseArray<BaseModel>());
-      cache.get(b.getClass()).put(b.getId(), b);
-    }
+      if (!o.getClass().isAnnotationPresent(DatabaseTable.class))
+        throw new DatabaseAccessException(o.getClass().getSimpleName() + ": is not a model");
 
-  @Nullable
-  public static BaseModel getFromCache (@NonNull Class c, long id)
-    {
-      if (!cache.containsKey(c))
-        return null;
-      if (cache.get(c).get(id, null) == null)
-        return null;
-      return cache.get(c).get(id);
+      models.get(o.getClass()).add(o, db);
     }
 
   public static void init ()
     {
-      // nothing here. go look elsewhere.
+      new Thread(new Runnable()
+      {
+        public void run ()
+          {
+            Log.d("Database", "starting Initialization");
+            long start = System.currentTimeMillis();
+
+            reflectModels();
+
+            // trigger migrations
+            database.getWritableDatabase();
+
+            BaseActivity.initLock.countDown();
+
+            Log.d("Database", "finished Initialization (took " + (System.currentTimeMillis() - start) + "ms)");
+          }
+      }).start();
     }
 
-  private static class DatabaseRevision
+  public static DatabaseQuery query (Class c)
+    {
+      if (!c.isAnnotationPresent(DatabaseTable.class))
+        throw new DatabaseAccessException(c.getSimpleName() + ": is not a model");
+
+      return new DatabaseQuery(c);
+    }
+
+  private static void importDefaults (SQLiteDatabase db)
+    {
+      XmlNode root;
+
+      try
+        {
+          root = new XmlNode(BaseActivity.getContext().getResources().getXml(R.xml.trainings_default));
+        }
+      catch (Exception e)
+        {
+          throw new DatabaseAccessException("failed to import defaults", e);
+        }
+
+      for (XmlNode n : root.getChildren("training"))
+        add(Training.fromXml(n), db);
+    }
+
+  public static class DatabaseAccessException extends RuntimeException
   {
-    private final String upgradeSql;
-    private final String downgradeSql;
-
-    public DatabaseRevision (String upgradeSql, String downgradeSql)
+    public DatabaseAccessException (String msg)
       {
-        this.upgradeSql = upgradeSql;
-        this.downgradeSql = downgradeSql;
+        super(msg);
       }
 
-    public void runUpgrade (@NonNull SQLiteDatabase db)
+    public DatabaseAccessException (String msg, Exception e)
       {
-        db.execSQL(this.upgradeSql);
-      }
-
-    public void runDowngrade (@NonNull SQLiteDatabase db)
-      {
-        db.execSQL(this.downgradeSql);
-      }
-  }
-
-  private static class DatabaseWrapper extends SQLiteOpenHelper
-  {
-    public DatabaseWrapper ()
-      {
-        super(BaseActivity.getContext(), DATABASE_NAME, null, DATABASE_VERSION);
-      }
-
-    @Override
-    public void onCreate (@NonNull SQLiteDatabase db)
-      {
-        Log.d("Database", "onCreate entered");
-        for (Class model : Reflection.getSubclassesOf(BaseModel.class))
-          BaseModel.onCreate(model, db);
-        newly_created = true;
-      }
-
-    @Override
-    public void onUpgrade (@NonNull final SQLiteDatabase db, final int oldVersion, final int newVersion)
-      {
-        Log.d("Database", "onUpgrade entered");
-        for (int i = oldVersion + 1; i <= newVersion; ++i)
-          revisions[i - 2].runUpgrade(db);
-      }
-
-    @Override
-    public void onDowngrade (@NonNull final SQLiteDatabase db, final int oldVersion, final int newVersion)
-      {
-        Log.d("Database", "onDowngrade entered");
-        for (int i = oldVersion; i > newVersion; --i)
-          revisions[i - 2].runDowngrade(db);
-      }
-
-    public void onDrop ()
-      {
-        Log.d("Database", "onDrop entered");
-        for (Class model : Reflection.getSubclassesOf(BaseModel.class))
-          BaseModel.onDrop(model);
-      }
-
-    private static void importDefaults ()
-      {
-        Log.d("Database", "importDefaults entered");
-        XmlNode root;
-        try
-          {
-            root = new XmlNode(BaseActivity.getContext().getResources().getXml(R.xml.trainings_default));
-          }
-        catch (Exception e)
-          {
-            throw new Error(e);
-          }
-
-        for (XmlNode n : root.getChildren("training"))
-          add(Training.fromXml(n));
+        super(msg, e);
       }
   }
 
