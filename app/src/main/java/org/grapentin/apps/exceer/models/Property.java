@@ -22,22 +22,30 @@ package org.grapentin.apps.exceer.models;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
 import org.grapentin.apps.exceer.helpers.XmlNode;
-import org.grapentin.apps.exceer.orm.Database;
-import org.grapentin.apps.exceer.orm.annotations.DatabaseColumn;
-import org.grapentin.apps.exceer.orm.annotations.DatabaseTable;
+import org.grapentin.apps.exceer.service.DatabaseService;
 
 @DatabaseTable
 public class Property
 {
 
-  @DatabaseColumn(id = true)
+  @DatabaseField(id = true)
   private int id;
 
-  @DatabaseColumn
+  @DatabaseField
   private String key;
-  @DatabaseColumn
+  @DatabaseField
   private String value;
+
+  @DatabaseField(foreign = true)
+  Training parentTraining;
+  @DatabaseField(foreign = true)
+  Exercise parentExercise;
+  @DatabaseField(foreign = true)
+  Level parentLevel;
 
   public static Property fromXml (@NonNull XmlNode root)
     {
@@ -52,7 +60,7 @@ public class Property
   @Nullable
   public static Property get (int id)
     {
-      return (Property)Database.query(Property.class).get(id);
+      return (Property)DatabaseService.query(Property.class).get(id);
     }
 
   public String getKey ()

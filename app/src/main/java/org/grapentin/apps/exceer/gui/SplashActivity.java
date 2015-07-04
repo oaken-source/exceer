@@ -36,6 +36,9 @@ import java.util.concurrent.CountDownLatch;
 public class SplashActivity extends Activity
 {
 
+  private ServiceConnection audioService;
+  private ServiceConnection databaseService;
+
   @Override
   protected void onCreate (Bundle savedInstanceState)
     {
@@ -62,7 +65,7 @@ public class SplashActivity extends Activity
 
       // bind to audio service and start threaded wait for finished init
       Intent audioServiceIntent = new Intent(this, AudioService.class);
-      bindService(audioServiceIntent, new ServiceConnection()
+      audioService = new ServiceConnection()
       {
         @Override
         public void onServiceConnected (ComponentName name, final IBinder service)
@@ -83,11 +86,12 @@ public class SplashActivity extends Activity
           {
             throw new Error("AudioService initialization failed");
           }
-      }, BIND_AUTO_CREATE);
+      };
+      bindService(audioServiceIntent, audioService, BIND_AUTO_CREATE);
 
       // bind to database service and start threaded wait for finished init
       Intent databaseServiceIntent = new Intent(this, DatabaseService.class);
-      bindService(databaseServiceIntent, new ServiceConnection()
+      databaseService = new ServiceConnection()
       {
         @Override
         public void onServiceConnected (ComponentName name, final IBinder service)
@@ -108,7 +112,8 @@ public class SplashActivity extends Activity
           {
             throw new Error("DatabaseService initialization failed");
           }
-      }, BIND_AUTO_CREATE);
+      };
+      bindService(databaseServiceIntent, databaseService, BIND_AUTO_CREATE);
 
       // wait for services to start
       while (initLock.getCount() > 0)
@@ -125,8 +130,15 @@ public class SplashActivity extends Activity
       Intent mainIntent = new Intent(this, MainActivity.class);
       startActivity(mainIntent);
 
-      // main activity exited - finalize
       finish();
+    }
+
+  protected void onDestroy ()
+    {
+      super.onDestroy();
+
+      unbindService(audioService);
+      unbindService(databaseService);
     }
 
 }

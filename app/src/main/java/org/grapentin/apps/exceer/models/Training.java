@@ -22,32 +22,33 @@ package org.grapentin.apps.exceer.models;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.j256.ormlite.dao.ForeignCollection;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
+import com.j256.ormlite.table.DatabaseTable;
+
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.gui.base.BaseActivity;
 import org.grapentin.apps.exceer.helpers.XmlNode;
-import org.grapentin.apps.exceer.orm.Database;
-import org.grapentin.apps.exceer.orm.annotations.DatabaseColumn;
-import org.grapentin.apps.exceer.orm.annotations.DatabaseRelation;
-import org.grapentin.apps.exceer.orm.annotations.DatabaseTable;
+import org.grapentin.apps.exceer.service.DatabaseService;
 import org.grapentin.apps.exceer.training.BaseExercisable;
 import org.grapentin.apps.exceer.training.Properties;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.SQLException;
 
 @DatabaseTable
 public class Training
 {
 
-  @DatabaseColumn(id = true)
+  @DatabaseField(id = true)
   private int id;
 
-  @DatabaseColumn
+  @DatabaseField
   private String name;
-  @DatabaseRelation
-  private List<Exercise> exercises;
-  @DatabaseRelation
-  private List<Property> properties;
+  @ForeignCollectionField
+  private ForeignCollection<Exercise> exercises;
+  @ForeignCollectionField
+  private ForeignCollection<Property> properties;
 
   private int currentExerciseId = 0;
 
@@ -57,10 +58,8 @@ public class Training
 
       m.name = root.getAttribute("name");
 
-      m.properties = new ArrayList<>();
       for (XmlNode property : root.getChildren("property"))
         m.properties.add(Property.fromXml(property));
-      m.exercises = new ArrayList<>();
       for (XmlNode exercise : root.getChildren("exercise"))
         m.exercises.add(Exercise.fromXml(exercise));
 
@@ -70,7 +69,7 @@ public class Training
   @Nullable
   public static Training get (int id)
     {
-      return (Training)Database.query(Training.class).get(id);
+      return (Training)DatabaseService.query(Training.class).get(id);
     }
 
   @Nullable
@@ -78,7 +77,14 @@ public class Training
     {
       if (exercises.size() <= currentExerciseId)
         return null;
-      return exercises.get(currentExerciseId);
+      try
+        {
+          return exercises.iterator(currentExerciseId).current();
+        }
+      catch (SQLException e)
+        {
+          throw new Error(e);
+        }
     }
 
   @Nullable

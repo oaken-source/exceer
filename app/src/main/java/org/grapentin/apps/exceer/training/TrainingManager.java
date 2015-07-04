@@ -23,9 +23,7 @@ import android.support.annotation.Nullable;
 
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.gui.base.BaseActivity;
-import org.grapentin.apps.exceer.models.Session;
 import org.grapentin.apps.exceer.models.Training;
-import org.grapentin.apps.exceer.orm.Database;
 
 import java.io.Serializable;
 
@@ -138,7 +136,7 @@ public class TrainingManager implements Serializable
         return;
 
       currentTraining.wrapUp();
-      Database.add(new Session(currentTraining));
+      //Database.add(new Session(currentTraining));
       currentTraining = null;
       setState(TrainingState.NOT_SET);
     }

@@ -29,7 +29,6 @@ import android.support.annotation.RawRes;
 import android.util.Log;
 
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.gui.SplashActivity;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -38,11 +37,19 @@ import java.util.concurrent.CountDownLatch;
 public class AudioService extends Service
 {
 
+  private static LocalBinder local = null;
+
   private final IBinder binder = new LocalBinder();
+
   private final SoundPool soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
   private final HashMap<Integer, Integer> sounds = new HashMap<>();
 
   public CountDownLatch initLock = new CountDownLatch(1);
+
+  public static void play (@RawRes int resource)
+    {
+      local.play(resource);
+    }
 
   @Override
   public void onCreate ()
@@ -87,6 +94,7 @@ public class AudioService extends Service
   @Override
   public IBinder onBind (Intent intent)
     {
+      local = (LocalBinder)binder;
       return binder;
     }
 

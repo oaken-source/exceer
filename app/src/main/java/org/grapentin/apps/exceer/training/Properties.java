@@ -23,6 +23,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
 
+import com.j256.ormlite.dao.ForeignCollection;
+
 import org.grapentin.apps.exceer.gui.base.BaseActivity;
 import org.grapentin.apps.exceer.models.Property;
 
@@ -85,7 +87,7 @@ public class Properties implements Serializable
         }
     }
 
-  public Properties (@NonNull List<Property> properties)
+  public Properties (@NonNull ForeignCollection<Property> properties)
     {
       for (Property p : properties)
         {
@@ -95,7 +97,7 @@ public class Properties implements Serializable
         }
     }
 
-  public Properties (@NonNull Properties other, @NonNull List<Property> properties)
+  public Properties (@NonNull Properties other, @NonNull ForeignCollection<Property> properties)
     {
       this(other);
 

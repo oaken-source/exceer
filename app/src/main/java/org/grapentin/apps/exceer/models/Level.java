@@ -22,35 +22,37 @@ package org.grapentin.apps.exceer.models;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.j256.ormlite.dao.ForeignCollection;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
+import com.j256.ormlite.table.DatabaseTable;
+
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.gui.base.BaseActivity;
 import org.grapentin.apps.exceer.helpers.XmlNode;
-import org.grapentin.apps.exceer.orm.Database;
-import org.grapentin.apps.exceer.orm.annotations.DatabaseBackref;
-import org.grapentin.apps.exceer.orm.annotations.DatabaseColumn;
-import org.grapentin.apps.exceer.orm.annotations.DatabaseRelation;
-import org.grapentin.apps.exceer.orm.annotations.DatabaseTable;
+import org.grapentin.apps.exceer.service.DatabaseService;
 import org.grapentin.apps.exceer.training.BaseExercisable;
 import org.grapentin.apps.exceer.training.Properties;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @DatabaseTable
 public class Level extends BaseExercisable
 {
 
-  @DatabaseColumn(id = true)
+  @DatabaseField(id = true)
   private int id;
 
-  @DatabaseColumn
+  @DatabaseField
   private String name;
-  @DatabaseColumn
+  @DatabaseField
   private String progress;
-  @DatabaseRelation
-  private List<Property> properties;
-  @DatabaseBackref
-  private Exercise exercise;
+
+  @ForeignCollectionField
+  private ForeignCollection<Property> properties;
+
+  @DatabaseField(foreign = true)
+  private Training parentTraining;
+  @DatabaseField(foreign = true)
+  private Exercise parentExercise;
 
   public static Level fromXml (@NonNull XmlNode root)
     {
@@ -58,7 +60,6 @@ public class Level extends BaseExercisable
 
       m.name = root.getAttribute("name");
 
-      m.properties = new ArrayList<>();
       for (XmlNode property : root.getChildren("property"))
         m.properties.add(Property.fromXml(property));
 
@@ -68,7 +69,7 @@ public class Level extends BaseExercisable
   @Nullable
   public static Level get (int id)
     {
-      return (Level)Database.query(Level.class).get(id);
+      return (Level)DatabaseService.query(Level.class).get(id);
     }
 
   @NonNull
@@ -87,8 +88,8 @@ public class Level extends BaseExercisable
   @Override
   public void show ()
     {
-      BaseActivity.setText(R.id.TrainingActivityCurrentExerciseLabel, exercise.getName());
-      BaseActivity.setText(R.id.TrainingActivityCurrentExerciseLevelLabel1, BaseActivity.getContext().getString(R.string.TrainingActivityCurrentExerciseLevelInt) + exercise.getCurrentLevelId());
+      BaseActivity.setText(R.id.TrainingActivityCurrentExerciseLabel, parentExercise.getName());
+      BaseActivity.setText(R.id.TrainingActivityCurrentExerciseLevelLabel1, BaseActivity.getContext().getString(R.string.TrainingActivityCurrentExerciseLevelInt) + parentExercise.getCurrentLevelId());
       BaseActivity.setText(R.id.TrainingActivityCurrentExerciseLevelLabel2, name);
 
       super.show();
@@ -97,7 +98,7 @@ public class Level extends BaseExercisable
   @Override
   public void levelUp ()
     {
-      exercise.levelUp();
+      parentExercise.levelUp();
     }
 
   @Nullable

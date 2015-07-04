@@ -29,8 +29,8 @@ import android.widget.TextView;
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.gui.TrainingActivity;
 import org.grapentin.apps.exceer.gui.base.BaseActivity;
-import org.grapentin.apps.exceer.helpers.Sounds;
 import org.grapentin.apps.exceer.helpers.Tasks;
+import org.grapentin.apps.exceer.service.AudioService;
 
 abstract public class BaseExercisable
 {
@@ -273,14 +273,14 @@ abstract public class BaseExercisable
       {
         if (start == 0 && countdown > 0)
           {
-            Sounds.play(R.raw.beep_low);
+            AudioService.play(R.raw.beep_low);
             countdown--;
             return System.currentTimeMillis() + 1000;
           }
 
         if (start == 0)
           {
-            Sounds.play(R.raw.beep_four);
+            AudioService.play(R.raw.beep_four);
             start = System.currentTimeMillis();
             paused = 0;
             countdown = 3;
@@ -297,19 +297,19 @@ abstract public class BaseExercisable
 
         if (props.two_sided && !halftime && duration.get() / elapsed >= 0.5)
           {
-            Sounds.play(R.raw.beep_two);
+            AudioService.play(R.raw.beep_two);
             halftime = true;
           }
 
         if (countdown > 0 && countdown >= remaining)
           {
-            Sounds.play(R.raw.beep_low);
+            AudioService.play(R.raw.beep_low);
             countdown--;
           }
 
         if (remaining <= 0)
           {
-            Sounds.play(R.raw.beep_four);
+            AudioService.play(R.raw.beep_four);
             finishExercise();
             return 0;
           }
@@ -360,7 +360,7 @@ abstract public class BaseExercisable
       {
         if (countdown > 0)
           {
-            Sounds.play(R.raw.beep_low);
+            AudioService.play(R.raw.beep_low);
             countdown--;
             next_sound = R.raw.beep_four;
             return System.currentTimeMillis() + 1000;
@@ -381,7 +381,7 @@ abstract public class BaseExercisable
 
             if (done.sets.get(currentSet) >= reps.sets.get(currentSet)) // a set finished
               {
-                Sounds.play(R.raw.beep_four);
+                AudioService.play(R.raw.beep_four);
                 next_sound = 0;
                 currentSet++;
 
@@ -404,7 +404,7 @@ abstract public class BaseExercisable
 
         if (next_sound != 0)
           {
-            Sounds.play(next_sound);
+            AudioService.play(next_sound);
             next_sound = 0;
           }
 
@@ -467,13 +467,13 @@ abstract public class BaseExercisable
 
         if (pause_countdown > 0 && pause_countdown >= remaining)
           {
-            Sounds.play(R.raw.beep_low);
+            AudioService.play(R.raw.beep_low);
             pause_countdown--;
           }
 
         if (remaining <= 0)
           {
-            Sounds.play(R.raw.beep_four);
+            AudioService.play(R.raw.beep_four);
             pause_duration = 0;
             pause_start = 0;
             countdown = 3;
@@ -518,13 +518,13 @@ abstract public class BaseExercisable
 
         if (countdown > 0 && countdown >= remaining)
           {
-            Sounds.play(R.raw.beep_low);
+            AudioService.play(R.raw.beep_low);
             countdown--;
           }
 
         if (remaining <= 0)
           {
-            Sounds.play(R.raw.beep_four);
+            AudioService.play(R.raw.beep_four);
             afterPause();
             return 0;
           }

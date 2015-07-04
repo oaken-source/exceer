@@ -20,21 +20,53 @@
 package org.grapentin.apps.exceer.service;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Binder;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
-import org.grapentin.apps.exceer.gui.SplashActivity;
+import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.support.ConnectionSource;
+import com.j256.ormlite.table.TableUtils;
 
+import org.grapentin.apps.exceer.models.Exercise;
+import org.grapentin.apps.exceer.models.Level;
+import org.grapentin.apps.exceer.models.Property;
+import org.grapentin.apps.exceer.models.Session;
+import org.grapentin.apps.exceer.models.Training;
+
+import java.sql.SQLException;
 import java.util.concurrent.CountDownLatch;
+
 
 public class DatabaseService extends Service
 {
 
-  private final IBinder binder = new LocalBinder();
+  // database version and name
+  public static final int DATABASE_VERSION = 1;
+  public static final String DATABASE_NAME = "Exceer.db";
 
+  // revisions
+  private static final DatabaseRevision revisions[] = new DatabaseRevision[]
+      {
+          new DatabaseRevision("")
+      };
+  private static LocalBinder local = null;
+  private final IBinder binder = new LocalBinder();
   public CountDownLatch initLock = new CountDownLatch(1);
+  // database wrapper
+  private DatabaseOpenHelper database;
+
+  @NonNull
+  public static DatabaseQuery query (Class c)
+    {
+      return local.query(c);
+    }
 
   @Override
   public void onCreate ()
@@ -61,6 +93,10 @@ public class DatabaseService extends Service
     {
       Log.d("DatabaseService", "starting Initialization");
 
+      database = new DatabaseOpenHelper(getApplicationContext(), DATABASE_NAME, null, DATABASE_VERSION);
+      database.getWritableDatabase();
+      database.initDaos();
+
       initLock.countDown();
 
       Log.d("DatabaseService", "finished Initialization");
@@ -69,11 +105,154 @@ public class DatabaseService extends Service
   @Override
   public IBinder onBind (Intent intent)
     {
+      local = (LocalBinder)binder;
       return binder;
     }
 
+  private static class DatabaseRevision
+  {
+    private final String upgradeSql;
+
+    public DatabaseRevision (String upgradeSql)
+      {
+        this.upgradeSql = upgradeSql;
+      }
+
+    public void runUpgrade (@NonNull SQLiteDatabase db)
+      {
+        db.execSQL(this.upgradeSql);
+      }
+  }
+
+  public static class DatabaseAccessException extends RuntimeException
+  {
+    public DatabaseAccessException (String msg)
+      {
+        super(msg);
+      }
+
+    public DatabaseAccessException (String msg, Exception e)
+      {
+        super(msg, e);
+      }
+  }
+
+  public static class DatabaseQuery<T, K>
+  {
+    private Dao<T, K> dao;
+    private QueryBuilder<T, K> builder;
+
+    protected DatabaseQuery (@NonNull Dao<T, K> dao)
+      {
+        this.dao = dao;
+        this.builder = dao.queryBuilder();
+      }
+
+    public T get (K id)
+      {
+        try
+          {
+            return dao.queryForId(id);
+          }
+        catch (SQLException e)
+          {
+            throw new DatabaseAccessException("query failed", e);
+          }
+      }
+
+    public T first ()
+      {
+        try
+          {
+            return dao.queryForFirst(builder.prepare());
+          }
+        catch (SQLException e)
+          {
+            throw new DatabaseAccessException("query failed", e);
+          }
+      }
+
+    public DatabaseQuery orderBy (String order, boolean ascending)
+      {
+        builder.orderBy(order, ascending);
+        return this;
+      }
+  }
+
+  private static class DatabaseOpenHelper extends OrmLiteSqliteOpenHelper
+  {
+    public Dao<Training, Integer> DaoTraining;
+    public Dao<Exercise, Integer> DaoExercise;
+    public Dao<Level, Integer> DaoLevel;
+    public Dao<Property, Integer> DaoProperty;
+    public Dao<Session, Integer> DaoSession;
+
+    public DatabaseOpenHelper (Context context, String databaseName, SQLiteDatabase.CursorFactory factory, int databaseVersion)
+      {
+        super(context, databaseName, factory, databaseVersion);
+      }
+
+    @Override
+    public void onCreate (SQLiteDatabase db, ConnectionSource source)
+      {
+        Log.d("DatabaseService", "onCreate");
+        try
+          {
+            TableUtils.createTable(connectionSource, Training.class);
+            TableUtils.createTable(connectionSource, Exercise.class);
+            TableUtils.createTable(connectionSource, Level.class);
+            TableUtils.createTable(connectionSource, Property.class);
+            TableUtils.createTable(connectionSource, Session.class);
+
+
+          }
+        catch (SQLException e)
+          {
+            throw new DatabaseAccessException("failed to access database", e);
+          }
+      }
+
+    @Override
+    public void onUpgrade (SQLiteDatabase db, ConnectionSource source, int oldVersion, int newVersion)
+      {
+        for (int i = oldVersion + 1; i <= newVersion; ++i)
+          revisions[i - 2].runUpgrade(db);
+      }
+
+    public void initDaos ()
+      {
+        try
+          {
+            DaoTraining = getDao(Training.class);
+            DaoExercise = getDao(Exercise.class);
+            DaoLevel = getDao(Level.class);
+            DaoProperty = getDao(Property.class);
+            DaoSession = getDao(Session.class);
+          }
+        catch (SQLException e)
+          {
+            throw new DatabaseAccessException("failed to access database", e);
+          }
+      }
+  }
+
   public class LocalBinder extends Binder
   {
+    public DatabaseQuery query (Class c)
+      {
+        if (c == Training.class)
+          return new DatabaseQuery<>(database.DaoTraining);
+        if (c == Exercise.class)
+          return new DatabaseQuery<>(database.DaoExercise);
+        if (c == Level.class)
+          return new DatabaseQuery<>(database.DaoLevel);
+        if (c == Property.class)
+          return new DatabaseQuery<>(database.DaoProperty);
+        if (c == Session.class)
+          return new DatabaseQuery<>(database.DaoSession);
+        throw new DatabaseAccessException(c.getSimpleName() + ": queried class is no model");
+      }
+
     public void await ()
       {
         while (initLock.getCount() > 0)

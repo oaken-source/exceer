@@ -21,18 +21,28 @@ package org.grapentin.apps.exceer.models;
 
 import android.support.annotation.Nullable;
 
-import org.grapentin.apps.exceer.orm.Database;
-import org.grapentin.apps.exceer.orm.annotations.DatabaseColumn;
-import org.grapentin.apps.exceer.orm.annotations.DatabaseTable;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
+import org.grapentin.apps.exceer.service.DatabaseService;
 
 @DatabaseTable
 public class Session
 {
 
-  @DatabaseColumn
+  @DatabaseField(id = true)
+  int id;
+
+  @DatabaseField
   private long date;
-  @DatabaseColumn
+
+  @DatabaseField(foreign = true)
   private Training training;
+
+  public Session ()
+    {
+
+    }
 
   public Session (Training training)
     {
@@ -43,7 +53,7 @@ public class Session
   @Nullable
   public static Session getLast ()
     {
-      return (Session)Database.query(Session.class).orderBy("date DESC").first();
+      return (Session)DatabaseService.query(Session.class).orderBy("date", false).first();
     }
 
   public long getDate ()

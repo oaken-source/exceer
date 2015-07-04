@@ -23,40 +23,47 @@ package org.grapentin.apps.exceer.models;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.j256.ormlite.dao.ForeignCollection;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
+import com.j256.ormlite.table.DatabaseTable;
+
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.gui.base.BaseActivity;
 import org.grapentin.apps.exceer.helpers.XmlNode;
-import org.grapentin.apps.exceer.orm.Database;
-import org.grapentin.apps.exceer.orm.annotations.DatabaseColumn;
-import org.grapentin.apps.exceer.orm.annotations.DatabaseRelation;
-import org.grapentin.apps.exceer.orm.annotations.DatabaseTable;
+import org.grapentin.apps.exceer.service.DatabaseService;
 import org.grapentin.apps.exceer.training.BaseExercisable;
 import org.grapentin.apps.exceer.training.Properties;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.SQLException;
 
 @DatabaseTable
 public class Exercise extends BaseExercisable
 {
 
-  @DatabaseColumn(id = true)
+  @DatabaseField(id = true)
   private int id;
 
-  @DatabaseColumn
+  @DatabaseField
   private String name;
-  @DatabaseColumn
+  @DatabaseField
   private int currentExerciseId;
-  @DatabaseColumn
+  @DatabaseField
   private int currentLevelId;
-  @DatabaseColumn
+  @DatabaseField
   private String progress;
-  @DatabaseRelation
-  private List<Level> levels;
-  @DatabaseRelation
-  private List<Exercise> exercises;
-  @DatabaseRelation
-  private List<Property> properties;
+
+  @ForeignCollectionField
+  private ForeignCollection<Level> levels;
+  @ForeignCollectionField
+  private ForeignCollection<Exercise> exercises;
+  @ForeignCollectionField
+  private ForeignCollection<Property> properties;
+
+  @DatabaseField(foreign = true)
+  private Training parentTtraining;
+  @DatabaseField(foreign = true)
+  private Exercise parentExercise;
 
   public static Exercise fromXml (@NonNull XmlNode root)
     {
@@ -66,13 +73,10 @@ public class Exercise extends BaseExercisable
       m.currentExerciseId = 0;
       m.currentLevelId = 0;
 
-      m.properties = new ArrayList<>();
       for (XmlNode property : root.getChildren("property"))
         m.properties.add(Property.fromXml(property));
-      m.exercises = new ArrayList<>();
       for (XmlNode exercise : root.getChildren("exercise"))
         m.exercises.add(Exercise.fromXml(exercise));
-      m.levels = new ArrayList<>();
       for (XmlNode level : root.getChildren("level"))
         m.levels.add(Level.fromXml(level));
 
@@ -83,7 +87,7 @@ public class Exercise extends BaseExercisable
   @SuppressWarnings("unused")
   public static Exercise get (int id)
     {
-      return (Exercise)Database.query(Exercise.class).get(id);
+      return (Exercise)DatabaseService.query(Exercise.class).get(id);
     }
 
   @NonNull
@@ -101,7 +105,14 @@ public class Exercise extends BaseExercisable
     {
       if (exercises.size() <= currentExerciseId)
         return null;
-      return exercises.get(currentExerciseId);
+      try
+        {
+          return exercises.iterator(currentExerciseId).current();
+        }
+      catch (SQLException e)
+        {
+          throw new Error(e);
+        }
     }
 
   @Nullable
@@ -109,7 +120,14 @@ public class Exercise extends BaseExercisable
     {
       if (levels.size() <= currentLevelId)
         return null;
-      return levels.get(currentLevelId);
+      try
+        {
+          return levels.iterator(currentLevelId).current();
+        }
+      catch (SQLException e)
+        {
+          throw new Error(e);
+        }
     }
 
   public int getCurrentLevelId ()
