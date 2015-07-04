@@ -40,11 +40,12 @@ import java.sql.SQLException;
 public class Training
 {
 
-  @DatabaseField(id = true)
+  @DatabaseField(generatedId = true)
   private int id;
 
   @DatabaseField
   private String name;
+
   @ForeignCollectionField
   private ForeignCollection<Exercise> exercises;
   @ForeignCollectionField
@@ -52,18 +53,18 @@ public class Training
 
   private int currentExerciseId = 0;
 
-  public static Training fromXml (@NonNull XmlNode root)
+  public static void fromXml (@NonNull XmlNode root)
     {
       Training m = new Training();
 
       m.name = root.getAttribute("name");
 
-      for (XmlNode property : root.getChildren("property"))
-        m.properties.add(Property.fromXml(property));
-      for (XmlNode exercise : root.getChildren("exercise"))
-        m.exercises.add(Exercise.fromXml(exercise));
+      DatabaseService.add(m);
 
-      return m;
+      for (XmlNode property : root.getChildren("property"))
+        Property.fromXml(property, m);
+      for (XmlNode exercise : root.getChildren("exercise"))
+        Exercise.fromXml(exercise, m);
     }
 
   @Nullable

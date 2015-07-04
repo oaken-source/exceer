@@ -32,7 +32,7 @@ import org.grapentin.apps.exceer.service.DatabaseService;
 public class Property
 {
 
-  @DatabaseField(id = true)
+  @DatabaseField(generatedId = true)
   private int id;
 
   @DatabaseField
@@ -47,14 +47,40 @@ public class Property
   @DatabaseField(foreign = true)
   Level parentLevel;
 
-  public static Property fromXml (@NonNull XmlNode root)
+  public static void fromXml (@NonNull XmlNode root, Training parentTraining)
     {
       Property m = new Property();
 
       m.key = root.getAttribute("name");
       m.value = root.getValue();
 
-      return m;
+      m.parentTraining = parentTraining;
+
+      DatabaseService.add(m);
+    }
+
+  public static void fromXml (@NonNull XmlNode root, Exercise parentExercise)
+    {
+      Property m = new Property();
+
+      m.key = root.getAttribute("name");
+      m.value = root.getValue();
+
+      m.parentExercise = parentExercise;
+
+      DatabaseService.add(m);
+    }
+
+  public static void fromXml (@NonNull XmlNode root, Level parentLevel)
+    {
+      Property m = new Property();
+
+      m.key = root.getAttribute("name");
+      m.value = root.getValue();
+
+      m.parentLevel = parentLevel;
+
+      DatabaseService.add(m);
     }
 
   @Nullable

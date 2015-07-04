@@ -38,7 +38,7 @@ import org.grapentin.apps.exceer.training.Properties;
 public class Level extends BaseExercisable
 {
 
-  @DatabaseField(id = true)
+  @DatabaseField(generatedId = true)
   private int id;
 
   @DatabaseField
@@ -50,20 +50,21 @@ public class Level extends BaseExercisable
   private ForeignCollection<Property> properties;
 
   @DatabaseField(foreign = true)
-  private Training parentTraining;
-  @DatabaseField(foreign = true)
   private Exercise parentExercise;
 
-  public static Level fromXml (@NonNull XmlNode root)
+  public static void fromXml (@NonNull XmlNode root, Exercise parentExercise)
     {
       Level m = new Level();
 
       m.name = root.getAttribute("name");
+      m.progress = null;
+
+      m.parentExercise = parentExercise;
+
+      DatabaseService.add(m);
 
       for (XmlNode property : root.getChildren("property"))
-        m.properties.add(Property.fromXml(property));
-
-      return m;
+        Property.fromXml(property, m);
     }
 
   @Nullable

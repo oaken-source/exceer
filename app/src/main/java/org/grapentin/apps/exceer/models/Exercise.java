@@ -41,7 +41,7 @@ import java.sql.SQLException;
 public class Exercise extends BaseExercisable
 {
 
-  @DatabaseField(id = true)
+  @DatabaseField(generatedId = true)
   private int id;
 
   @DatabaseField
@@ -61,26 +61,50 @@ public class Exercise extends BaseExercisable
   private ForeignCollection<Property> properties;
 
   @DatabaseField(foreign = true)
-  private Training parentTtraining;
+  private Training parentTraining;
   @DatabaseField(foreign = true)
   private Exercise parentExercise;
 
-  public static Exercise fromXml (@NonNull XmlNode root)
+  public static void fromXml (@NonNull XmlNode root, Training parentTraining)
     {
       Exercise m = new Exercise();
 
       m.name = (root.getAttribute("name"));
       m.currentExerciseId = 0;
       m.currentLevelId = 0;
+      m.progress = null;
+
+      m.parentTraining = parentTraining;
+
+      DatabaseService.add(m);
 
       for (XmlNode property : root.getChildren("property"))
-        m.properties.add(Property.fromXml(property));
+        Property.fromXml(property, m);
       for (XmlNode exercise : root.getChildren("exercise"))
-        m.exercises.add(Exercise.fromXml(exercise));
+        Exercise.fromXml(exercise, m);
       for (XmlNode level : root.getChildren("level"))
-        m.levels.add(Level.fromXml(level));
+        Level.fromXml(level, m);
+    }
 
-      return m;
+  public static void fromXml (@NonNull XmlNode root, Exercise parentExercise)
+    {
+      Exercise m = new Exercise();
+
+      m.name = (root.getAttribute("name"));
+      m.currentExerciseId = 0;
+      m.currentLevelId = 0;
+      m.progress = null;
+
+      m.parentExercise = parentExercise;
+
+      DatabaseService.add(m);
+
+      for (XmlNode property : root.getChildren("property"))
+        Property.fromXml(property, m);
+      for (XmlNode exercise : root.getChildren("exercise"))
+        Exercise.fromXml(exercise, m);
+      for (XmlNode level : root.getChildren("level"))
+        Level.fromXml(level, m);
     }
 
   @Nullable

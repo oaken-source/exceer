@@ -34,6 +34,8 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
+import org.grapentin.apps.exceer.R;
+import org.grapentin.apps.exceer.helpers.XmlNode;
 import org.grapentin.apps.exceer.models.Exercise;
 import org.grapentin.apps.exceer.models.Level;
 import org.grapentin.apps.exceer.models.Property;
@@ -68,6 +70,18 @@ public class DatabaseService extends Service
       return local.query(c);
     }
 
+  public static void add (Object o)
+    {
+      try
+        {
+          local.add(o);
+        }
+      catch (SQLException e)
+        {
+          throw new DatabaseAccessException("failed to add object of type " + o.getClass().getSimpleName(), e);
+        }
+    }
+
   @Override
   public void onCreate ()
     {
@@ -94,8 +108,8 @@ public class DatabaseService extends Service
       Log.d("DatabaseService", "starting Initialization");
 
       database = new DatabaseOpenHelper(getApplicationContext(), DATABASE_NAME, null, DATABASE_VERSION);
-      database.getWritableDatabase();
       database.initDaos();
+      database.getWritableDatabase();
 
       initLock.countDown();
 
@@ -179,7 +193,7 @@ public class DatabaseService extends Service
       }
   }
 
-  private static class DatabaseOpenHelper extends OrmLiteSqliteOpenHelper
+  private class DatabaseOpenHelper extends OrmLiteSqliteOpenHelper
   {
     public Dao<Training, Integer> DaoTraining;
     public Dao<Exercise, Integer> DaoExercise;
@@ -204,9 +218,11 @@ public class DatabaseService extends Service
             TableUtils.createTable(connectionSource, Property.class);
             TableUtils.createTable(connectionSource, Session.class);
 
-
+            XmlNode root = new XmlNode(getResources().getXml(R.xml.trainings_default));
+            for (XmlNode n : root.getChildren("training"))
+              Training.fromXml(n);
           }
-        catch (SQLException e)
+        catch (Exception e)
           {
             throw new DatabaseAccessException("failed to access database", e);
           }
@@ -251,6 +267,23 @@ public class DatabaseService extends Service
         if (c == Session.class)
           return new DatabaseQuery<>(database.DaoSession);
         throw new DatabaseAccessException(c.getSimpleName() + ": queried class is no model");
+      }
+
+    public void add (Object o) throws SQLException
+      {
+        Class c = o.getClass();
+        if (c == Training.class)
+          database.DaoTraining.create((Training)o);
+        else if (c == Exercise.class)
+          database.DaoExercise.create((Exercise)o);
+        else if (c == Level.class)
+          database.DaoLevel.create((Level)o);
+        else if (c == Property.class)
+          database.DaoProperty.create((Property)o);
+        else if (c == Session.class)
+          database.DaoSession.create((Session)o);
+        else
+          throw new DatabaseAccessException(o.getClass().getSimpleName() + ": queried class is no model");
       }
 
     public void await ()

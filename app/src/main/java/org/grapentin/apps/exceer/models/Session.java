@@ -30,7 +30,7 @@ import org.grapentin.apps.exceer.service.DatabaseService;
 public class Session
 {
 
-  @DatabaseField(id = true)
+  @DatabaseField(generatedId = true)
   int id;
 
   @DatabaseField
