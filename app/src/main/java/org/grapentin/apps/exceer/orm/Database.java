@@ -25,6 +25,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import org.grapentin.apps.exceer.R;
+import org.grapentin.apps.exceer.gui.SplashActivity;
 import org.grapentin.apps.exceer.gui.base.BaseActivity;
 import org.grapentin.apps.exceer.helpers.XmlNode;
 import org.grapentin.apps.exceer.models.Exercise;
@@ -125,8 +126,6 @@ public class Database
 
             // trigger migrations
             database.getWritableDatabase();
-
-            BaseActivity.initLock.countDown();
 
             Log.d("Database", "finished Initialization (took " + (System.currentTimeMillis() - start) + "ms)");
           }

@@ -17,71 +17,98 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.helpers;
+package org.grapentin.apps.exceer.service;
 
+import android.app.Service;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.os.Binder;
+import android.os.IBinder;
 import android.support.annotation.RawRes;
 import android.util.Log;
 
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.gui.SplashActivity;
-import org.grapentin.apps.exceer.gui.base.BaseActivity;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.CountDownLatch;
 
-public class Sounds
+public class AudioService extends Service
 {
 
-  private static final BlockingQueue<Integer> queue = new LinkedBlockingQueue<>();
+  private final IBinder binder = new LocalBinder();
+  private final SoundPool soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
+  private final HashMap<Integer, Integer> sounds = new HashMap<>();
 
-  public static void init ()
+  public CountDownLatch initLock = new CountDownLatch(1);
+
+  @Override
+  public void onCreate ()
     {
+      super.onCreate();
+
       new Thread(new Runnable()
       {
+        @Override
         public void run ()
           {
-            Log.d("Sounds", "starting Initialization");
-
-            // initialize
-            SoundPool soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
-            HashMap<Integer, Integer> sounds = new HashMap<>();
-
-            for (Field field : R.raw.class.getFields())
-              try
-                {
-                  sounds.put(field.getInt(null), soundPool.load(BaseActivity.getContext(), field.getInt(null), 0));
-                }
-              catch (IllegalAccessException e)
-                {
-                  throw new Error(e);
-                }
-
-            Log.d("Sounds", "finished Initialization");
-
-            // process queue
-            while (true)
-              {
-                try
-                  {
-                    int resource = queue.take();
-                    soundPool.play(sounds.get(resource), 1, 1, 1, 0, 1);
-                  }
-                catch (InterruptedException e)
-                  {
-                    break;
-                  }
-              }
+            initialize();
           }
       }).start();
     }
 
-  public static void play (@RawRes int resource)
+  @Override
+  public void onDestroy ()
     {
-      queue.add(resource);
+      Log.d("AudioService", "onDestroy");
     }
+
+  void initialize ()
+    {
+      Log.d("AudioService", "starting Initialization");
+
+      for (Field field : R.raw.class.getFields())
+        try
+          {
+            sounds.put(field.getInt(null), soundPool.load(getApplicationContext(), field.getInt(null), 0));
+          }
+        catch (IllegalAccessException e)
+          {
+            throw new Error(e);
+          }
+
+      initLock.countDown();
+
+      Log.d("AudioService", "finished Initialization");
+    }
+
+  @Override
+  public IBinder onBind (Intent intent)
+    {
+      return binder;
+    }
+
+  public class LocalBinder extends Binder
+  {
+    public void play (@RawRes int resource)
+      {
+        soundPool.play(sounds.get(resource), 1, 1, 1, 0, 1);
+      }
+
+    public void await ()
+      {
+        while (initLock.getCount() > 0)
+          try
+            {
+              initLock.await();
+            }
+          catch (InterruptedException e)
+            {
+              // just retry
+            }
+      }
+  }
 
 }

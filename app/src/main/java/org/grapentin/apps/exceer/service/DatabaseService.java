@@ -17,55 +17,75 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.gui.base;
+package org.grapentin.apps.exceer.service;
 
-import android.app.Activity;
-import android.content.Context;
-import android.support.annotation.CallSuper;
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.util.Log;
 
-import org.grapentin.apps.exceer.gui.widgets.interfaces.TextContainer;
+import org.grapentin.apps.exceer.gui.SplashActivity;
 
-public class BaseActivity extends Activity
+import java.util.concurrent.CountDownLatch;
+
+public class DatabaseService extends Service
 {
 
-  private static volatile BaseActivity instance = null;
+  private final IBinder binder = new LocalBinder();
 
-  @NonNull
-  public static Context getContext ()
-    {
-      return getInstance();
-    }
+  public CountDownLatch initLock = new CountDownLatch(1);
 
-  @NonNull
-  public static BaseActivity getInstance ()
-    {
-      assert instance != null;
-      return instance;
-    }
-
-  public static void setText (@IdRes int res, @StringRes int string)
-    {
-      TextContainer c = (TextContainer)getInstance().findViewById(res);
-      if (c != null)
-        c.setText(string);
-    }
-
-  public static void setText (@IdRes int res, @NonNull CharSequence string)
-    {
-      TextContainer c = (TextContainer)getInstance().findViewById(res);
-      if (c != null)
-        c.setText(string);
-    }
-
-  @CallSuper
   @Override
-  protected void onResume ()
+  public void onCreate ()
     {
-      super.onResume();
-      instance = this;
+      super.onCreate();
+
+      new Thread(new Runnable()
+      {
+        @Override
+        public void run ()
+          {
+            initialize();
+          }
+      }).start();
     }
+
+  @Override
+  public void onDestroy ()
+    {
+      Log.d("DatabaseService", "onDestroy");
+    }
+
+  void initialize ()
+    {
+      Log.d("DatabaseService", "starting Initialization");
+
+      initLock.countDown();
+
+      Log.d("DatabaseService", "finished Initialization");
+    }
+
+  @Override
+  public IBinder onBind (Intent intent)
+    {
+      return binder;
+    }
+
+  public class LocalBinder extends Binder
+  {
+    public void await ()
+      {
+        while (initLock.getCount() > 0)
+          try
+            {
+              initLock.await();
+            }
+          catch (InterruptedException e)
+            {
+              // just retry
+            }
+      }
+  }
 
 }
