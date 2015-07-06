@@ -19,7 +19,6 @@
 
 package org.grapentin.apps.exceer.gui.base;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -30,12 +29,14 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.support.v7.app.ActionBarActivity;
 
 import org.grapentin.apps.exceer.gui.widgets.interfaces.TextContainer;
+import org.grapentin.apps.exceer.helpers.Tasks;
 import org.grapentin.apps.exceer.service.AudioService;
 import org.grapentin.apps.exceer.service.DatabaseService;
 
-public class BaseActivity extends Activity
+public class BaseActivity extends ActionBarActivity
 {
 
   private static volatile BaseActivity instance = null;
@@ -77,7 +78,7 @@ public class BaseActivity extends Activity
       super.onCreate(savedInstanceState);
 
       Intent audioServiceIntent = new Intent(this, AudioService.class);
-      audioService =  new ServiceConnection()
+      audioService = new ServiceConnection()
       {
         @Override
         public void onServiceConnected (ComponentName name, final IBinder service)
@@ -117,6 +118,8 @@ public class BaseActivity extends Activity
     {
       super.onResume();
       instance = this;
+
+      Tasks.init();
     }
 
   @CallSuper

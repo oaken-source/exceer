@@ -21,6 +21,7 @@ package org.grapentin.apps.exceer.training;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.ForeignCollection;
@@ -170,8 +171,7 @@ public class Properties implements Serializable
             }
           break;
         default:
-          Toast.makeText(BaseActivity.getContext(), "invalid property: '" + key + "'", Toast.LENGTH_LONG).show();
-          break;
+          throw new IndexOutOfBoundsException();
         }
     }
 

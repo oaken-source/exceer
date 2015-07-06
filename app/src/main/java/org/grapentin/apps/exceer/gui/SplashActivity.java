@@ -19,13 +19,13 @@
 
 package org.grapentin.apps.exceer.gui;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v7.app.ActionBarActivity;
 
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.service.AudioService;
@@ -33,7 +33,7 @@ import org.grapentin.apps.exceer.service.DatabaseService;
 
 import java.util.concurrent.CountDownLatch;
 
-public class SplashActivity extends Activity
+public class SplashActivity extends ActionBarActivity
 {
 
   private ServiceConnection audioService;
@@ -43,7 +43,7 @@ public class SplashActivity extends Activity
   protected void onCreate (Bundle savedInstanceState)
     {
       super.onCreate(savedInstanceState);
-      setContentView(R.layout.activity_loading);
+      setContentView(R.layout.activity_splash);
 
       new Thread(new Runnable()
       {

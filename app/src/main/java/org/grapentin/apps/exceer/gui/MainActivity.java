@@ -24,38 +24,19 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.gui.base.BaseActivity;
 import org.grapentin.apps.exceer.gui.settings.MainSettingsActivity;
-import org.grapentin.apps.exceer.helpers.Tasks;
-import org.grapentin.apps.exceer.models.Session;
 
 public class MainActivity extends BaseActivity
 {
-
-  private Tasks.TimerTask task = new UpdateTimerTask();
 
   @Override
   protected void onCreate (Bundle savedInstanceState)
     {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_main);
-    }
-
-  @Override
-  protected void onResume ()
-    {
-      super.onResume();
-      task.start();
-    }
-
-  @Override
-  protected void onPause ()
-    {
-      super.onPause();
-      task.stop();
     }
 
   @Override
@@ -90,41 +71,5 @@ public class MainActivity extends BaseActivity
       Intent intent = new Intent(this, TrainingActivity.class);
       startActivity(intent);
     }
-
-  private class UpdateTimerTask extends Tasks.TimerTask
-  {
-    @Override
-    public long update ()
-      {
-        TextView lastSessionTextView = (TextView)findViewById(R.id.MainActivityLastSessionDate);
-
-        Session lastSession = Session.getLast();
-        long last = (lastSession == null ? System.currentTimeMillis() : lastSession.getDate());
-        long elapsed = System.currentTimeMillis() - last;
-
-        elapsed = Math.round(elapsed / 1000.0);
-        if (elapsed < 60 /* seconds */)
-          {
-            lastSessionTextView.setText(elapsed + " sec");
-            return last + (elapsed + 1) * 1000;
-          }
-        elapsed = Math.round(elapsed / 60.0);
-        if (elapsed < 60 /* minutes */)
-          {
-            lastSessionTextView.setText(elapsed + " min");
-            return last + (elapsed + 1) * 1000 * 60;
-          }
-        elapsed = Math.round(elapsed / 60.0);
-        if (elapsed < 24 /* hours */)
-          {
-            lastSessionTextView.setText(elapsed + " hour" + (elapsed > 1 ? "s" : ""));
-            return last + (elapsed + 1) * 1000 * 60 * 60;
-          }
-        elapsed = Math.round(elapsed / 24.0);
-
-        lastSessionTextView.setText(elapsed + " day" + (elapsed > 1 ? "s" : ""));
-        return last + (elapsed + 1) * 1000 * 60 * 60 * 24;
-      }
-  }
 
 }

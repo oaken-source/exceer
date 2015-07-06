@@ -46,7 +46,7 @@ public class Level extends BaseExercisable
   @DatabaseField
   private String progress;
 
-  @ForeignCollectionField
+  @ForeignCollectionField(eager = true)
   private ForeignCollection<Property> properties;
 
   @DatabaseField(foreign = true)

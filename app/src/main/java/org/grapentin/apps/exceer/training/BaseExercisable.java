@@ -22,6 +22,7 @@ package org.grapentin.apps.exceer.training;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -30,6 +31,7 @@ import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.gui.TrainingActivity;
 import org.grapentin.apps.exceer.gui.base.BaseActivity;
 import org.grapentin.apps.exceer.helpers.Tasks;
+import org.grapentin.apps.exceer.models.Exercise;
 import org.grapentin.apps.exceer.service.AudioService;
 
 abstract public class BaseExercisable
@@ -321,7 +323,7 @@ abstract public class BaseExercisable
         progressLabel.setText((min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec);
         ProgressBar progressBar = (ProgressBar)TrainingActivity.getInstance().findViewById(R.id.TrainingActivityProgressBar);
         progressBar.setMax((int)duration.get());
-        progressBar.setProgress((int)(duration.get() - remaining));
+        progressBar.setProgress((int)(elapsed));
 
         return start + (Math.round(elapsed / 1000.0) + 1) * 1000;
       }

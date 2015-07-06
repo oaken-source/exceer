@@ -22,6 +22,7 @@ package org.grapentin.apps.exceer.models;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
@@ -42,7 +43,7 @@ public class Exercise extends BaseExercisable
 {
 
   @DatabaseField(generatedId = true)
-  private int id;
+  public int id;
 
   @DatabaseField
   private String name;
@@ -53,11 +54,11 @@ public class Exercise extends BaseExercisable
   @DatabaseField
   private String progress;
 
-  @ForeignCollectionField
+  @ForeignCollectionField(eager = true)
   private ForeignCollection<Level> levels;
-  @ForeignCollectionField
+  @ForeignCollectionField(eager = true)
   private ForeignCollection<Exercise> exercises;
-  @ForeignCollectionField
+  @ForeignCollectionField(eager = true)
   private ForeignCollection<Property> properties;
 
   @DatabaseField(foreign = true)

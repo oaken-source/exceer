@@ -37,7 +37,7 @@
       android:layout_marginBottom="10dp"
       android:orientation="vertical">
 
-    <org.grapentin.apps.exceer.gui.widgets.TextWidget
+    <org.grapentin.apps.exceer.gui.widgets.main.TimeSinceLastSessionWidget
         android:id="@+id/MainActivityLastSessionDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
         android:freezesText="true"
         android:textStyle="bold" />
 
-    <org.grapentin.apps.exceer.gui.widgets.TextWidget
+    <TextView
         android:id="@+id/MainActivityLastSessionLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
 
   </LinearLayout>
 
-  <org.grapentin.apps.exceer.gui.widgets.ButtonWidget
+  <Button
       android:id="@+id/MainActivityTrainButton"
       android:layout_width="fill_parent"
       android:layout_height="70dp"

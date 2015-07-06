@@ -33,12 +33,12 @@ public class Property
 {
 
   @DatabaseField(generatedId = true)
-  private int id;
+  public int id;
 
   @DatabaseField
-  private String key;
+  public String key;
   @DatabaseField
-  private String value;
+  public String value;
 
   @DatabaseField(foreign = true)
   Training parentTraining;

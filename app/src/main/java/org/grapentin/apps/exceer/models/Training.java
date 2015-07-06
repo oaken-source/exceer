@@ -22,6 +22,8 @@ package org.grapentin.apps.exceer.models;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.j256.ormlite.dao.CloseableIterable;
+import com.j256.ormlite.dao.CloseableIterator;
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
@@ -46,12 +48,12 @@ public class Training
   @DatabaseField
   private String name;
 
-  @ForeignCollectionField
+  @ForeignCollectionField(eager = true)
   private ForeignCollection<Exercise> exercises;
-  @ForeignCollectionField
+  @ForeignCollectionField(eager = true)
   private ForeignCollection<Property> properties;
 
-  private int currentExerciseId = 0;
+  private CloseableIterator<Exercise> currentExercise = null;
 
   public static void fromXml (@NonNull XmlNode root)
     {
@@ -76,15 +78,16 @@ public class Training
   @Nullable
   private Exercise getCurrentExercise ()
     {
-      if (exercises.size() <= currentExerciseId)
+      if (currentExercise == null)
         return null;
+
       try
         {
-          return exercises.iterator(currentExerciseId).current();
+          return currentExercise.current();
         }
       catch (SQLException e)
         {
-          throw new Error(e);
+          throw new DatabaseService.DatabaseAccessException("unable to get foreign", e);
         }
     }
 
@@ -103,6 +106,9 @@ public class Training
       for (Exercise e : exercises)
         e.prepare(props);
 
+      if (exercises.size() > 0)
+        currentExercise = exercises.iterator(0);
+
       if (getLeafExercisable() != null)
         getLeafExercisable().show();
       else
@@ -118,17 +124,20 @@ public class Training
 
   public boolean next ()
     {
-      currentExerciseId++;
-      if (getCurrentExercise() == null)
+      if (!currentExercise.hasNext())
         return false;
+      currentExercise.moveToNext();
 
-      getCurrentExercise().getLeafExercisable().show();
+      assert getLeafExercisable() != null;
+
+      getLeafExercisable().show();
       return true;
     }
 
   public void reset ()
     {
-      currentExerciseId = 0;
+      if (exercises.size() > 0)
+        currentExercise = exercises.iterator(0);
 
       for (Exercise e : exercises)
         e.reset();
@@ -154,7 +163,8 @@ public class Training
 
   public void wrapUp ()
     {
-      currentExerciseId = 0;
+      if (exercises.size() > 0)
+        currentExercise = exercises.iterator(0);
 
       for (Exercise e : exercises)
         e.wrapUp();
