@@ -29,45 +29,67 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
-  <LinearLayout
+  <android.support.v4.view.ViewPager
+      android:id="@+id/MainActivityViewPager"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:layout_above="@+id/MainActivityTrainButton"
-      android:gravity="center"
-      android:layout_marginBottom="10dp"
-      android:orientation="vertical">
+      android:layout_marginBottom="10dp">
 
-    <org.grapentin.apps.exceer.gui.widgets.main.TimeSinceLastSessionWidget
-        android:id="@+id/MainActivityLastSessionDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:singleLine="true"
-        android:text="@string/MainActivityLastSessionDateText"
-        android:textSize="60sp"
-        android:freezesText="true"
-        android:textStyle="bold" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/MainActivityLastSessionLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:singleLine="true"
-        android:text="@string/MainActivityLastSessionLabelText"
-        android:textSize="30sp" />
+      <org.grapentin.apps.exceer.gui.widgets.main.TimeSinceLastSessionWidget
+          android:id="@+id/MainActivityLastSessionLabel"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:freezesText="true"
+          android:text="@string/MainActivityLastSessionDateText"
+          android:textAppearance="?android:attr/textAppearanceLarge" />
 
-  </LinearLayout>
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:singleLine="true"
+          android:text="@string/MainActivityLastSessionLabelText" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+      <TextView
+          android:id="@+id/MainActivityNumSessionLabel"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:freezesText="true"
+          android:text="@string/MainActivityNumSessionDateText"
+          android:textAppearance="?android:attr/textAppearanceLarge" />
+
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:singleLine="true"
+          android:text="@string/MainActivityNumSessionLabelText" />
+
+    </LinearLayout>
+
+  </android.support.v4.view.ViewPager>
 
   <Button
       android:id="@+id/MainActivityTrainButton"
       android:layout_width="fill_parent"
-      android:layout_height="70dp"
+      android:layout_height="wrap_content"
       android:layout_alignParentBottom="true"
       android:layout_centerHorizontal="true"
       android:onClick="onTrainButtonClicked"
-      android:gravity="center"
-      android:singleLine="true"
       android:text="@string/MainActivityTrainButtonText"
-      android:textSize="40sp"
-      android:textStyle="bold|normal" />
+      android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>

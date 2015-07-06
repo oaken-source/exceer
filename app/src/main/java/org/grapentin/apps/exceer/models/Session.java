@@ -50,6 +50,11 @@ public class Session
       this.training = training;
     }
 
+  public static long count ()
+    {
+      return DatabaseService.query(Session.class).count();
+    }
+
   @Nullable
   public static Session getLast ()
     {

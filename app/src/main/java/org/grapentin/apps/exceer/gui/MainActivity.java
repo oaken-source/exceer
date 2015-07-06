@@ -21,23 +21,45 @@ package org.grapentin.apps.exceer.gui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.gui.base.BaseActivity;
 import org.grapentin.apps.exceer.gui.settings.MainSettingsActivity;
+import org.grapentin.apps.exceer.gui.widgets.main.TimeSinceLastSessionWidget;
+import org.grapentin.apps.exceer.models.Session;
 
 public class MainActivity extends BaseActivity
 {
+
+  private ViewPager viewPager;
 
   @Override
   protected void onCreate (Bundle savedInstanceState)
     {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_main);
+
+      viewPager = (ViewPager)findViewById(R.id.MainActivityViewPager);
+      viewPager.setAdapter(new ViewPagerAdapter());
+    }
+
+  @Override
+  protected void onResume ()
+    {
+      super.onResume();
+
+      TimeSinceLastSessionWidget lastSession = (TimeSinceLastSessionWidget)findViewById(R.id.MainActivityLastSessionLabel);
+      lastSession.setSession(Session.getLast());
+
+      TextView numSession = (TextView)findViewById(R.id.MainActivityNumSessionLabel);
+      numSession.setText(Long.toString(Session.count()));
     }
 
   @Override
@@ -67,16 +89,37 @@ public class MainActivity extends BaseActivity
       return super.onOptionsItemSelected(item);
     }
 
-  @Override
-  public void onOptionsMenuClosed (Menu menu)
-    {
-      Log.d("Overflow", "closed :)");
-    }
-
   public void onTrainButtonClicked (View view)
     {
       Intent intent = new Intent(this, TrainingActivity.class);
       startActivity(intent);
     }
+
+  private class ViewPagerAdapter extends PagerAdapter
+  {
+    @Override
+    public int getCount ()
+      {
+        return viewPager.getChildCount();
+      }
+
+    @Override
+    public Object instantiateItem (ViewGroup collection, int position)
+      {
+        return viewPager.getChildAt(position);
+      }
+
+    @Override
+    public void destroyItem (ViewGroup container, int position, Object object)
+      {
+        // nothing here
+      }
+
+    @Override
+    public boolean isViewFromObject (View view, Object object)
+      {
+        return view == object;
+      }
+  }
 
 }

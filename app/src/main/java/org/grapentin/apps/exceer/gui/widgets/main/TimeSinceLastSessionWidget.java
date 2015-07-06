@@ -57,7 +57,7 @@ public class TimeSinceLastSessionWidget extends TextView
 
   private void start ()
     {
-      update();
+      updateView();
 
       new Timer().scheduleAtFixedRate(new TimerTask()
       {
@@ -69,20 +69,25 @@ public class TimeSinceLastSessionWidget extends TextView
               @Override
               public void run ()
                 {
-                  update();
+                  updateView();
                 }
             });
           }
       }, 0, 1000);
     }
 
-  private void update ()
+  private void updateView ()
     {
       long last = (session == null ? System.currentTimeMillis() : session.getDate());
 
-      String s = (String)DateUtils.getRelativeTimeSpanString(last, System.currentTimeMillis(), 1000, DateUtils.FORMAT_ABBREV_ALL);
+      String s = (String)DateUtils.getRelativeTimeSpanString(last, System.currentTimeMillis(), 1000);
       s = s.substring(0, s.length() - 4);
       setText(s);
+    }
+
+  public void setSession (Session session)
+    {
+      this.session = session;
     }
 
 }

@@ -35,6 +35,8 @@
 
   <string name="MainActivityLastSessionDateText">0 sec</string>
   <string name="MainActivityLastSessionLabelText">since last session</string>
+  <string name="MainActivityNumSessionDateText">0</string>
+  <string name="MainActivityNumSessionLabelText">total sessions</string>
   <string name="MainActivityTrainButtonText">Train Now!</string>
 
   <string name="TrainingActivityNoExercises">(no exercises)</string>

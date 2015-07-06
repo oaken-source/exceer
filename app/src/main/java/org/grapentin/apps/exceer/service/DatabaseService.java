@@ -178,7 +178,7 @@ public class DatabaseService extends Service
       {
         try
           {
-            return dao.queryForFirst(builder.prepare());
+            return builder.queryForFirst();
           }
         catch (SQLException e)
           {
@@ -190,6 +190,18 @@ public class DatabaseService extends Service
       {
         builder.orderBy(order, ascending);
         return this;
+      }
+
+    public long count ()
+      {
+        try
+          {
+            return builder.countOf();
+          }
+        catch (SQLException e)
+          {
+            throw new DatabaseAccessException("query failed", e);
+          }
       }
   }
 
