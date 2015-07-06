@@ -29,14 +29,17 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.view.ViewConfiguration;
 
 import org.grapentin.apps.exceer.gui.widgets.interfaces.TextContainer;
 import org.grapentin.apps.exceer.helpers.Tasks;
 import org.grapentin.apps.exceer.service.AudioService;
 import org.grapentin.apps.exceer.service.DatabaseService;
 
-public class BaseActivity extends ActionBarActivity
+import java.lang.reflect.Field;
+
+public class BaseActivity extends AppCompatActivity
 {
 
   private static volatile BaseActivity instance = null;

@@ -18,7 +18,33 @@
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
-    <item android:id="@+id/action_settings" android:title="@string/action_main_settings" />
-    <item android:id="@+id/action_about" android:title="@string/action_main_about" />
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context=".MainActivity">
+
+  <item
+      android:id="@+id/action_settings"
+      android:icon="@drawable/ic_build_white_24dp"
+      android:title="@string/action_settings"
+      app:showAsAction="always" />
+
+  <item
+      android:id="@+id/menu_overflow"
+      android:icon="@drawable/ic_more_vert_white_24dp"
+      android:title="@string/action_overflow"
+      app:showAsAction="always">
+
+    <menu>
+
+      <item
+          android:id="@+id/action_about"
+          android:title="@string/action_main_about"
+          app:showAsAction="never" />
+
+    </menu>
+
+  </item>
+
+
+
 </menu>

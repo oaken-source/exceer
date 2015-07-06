@@ -25,7 +25,7 @@ import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.service.AudioService;
@@ -33,7 +33,7 @@ import org.grapentin.apps.exceer.service.DatabaseService;
 
 import java.util.concurrent.CountDownLatch;
 
-public class SplashActivity extends ActionBarActivity
+public class SplashActivity extends AppCompatActivity
 {
 
   private ServiceConnection audioService;

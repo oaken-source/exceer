@@ -29,18 +29,15 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="org.grapentin.apps.exceer.gui.AboutActivity">
 
-  <org.grapentin.apps.exceer.gui.widgets.TextWidget
+  <TextView
       android:id="@+id/AboutActivityTitleLabel"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginBottom="10dp"
-      android:singleLine="true"
       android:text="@string/app_name"
-      android:textSize="25sp"
-      android:textStyle="bold" />
+      android:textAppearance="?android:attr/textAppearanceLarge" />
 
   <ScrollView
-      android:id="@+id/scrollView"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:layout_below="@+id/AboutActivityTitleLabel">
@@ -50,47 +47,47 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-      <org.grapentin.apps.exceer.gui.widgets.TextWidget
-          android:id="@+id/AboutActivityShortCopyrightLabel"
+      <TextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginBottom="10dp"
           android:text="@string/AboutActivityShortCopyrightLabelText"
-          android:textSize="14sp" />
+          android:textAppearance="?android:attr/textAppearanceSmall" />
 
-      <org.grapentin.apps.exceer.gui.widgets.LinkTextWidget
-          android:id="@+id/AboutActivityNickJanvierLabel"
+      <org.grapentin.apps.exceer.gui.widgets.common.LinkTextWidget
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginBottom="10dp"
           android:text="@string/AboutActivityNickJanvierLabelText"
-          android:textSize="14sp" />
+          android:textAppearance="?android:attr/textAppearanceSmall" />
 
-      <org.grapentin.apps.exceer.gui.widgets.LinkTextWidget
-          android:id="@+id/AboutActivitySoundsCopyrightLabel"
+      <org.grapentin.apps.exceer.gui.widgets.common.LinkTextWidget
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginBottom="10dp"
           android:text="@string/AboutActivitySoundsCopyrightLabelText"
-          android:textSize="14sp" />
+          android:textAppearance="?android:attr/textAppearanceSmall" />
 
-      <org.grapentin.apps.exceer.gui.widgets.LinkTextWidget
-          android:id="@+id/AboutActivityIconCopyrightLabel"
+      <org.grapentin.apps.exceer.gui.widgets.common.LinkTextWidget
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginBottom="10dp"
-          android:drawableLeft="@mipmap/ic_launcher"
-          android:drawableStart="@mipmap/ic_launcher"
-          android:text="@string/AboutActivityIconCopyrightLabelText"
-          android:textSize="14sp" />
+          android:text="@string/AboutActivityIconFlaticonCopyrightLabelText"
+          android:textAppearance="?android:attr/textAppearanceSmall" />
 
-      <org.grapentin.apps.exceer.gui.widgets.LinkTextWidget
-          android:id="@+id/AboutActivityLongCopyrightLabel"
+      <org.grapentin.apps.exceer.gui.widgets.common.LinkTextWidget
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="10dp"
+          android:text="@string/AboutActivityIconMaterialCopyrightLabelText"
+          android:textAppearance="?android:attr/textAppearanceSmall" />
+
+      <org.grapentin.apps.exceer.gui.widgets.common.LinkTextWidget
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginBottom="10dp"
           android:text="@string/AboutActivityLongCopyrightLabelText"
-          android:textSize="14sp" />
+          android:textAppearance="?android:attr/textAppearanceSmall" />
 
     </LinearLayout>
 

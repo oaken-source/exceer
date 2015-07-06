@@ -20,12 +20,13 @@
 package org.grapentin.apps.exceer.gui;
 
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.TextView;
 
 import org.grapentin.apps.exceer.BuildConfig;
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.gui.base.BaseActivity;
 
-public class AboutActivity extends BaseActivity
+public class AboutActivity extends AppCompatActivity
 {
 
   @Override
@@ -33,13 +34,9 @@ public class AboutActivity extends BaseActivity
     {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_about);
-    }
 
-  @Override
-  protected void onResume ()
-    {
-      super.onResume();
-      setText(R.id.AboutActivityTitleLabel, getString(R.string.app_name) + "-" + BuildConfig.VERSION_NAME);
+      TextView titleLabel = (TextView)findViewById(R.id.AboutActivityTitleLabel);
+      titleLabel.setText(getString(R.string.app_name) + "-" + BuildConfig.VERSION_NAME);
     }
 
 }

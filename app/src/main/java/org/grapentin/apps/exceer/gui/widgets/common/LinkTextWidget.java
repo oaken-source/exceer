@@ -17,13 +17,14 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.gui.widgets;
+package org.grapentin.apps.exceer.gui.widgets.common;
 
 import android.content.Context;
 import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
+import android.widget.TextView;
 
-public class LinkTextWidget extends TextWidget
+public class LinkTextWidget extends TextView
 {
 
   public LinkTextWidget (Context context)
