@@ -21,26 +21,75 @@ package org.grapentin.apps.exceer.gui.widgets;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.Button;
+import android.widget.TextView;
 
-import org.grapentin.apps.exceer.gui.widgets.interfaces.TextContainer;
+import org.grapentin.apps.exceer.R;
+import org.grapentin.apps.exceer.models.Session;
+import org.ocpsoft.prettytime.PrettyTime;
 
-public class ButtonWidget extends Button implements TextContainer
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class TimeSinceLastSessionWidget extends TextView
 {
 
-  public ButtonWidget (Context context)
+  private Session session = null;
+
+  private PrettyTime formatter = new PrettyTime();
+
+  public TimeSinceLastSessionWidget (Context context)
     {
       super(context);
+      if (!isInEditMode())
+        start();
     }
 
-  public ButtonWidget (Context context, AttributeSet attrs)
+  public TimeSinceLastSessionWidget (Context context, AttributeSet attrs)
     {
       super(context, attrs);
+      if (!isInEditMode())
+        start();
     }
 
-  public ButtonWidget (Context context, AttributeSet attrs, int defStyleAttr)
+  public TimeSinceLastSessionWidget (Context context, AttributeSet attrs, int defStyleAttr)
     {
       super(context, attrs, defStyleAttr);
+      if (!isInEditMode())
+        start();
+    }
+
+  private void start ()
+    {
+      new Timer().scheduleAtFixedRate(new TimerTask()
+      {
+        @Override
+        public void run ()
+          {
+            post(new Runnable()
+            {
+              @Override
+              public void run ()
+                {
+                  updateView();
+                }
+            });
+          }
+      }, 0, 1000);
+    }
+
+  private void updateView ()
+    {
+      if (session == null)
+        setText(R.string.MainActivityLastSessionDateText);
+      else
+        setText(formatter.format(new Date(session.getDate())));
+    }
+
+  public void setSession (Session session)
+    {
+      this.session = session;
+      updateView();
     }
 
 }

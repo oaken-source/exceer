@@ -29,78 +29,26 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="org.grapentin.apps.exceer.gui.TrainingActivity">
 
-  <org.grapentin.apps.exceer.gui.widgets.TextWidget
-      android:id="@+id/TrainingActivityCurrentExerciseLabel"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_alignParentTop="true"
-      android:layout_centerHorizontal="true"
-      android:clickable="true"
-      android:enabled="true"
-      android:freezesText="true"
-      android:onClick="onCurrentExerciseLevelLabelClicked"
-      android:singleLine="true"
-      android:textSize="30sp" />
-
-  <org.grapentin.apps.exceer.gui.widgets.TextWidget
-      android:id="@+id/TrainingActivityCurrentExerciseLevelLabel1"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_below="@+id/TrainingActivityCurrentExerciseLabel"
-      android:layout_centerHorizontal="true"
-      android:clickable="true"
-      android:enabled="true"
-      android:freezesText="true"
-      android:onClick="onCurrentExerciseLevelLabelClicked"
-      android:singleLine="true"
-      android:textSize="20sp"
-      android:textStyle="bold" />
-
-  <org.grapentin.apps.exceer.gui.widgets.TextWidget
-      android:id="@+id/TrainingActivityCurrentExerciseLevelLabel2"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_below="@+id/TrainingActivityCurrentExerciseLevelLabel1"
-      android:layout_centerHorizontal="true"
-      android:clickable="true"
-      android:enabled="true"
-      android:freezesText="true"
-      android:onClick="onCurrentExerciseLevelLabelClicked"
-      android:singleLine="true"
-      android:textSize="20sp" />
-
-  <ProgressBar
-      android:id="@+id/TrainingActivityProgressBar"
-      style="@android:style/Widget.ProgressBar.Horizontal"
+  <android.support.v4.view.ViewPager
+      android:id="@+id/TrainingActivityViewPager"
       android:layout_width="match_parent"
-      android:layout_height="40dp"
+      android:layout_height="match_parent"
       android:layout_above="@+id/TrainingActivityContextButton"
-      android:layout_centerHorizontal="true" />
+      android:layout_marginBottom="10dp">
 
-  <org.grapentin.apps.exceer.gui.widgets.TextWidget
-      android:id="@+id/TrainingActivityProgressLabel"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_above="@+id/TrainingActivityContextButton"
-      android:layout_centerHorizontal="true"
-      android:freezesText="true"
-      android:singleLine="true"
-      android:textSize="30sp"
-      android:textStyle="bold"
-      android:typeface="monospace" />
+  </android.support.v4.view.ViewPager>
 
-  <org.grapentin.apps.exceer.gui.widgets.ButtonWidget
+
+
+  <Button
       android:id="@+id/TrainingActivityContextButton"
       android:layout_width="fill_parent"
-      android:layout_height="70dp"
+      android:layout_height="wrap_content"
       android:layout_alignParentBottom="true"
       android:layout_centerHorizontal="true"
-      android:layout_marginTop="10dp"
-      android:freezesText="true"
-      android:gravity="center"
       android:onClick="onContextButtonClicked"
-      android:singleLine="true"
+      android:freezesText="true"
       android:text="@string/TrainingActivityContextButtonTextStart"
-      android:textSize="40sp" />
+      android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>

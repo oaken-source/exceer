@@ -20,13 +20,13 @@
 package org.grapentin.apps.exceer.gui;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import org.grapentin.apps.exceer.BuildConfig;
 import org.grapentin.apps.exceer.R;
+import org.grapentin.apps.exceer.gui.base.ServiceBoundActivity;
 
-public class AboutActivity extends AppCompatActivity
+public class AboutActivity extends ServiceBoundActivity
 {
 
   @Override

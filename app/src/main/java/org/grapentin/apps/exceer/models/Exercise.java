@@ -21,25 +21,23 @@ package org.grapentin.apps.exceer.models;
 
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.j256.ormlite.dao.ForeignCollection;
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.gui.base.BaseActivity;
 import org.grapentin.apps.exceer.helpers.XmlNode;
 import org.grapentin.apps.exceer.service.DatabaseService;
-import org.grapentin.apps.exceer.training.BaseExercisable;
-import org.grapentin.apps.exceer.training.Properties;
 
-import java.sql.SQLException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Map;
 
 @DatabaseTable
-public class Exercise extends BaseExercisable
+public class Exercise implements Serializable
 {
 
   @DatabaseField(generatedId = true)
@@ -50,177 +48,69 @@ public class Exercise extends BaseExercisable
   @DatabaseField
   private int currentExerciseId;
   @DatabaseField
-  private int currentLevelId;
-  @DatabaseField
   private String progress;
+  @DatabaseField(dataType = DataType.ENUM_INTEGER)
+  private ExerciseChildrenType exerciseChildrenType;
 
-  @ForeignCollectionField(eager = true)
-  private ForeignCollection<Level> levels;
-  @ForeignCollectionField(eager = true)
-  private ForeignCollection<Exercise> exercises;
-  @ForeignCollectionField(eager = true)
-  private ForeignCollection<Property> properties;
+  @ForeignCollectionField
+  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+  private ForeignCollection<Exercise> exercisesField;
+  private ArrayList<Exercise> exercises = null;
 
   @DatabaseField(foreign = true)
   private Training parentTraining;
   @DatabaseField(foreign = true)
   private Exercise parentExercise;
 
-  public static void fromXml (@NonNull XmlNode root, Training parentTraining)
+  public static void fromXml (@NonNull XmlNode root, Training p)
     {
-      Exercise m = new Exercise();
+      Exercise e = new Exercise();
 
-      m.name = (root.getAttribute("name"));
-      m.currentExerciseId = 0;
-      m.currentLevelId = 0;
-      m.progress = null;
+      e.currentExerciseId = 0;
+      e.progress = null;
 
-      m.parentTraining = parentTraining;
+      e.parentTraining = p;
 
-      DatabaseService.add(m);
+      for (Map.Entry<String, String> entry : root.getAttributes().entrySet())
+        e.set(entry.getKey(), entry.getValue());
 
-      for (XmlNode property : root.getChildren("property"))
-        Property.fromXml(property, m);
+      DatabaseService.add(e);
+
       for (XmlNode exercise : root.getChildren("exercise"))
-        Exercise.fromXml(exercise, m);
-      for (XmlNode level : root.getChildren("level"))
-        Level.fromXml(level, m);
+        Exercise.fromXml(exercise, e);
     }
 
-  public static void fromXml (@NonNull XmlNode root, Exercise parentExercise)
+  public static void fromXml (@NonNull XmlNode root, Exercise p)
     {
-      Exercise m = new Exercise();
+      Exercise e = new Exercise();
 
-      m.name = (root.getAttribute("name"));
-      m.currentExerciseId = 0;
-      m.currentLevelId = 0;
-      m.progress = null;
+      e.currentExerciseId = 0;
+      e.progress = null;
 
-      m.parentExercise = parentExercise;
+      e.parentExercise = p;
 
-      DatabaseService.add(m);
+      for (Map.Entry<String, String> entry : root.getAttributes().entrySet())
+        e.set(entry.getKey(), entry.getValue());
 
-      for (XmlNode property : root.getChildren("property"))
-        Property.fromXml(property, m);
+      DatabaseService.add(e);
+
       for (XmlNode exercise : root.getChildren("exercise"))
-        Exercise.fromXml(exercise, m);
-      for (XmlNode level : root.getChildren("level"))
-        Level.fromXml(level, m);
+        Exercise.fromXml(exercise, e);
     }
 
-  @Nullable
-  @SuppressWarnings("unused")
-  public static Exercise get (int id)
+  private void set (String key, String value)
     {
-      return (Exercise)DatabaseService.query(Exercise.class).get(id);
-    }
+      Log.d("set called", key + "->" + value);
 
-  @NonNull
-  public BaseExercisable getLeafExercisable ()
-    {
-      if (getCurrentExercise() != null)
-        return getCurrentExercise().getLeafExercisable();
-      if (getCurrentLevel() != null)
-        return getCurrentLevel().getLeafExercisable();
-      return this;
-    }
-
-  @Nullable
-  private Exercise getCurrentExercise ()
-    {
-      if (exercises.size() <= currentExerciseId)
-        return null;
-      try
+      switch (key)
         {
-          return exercises.iterator(currentExerciseId).current();
+        case "name":
+          name = value;
+          break;
+        case "type":
+          exerciseChildrenType = ExerciseChildrenType.valueOf(value);
+          break;
         }
-      catch (SQLException e)
-        {
-          throw new Error(e);
-        }
-    }
-
-  @Nullable
-  private Level getCurrentLevel ()
-    {
-      if (levels.size() <= currentLevelId)
-        return null;
-      try
-        {
-          return levels.iterator(currentLevelId).current();
-        }
-      catch (SQLException e)
-        {
-          throw new Error(e);
-        }
-    }
-
-  public int getCurrentLevelId ()
-    {
-      return currentLevelId + 1;
-    }
-
-  public void prepare (@NonNull Properties p)
-    {
-      props = new Properties(p, properties);
-
-      if (getCurrentExercise() != null)
-        getCurrentExercise().prepare(props);
-      else if (getCurrentLevel() != null)
-        getCurrentLevel().prepare(props);
-      else
-        super.prepare();
-    }
-
-  @Override
-  public void show ()
-    {
-      BaseActivity.setText(R.id.TrainingActivityCurrentExerciseLabel, name);
-      BaseActivity.setText(R.id.TrainingActivityCurrentExerciseLevelLabel1, "");
-      BaseActivity.setText(R.id.TrainingActivityCurrentExerciseLevelLabel2, "");
-
-      super.show();
-    }
-
-  public void reset ()
-    {
-      if (getCurrentExercise() != null)
-        getCurrentExercise().reset();
-      else if (getCurrentLevel() != null)
-        getCurrentLevel().reset();
-      super.reset();
-    }
-
-  @Override
-  public void levelUp ()
-    {
-      if (levels.size() <= currentLevelId + 1)
-        return;
-
-      currentLevelId++;
-      progress = null;
-    }
-
-  @Nullable
-  public String getCurrentProgress ()
-    {
-      return progress;
-    }
-
-  public void setCurrentProgress (@NonNull String s)
-    {
-      progress = s;
-    }
-
-  public void wrapUp ()
-    {
-      if (!exercises.isEmpty())
-        currentExerciseId = (currentExerciseId + 1) % exercises.size();
-
-      for (Exercise e : exercises)
-        e.wrapUp();
-      for (Level l : levels)
-        l.wrapUp();
     }
 
   public String getName ()
@@ -228,5 +118,53 @@ public class Exercise extends BaseExercisable
       return name;
     }
 
+  public void collectExercises (ArrayList<Exercise> exercises)
+    {
+      if (getNumberOfExercises() == 0)
+        exercises.add(this);
+      else if (exerciseChildrenType == ExerciseChildrenType.progressing)
+        exercises.add(getCurrentExercise());
+      else if (exerciseChildrenType == ExerciseChildrenType.alternating)
+        getCurrentExercise().collectExercises(exercises);
+      else if (exerciseChildrenType == ExerciseChildrenType.sequential)
+        for (Exercise e : getExercises())
+          e.collectExercises(exercises);
+    }
+
+  private ArrayList<Exercise> getExercises ()
+    {
+      if (exercises == null)
+        exercises = new ArrayList<>(exercisesField);
+      return exercises;
+    }
+
+  private Exercise getCurrentExercise ()
+    {
+      if (currentExerciseId >= exercises.size())
+        currentExerciseId = exercises.size() - 1;
+      return getExercises().get(currentExerciseId);
+    }
+
+  private int getNumberOfExercises ()
+    {
+      return getExercises().size();
+    }
+
+  public Exercise getParentExercise ()
+    {
+      return parentExercise;
+    }
+
+  public ExerciseChildrenType getExerciseChildrenType ()
+    {
+      return exerciseChildrenType;
+    }
+
+  public enum ExerciseChildrenType
+  {
+    alternating,
+    sequential,
+    progressing
+  }
 }
 

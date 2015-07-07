@@ -20,59 +20,21 @@
 package org.grapentin.apps.exceer.gui.base;
 
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.CallSuper;
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
-import android.view.ViewConfiguration;
 
-import org.grapentin.apps.exceer.gui.widgets.interfaces.TextContainer;
-import org.grapentin.apps.exceer.helpers.Tasks;
 import org.grapentin.apps.exceer.service.AudioService;
 import org.grapentin.apps.exceer.service.DatabaseService;
 
-import java.lang.reflect.Field;
-
-public class BaseActivity extends AppCompatActivity
+public class ServiceBoundActivity extends AppCompatActivity
 {
-
-  private static volatile BaseActivity instance = null;
 
   protected ServiceConnection audioService;
   protected ServiceConnection databaseService;
-
-  @NonNull
-  public static Context getContext ()
-    {
-      return getInstance();
-    }
-
-  @NonNull
-  public static BaseActivity getInstance ()
-    {
-      assert instance != null;
-      return instance;
-    }
-
-  public static void setText (@IdRes int res, @StringRes int string)
-    {
-      TextContainer c = (TextContainer)getInstance().findViewById(res);
-      if (c != null)
-        c.setText(string);
-    }
-
-  public static void setText (@IdRes int res, @NonNull CharSequence string)
-    {
-      TextContainer c = (TextContainer)getInstance().findViewById(res);
-      if (c != null)
-        c.setText(string);
-    }
 
   @CallSuper
   @Override
@@ -113,16 +75,6 @@ public class BaseActivity extends AppCompatActivity
           }
       };
       bindService(databaseServiceIntent, databaseService, BIND_AUTO_CREATE);
-    }
-
-  @CallSuper
-  @Override
-  protected void onResume ()
-    {
-      super.onResume();
-      instance = this;
-
-      Tasks.init();
     }
 
   @CallSuper

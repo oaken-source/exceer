@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ~    This file is part of Exceer                                            ~
   ~                                                                           ~
@@ -17,24 +18,26 @@
   ~    along with this program.  If not, see <http://www.gnu.org/licenses/>.  ~
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
-<menu
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".MainActivity">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal">
 
-  <item
-      android:id="@+id/menu_overflow"
-      android:icon="@drawable/ic_more_vert_white_24dp"
-      android:title="@string/action_overflow"
-      app:showAsAction="always">
+  <TextView
+      android:id="@+id/ExerciseFragmentExerciseNameLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content" />
 
-    <menu>
+  <TextView
+      android:id="@+id/ExerciseFragmentLevelLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content" />
 
-      <!-- ... -->
+  <TextView
+      android:id="@+id/ExerciseFragmentLevelNameLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content" />
 
-    </menu>
-
-  </item>
-
-</menu>
+</LinearLayout>

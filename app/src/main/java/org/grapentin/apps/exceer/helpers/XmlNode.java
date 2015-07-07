@@ -112,6 +112,11 @@ public class XmlNode implements Serializable
       return attributes.get(key);
     }
 
+  public HashMap<String, String> getAttributes ()
+    {
+      return attributes;
+    }
+
   @NonNull
   public ArrayList<XmlNode> getChildren (@NonNull String name)
     {

@@ -37,8 +37,6 @@ import com.j256.ormlite.table.TableUtils;
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.helpers.XmlNode;
 import org.grapentin.apps.exceer.models.Exercise;
-import org.grapentin.apps.exceer.models.Level;
-import org.grapentin.apps.exceer.models.Property;
 import org.grapentin.apps.exceer.models.Session;
 import org.grapentin.apps.exceer.models.Training;
 
@@ -203,14 +201,13 @@ public class DatabaseService extends Service
             throw new DatabaseAccessException("query failed", e);
           }
       }
+
   }
 
   private class DatabaseOpenHelper extends OrmLiteSqliteOpenHelper
   {
     public Dao<Training, Integer> DaoTraining;
     public Dao<Exercise, Integer> DaoExercise;
-    public Dao<Level, Integer> DaoLevel;
-    public Dao<Property, Integer> DaoProperty;
     public Dao<Session, Integer> DaoSession;
 
     public DatabaseOpenHelper (Context context, String databaseName, SQLiteDatabase.CursorFactory factory, int databaseVersion)
@@ -226,8 +223,6 @@ public class DatabaseService extends Service
           {
             TableUtils.createTable(connectionSource, Training.class);
             TableUtils.createTable(connectionSource, Exercise.class);
-            TableUtils.createTable(connectionSource, Level.class);
-            TableUtils.createTable(connectionSource, Property.class);
             TableUtils.createTable(connectionSource, Session.class);
 
             XmlNode root = new XmlNode(getResources().getXml(R.xml.trainings_default));
@@ -253,8 +248,6 @@ public class DatabaseService extends Service
           {
             DaoTraining = getDao(Training.class);
             DaoExercise = getDao(Exercise.class);
-            DaoLevel = getDao(Level.class);
-            DaoProperty = getDao(Property.class);
             DaoSession = getDao(Session.class);
           }
         catch (SQLException e)
@@ -272,10 +265,6 @@ public class DatabaseService extends Service
           return new DatabaseQuery<>(database.DaoTraining);
         if (c == Exercise.class)
           return new DatabaseQuery<>(database.DaoExercise);
-        if (c == Level.class)
-          return new DatabaseQuery<>(database.DaoLevel);
-        if (c == Property.class)
-          return new DatabaseQuery<>(database.DaoProperty);
         if (c == Session.class)
           return new DatabaseQuery<>(database.DaoSession);
         throw new DatabaseAccessException(c.getSimpleName() + ": queried class is no model");
@@ -288,10 +277,6 @@ public class DatabaseService extends Service
           database.DaoTraining.create((Training)o);
         else if (c == Exercise.class)
           database.DaoExercise.create((Exercise)o);
-        else if (c == Level.class)
-          database.DaoLevel.create((Level)o);
-        else if (c == Property.class)
-          database.DaoProperty.create((Property)o);
         else if (c == Session.class)
           database.DaoSession.create((Session)o);
         else

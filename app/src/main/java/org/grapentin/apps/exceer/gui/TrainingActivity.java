@@ -21,50 +21,44 @@ package org.grapentin.apps.exceer.gui;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.view.Gravity;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.gui.base.BaseActivity;
-import org.grapentin.apps.exceer.gui.settings.TrainingSettingsActivity;
-import org.grapentin.apps.exceer.models.Level;
-import org.grapentin.apps.exceer.training.BaseExercisable;
-import org.grapentin.apps.exceer.training.TrainingManager;
+import org.grapentin.apps.exceer.gui.base.ServiceBoundActivity;
+import org.grapentin.apps.exceer.gui.fragments.ExerciseFragment;
+import org.grapentin.apps.exceer.models.Training;
 
-import java.io.InputStream;
-
-public class TrainingActivity extends BaseActivity
+public class TrainingActivity extends ServiceBoundActivity
 {
+
+  private ViewPager viewPager;
+  private ViewPagerAdapter adapter;
 
   @Override
   protected void onCreate (Bundle savedInstanceState)
     {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_training);
-      TrainingManager.onCreate();
+
+      adapter = new ViewPagerAdapter();
+
+      viewPager = (ViewPager)findViewById(R.id.TrainingActivityViewPager);
+      viewPager.setAdapter(adapter);
     }
 
   @Override
   protected void onResume ()
     {
       super.onResume();
-      TrainingManager.onResume();
-    }
-
-  @Override
-  protected void onPause ()
-    {
-      super.onPause();
-      TrainingManager.onPause();
+      // TODO: make training id configurable
+      adapter.setTraining(Training.get(1));
     }
 
   @Override
@@ -75,30 +69,15 @@ public class TrainingActivity extends BaseActivity
     }
 
   @Override
-  public boolean onPrepareOptionsMenu (Menu menu)
-    {
-      BaseExercisable e = TrainingManager.getLeafExercisable();
-
-      // allow setting levels when leaf exercise is level
-      boolean showSettingsLevel = (e != null && e.getClass() == Level.class);
-      // allow setting progress when leaf exercise knows progress
-      boolean showSettingsProgress = (e != null && e.knowsProgress());
-
-      // if we allow neither, don't show the menu
-      return showSettingsLevel || showSettingsProgress;
-    }
-
-  @Override
   public boolean onOptionsItemSelected (@NonNull MenuItem item)
     {
       int id = item.getItemId();
 
       switch (id)
         {
-        case R.id.action_training_settings:
-          Intent progressSettingsIntent = new Intent(this, TrainingSettingsActivity.class);
-          startActivity(progressSettingsIntent);
-          break;
+        case android.R.id.home:
+          onBackPressed();
+          return true;
         }
 
       return super.onOptionsItemSelected(item);
@@ -115,7 +94,6 @@ public class TrainingActivity extends BaseActivity
             switch (which)
               {
               case DialogInterface.BUTTON_POSITIVE:
-                TrainingManager.onAbort();
                 TrainingActivity.super.onBackPressed();
                 break;
               case DialogInterface.BUTTON_NEGATIVE:
@@ -133,50 +111,36 @@ public class TrainingActivity extends BaseActivity
 
   public void onContextButtonClicked (View view)
     {
-      switch (TrainingManager.getState())
-        {
-        case PREPARED:
-          TrainingManager.start();
-          break;
-        case RUNNING:
-          TrainingManager.pause();
-          break;
-        case PAUSED:
-          TrainingManager.resume();
-          break;
-        case FINISHED:
-          TrainingManager.wrapUp();
-          super.onBackPressed();
-          break;
-        default:
-          throw new Error("Training Manager in indeterminate state");
-        }
+      // ...
     }
 
-  public void onCurrentExerciseLevelLabelClicked (View view)
-    {
-      BaseExercisable ex = TrainingManager.getLeafExercisable();
-      if (ex == null || ex.getImage() == null)
-        return;
+  private class ViewPagerAdapter extends FragmentPagerAdapter
+  {
+    private Training training = null;
 
-      Bitmap bitmap;
-      try
-        {
-          InputStream in = new java.net.URL(ex.getImage()).openStream();
-          bitmap = BitmapFactory.decodeStream(in);
-        }
-      catch (Exception e)
-        {
-          return;
-        }
+    public ViewPagerAdapter ()
+      {
+        super(getSupportFragmentManager());
+      }
 
-      ImageView imageView = new ImageView(this);
-      imageView.setImageBitmap(bitmap);
+    @Override
+    public Fragment getItem (int position)
+      {
+        return ExerciseFragment.newInstance(training.getExercise(position));
+      }
 
-      Toast toast = new Toast(this);
-      toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-      toast.setView(imageView);
-      toast.show();
-    }
+    @Override
+    public int getCount ()
+      {
+        return (training == null) ? 0 : training.getNumberOfExercises();
+      }
+
+    public void setTraining (Training training)
+      {
+        this.training = training;
+        notifyDataSetChanged();
+      }
+
+  }
 
 }

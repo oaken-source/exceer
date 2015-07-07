@@ -30,12 +30,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.gui.base.BaseActivity;
-import org.grapentin.apps.exceer.gui.settings.MainSettingsActivity;
-import org.grapentin.apps.exceer.gui.widgets.main.TimeSinceLastSessionWidget;
+import org.grapentin.apps.exceer.gui.base.ServiceBoundActivity;
+import org.grapentin.apps.exceer.gui.widgets.TimeSinceLastSessionWidget;
 import org.grapentin.apps.exceer.models.Session;
 
-public class MainActivity extends BaseActivity
+public class MainActivity extends ServiceBoundActivity
 {
 
   private ViewPager viewPager;
@@ -76,10 +75,6 @@ public class MainActivity extends BaseActivity
 
       switch (id)
         {
-        case R.id.action_settings:
-          Intent settingsIntent = new Intent(this, MainSettingsActivity.class);
-          startActivity(settingsIntent);
-          break;
         case R.id.action_about:
           Intent aboutIntent = new Intent(this, AboutActivity.class);
           startActivity(aboutIntent);
@@ -104,7 +99,7 @@ public class MainActivity extends BaseActivity
       }
 
     @Override
-    public Object instantiateItem (ViewGroup collection, int position)
+    public Object instantiateItem (ViewGroup container, int position)
       {
         return viewPager.getChildAt(position);
       }

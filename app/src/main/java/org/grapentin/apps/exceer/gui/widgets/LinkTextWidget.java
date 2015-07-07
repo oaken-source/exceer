@@ -17,16 +17,40 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.gui.widgets.interfaces;
+package org.grapentin.apps.exceer.gui.widgets;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
+import android.content.Context;
+import android.text.method.LinkMovementMethod;
+import android.util.AttributeSet;
+import android.widget.TextView;
 
-public interface TextContainer
+public class LinkTextWidget extends TextView
 {
 
-  void setText (@NonNull CharSequence s);
+  public LinkTextWidget (Context context)
+    {
+      super(context);
+      if (!isInEditMode())
+        init();
+    }
 
-  void setText (@StringRes int res);
+  public LinkTextWidget (Context context, AttributeSet attrs)
+    {
+      super(context, attrs);
+      if (!isInEditMode())
+        init();
+    }
+
+  public LinkTextWidget (Context context, AttributeSet attrs, int defStyleAttr)
+    {
+      super(context, attrs, defStyleAttr);
+      if (!isInEditMode())
+        init();
+    }
+
+  private void init ()
+    {
+      setMovementMethod(LinkMovementMethod.getInstance());
+    }
 
 }

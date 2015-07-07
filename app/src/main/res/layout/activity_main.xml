@@ -42,7 +42,7 @@
         android:gravity="center"
         android:orientation="vertical">
 
-      <org.grapentin.apps.exceer.gui.widgets.main.TimeSinceLastSessionWidget
+      <org.grapentin.apps.exceer.gui.widgets.TimeSinceLastSessionWidget
           android:id="@+id/MainActivityLastSessionLabel"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"

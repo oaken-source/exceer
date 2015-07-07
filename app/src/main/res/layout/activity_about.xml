@@ -54,35 +54,35 @@
           android:text="@string/AboutActivityShortCopyrightLabelText"
           android:textAppearance="?android:attr/textAppearanceSmall" />
 
-      <org.grapentin.apps.exceer.gui.widgets.common.LinkTextWidget
+      <org.grapentin.apps.exceer.gui.widgets.LinkTextWidget
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginBottom="10dp"
           android:text="@string/AboutActivityNickJanvierLabelText"
           android:textAppearance="?android:attr/textAppearanceSmall" />
 
-      <org.grapentin.apps.exceer.gui.widgets.common.LinkTextWidget
+      <org.grapentin.apps.exceer.gui.widgets.LinkTextWidget
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginBottom="10dp"
           android:text="@string/AboutActivitySoundsCopyrightLabelText"
           android:textAppearance="?android:attr/textAppearanceSmall" />
 
-      <org.grapentin.apps.exceer.gui.widgets.common.LinkTextWidget
+      <org.grapentin.apps.exceer.gui.widgets.LinkTextWidget
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginBottom="10dp"
           android:text="@string/AboutActivityIconFlaticonCopyrightLabelText"
           android:textAppearance="?android:attr/textAppearanceSmall" />
 
-      <org.grapentin.apps.exceer.gui.widgets.common.LinkTextWidget
+      <org.grapentin.apps.exceer.gui.widgets.LinkTextWidget
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginBottom="10dp"
           android:text="@string/AboutActivityIconMaterialCopyrightLabelText"
           android:textAppearance="?android:attr/textAppearanceSmall" />
 
-      <org.grapentin.apps.exceer.gui.widgets.common.LinkTextWidget
+      <org.grapentin.apps.exceer.gui.widgets.LinkTextWidget
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginBottom="10dp"

@@ -22,24 +22,20 @@ package org.grapentin.apps.exceer.models;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.j256.ormlite.dao.CloseableIterable;
-import com.j256.ormlite.dao.CloseableIterator;
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.gui.base.BaseActivity;
 import org.grapentin.apps.exceer.helpers.XmlNode;
 import org.grapentin.apps.exceer.service.DatabaseService;
-import org.grapentin.apps.exceer.training.BaseExercisable;
-import org.grapentin.apps.exceer.training.Properties;
 
-import java.sql.SQLException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 @DatabaseTable
-public class Training
+public class Training implements Serializable
 {
 
   @DatabaseField(generatedId = true)
@@ -48,126 +44,58 @@ public class Training
   @DatabaseField
   private String name;
 
-  @ForeignCollectionField(eager = true)
-  private ForeignCollection<Exercise> exercises;
-  @ForeignCollectionField(eager = true)
-  private ForeignCollection<Property> properties;
-
-  private CloseableIterator<Exercise> currentExercise = null;
+  @ForeignCollectionField
+  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+  private ForeignCollection<Exercise> exercisesField;
+  private ArrayList<Exercise> exercises = null;
 
   public static void fromXml (@NonNull XmlNode root)
     {
-      Training m = new Training();
+      Training t = new Training();
+      t.name = root.getAttribute("name");
+      DatabaseService.add(t);
 
-      m.name = root.getAttribute("name");
-
-      DatabaseService.add(m);
-
-      for (XmlNode property : root.getChildren("property"))
-        Property.fromXml(property, m);
       for (XmlNode exercise : root.getChildren("exercise"))
-        Exercise.fromXml(exercise, m);
+        Exercise.fromXml(exercise, t);
     }
 
   @Nullable
   public static Training get (int id)
     {
+      //noinspection unchecked
       return (Training)DatabaseService.query(Training.class).get(id);
     }
 
-  @Nullable
-  private Exercise getCurrentExercise ()
+  public int getId ()
     {
-      if (currentExercise == null)
-        return null;
-
-      try
-        {
-          return currentExercise.current();
-        }
-      catch (SQLException e)
-        {
-          throw new DatabaseService.DatabaseAccessException("unable to get foreign", e);
-        }
+      return id;
     }
 
-  @Nullable
-  public BaseExercisable getLeafExercisable ()
+  public String getName ()
     {
-      if (getCurrentExercise() == null)
-        return null;
-      return getCurrentExercise().getLeafExercisable();
+      return name;
     }
 
-  public void prepare ()
+  public int getNumberOfExercises ()
     {
-      Properties props = new Properties(properties);
-
-      for (Exercise e : exercises)
-        e.prepare(props);
-
-      if (exercises.size() > 0)
-        currentExercise = exercises.iterator(0);
-
-      if (getLeafExercisable() != null)
-        getLeafExercisable().show();
-      else
-        show();
+      if (exercises == null)
+        collectExercises();
+      return exercises.size();
     }
 
-  private void show ()
+  public Exercise getExercise (int position)
     {
-      BaseActivity.setText(R.id.TrainingActivityCurrentExerciseLabel, R.string.TrainingActivityNoExercises);
-      BaseActivity.setText(R.id.TrainingActivityCurrentExerciseLevelLabel1, "");
-      BaseActivity.setText(R.id.TrainingActivityCurrentExerciseLevelLabel2, "");
+      if (exercises == null)
+        collectExercises();
+      return exercises.get(position);
     }
 
-  public boolean next ()
+  private void collectExercises ()
     {
-      if (!currentExercise.hasNext())
-        return false;
-      currentExercise.moveToNext();
-
-      assert getLeafExercisable() != null;
-
-      getLeafExercisable().show();
-      return true;
-    }
-
-  public void reset ()
-    {
-      if (exercises.size() > 0)
-        currentExercise = exercises.iterator(0);
-
-      for (Exercise e : exercises)
-        e.reset();
-    }
-
-  public void start ()
-    {
-      if (getLeafExercisable() != null)
-        getLeafExercisable().start();
-    }
-
-  public void pause ()
-    {
-      if (getLeafExercisable() != null)
-        getLeafExercisable().pause();
-    }
-
-  public void resume ()
-    {
-      if (getLeafExercisable() != null)
-        getLeafExercisable().start();
-    }
-
-  public void wrapUp ()
-    {
-      if (exercises.size() > 0)
-        currentExercise = exercises.iterator(0);
-
-      for (Exercise e : exercises)
-        e.wrapUp();
+      exercises = new ArrayList<>();
+      Iterator<Exercise> i = exercisesField.closeableIterator();
+      while (i.hasNext())
+        i.next().collectExercises(exercises);
     }
 
 }
