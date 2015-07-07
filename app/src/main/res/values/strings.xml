@@ -33,8 +33,8 @@
   <string name="action_main_about">About</string>
   <string name="action_training_settings">Set Progress</string>
 
-  <string name="MainActivityLastSessionDateText">0 sec</string>
-  <string name="MainActivityLastSessionLabelText">since last session</string>
+  <string name="MainActivityLastSessionDateText">Never</string>
+  <string name="MainActivityLastSessionLabelText">last session</string>
   <string name="MainActivityNumSessionDateText">0</string>
   <string name="MainActivityNumSessionLabelText">total sessions</string>
   <string name="MainActivityTrainButtonText">Train Now!</string>

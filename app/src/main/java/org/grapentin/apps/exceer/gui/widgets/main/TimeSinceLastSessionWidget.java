@@ -20,12 +20,14 @@
 package org.grapentin.apps.exceer.gui.widgets.main;
 
 import android.content.Context;
-import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
+import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.models.Session;
+import org.ocpsoft.prettytime.PrettyTime;
 
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -33,6 +35,8 @@ public class TimeSinceLastSessionWidget extends TextView
 {
 
   private Session session = null;
+
+  private PrettyTime formatter = new PrettyTime();
 
   public TimeSinceLastSessionWidget (Context context)
     {
@@ -57,8 +61,6 @@ public class TimeSinceLastSessionWidget extends TextView
 
   private void start ()
     {
-      updateView();
-
       new Timer().scheduleAtFixedRate(new TimerTask()
       {
         @Override
@@ -78,16 +80,16 @@ public class TimeSinceLastSessionWidget extends TextView
 
   private void updateView ()
     {
-      long last = (session == null ? System.currentTimeMillis() : session.getDate());
-
-      String s = (String)DateUtils.getRelativeTimeSpanString(last, System.currentTimeMillis(), 1000);
-      s = s.substring(0, s.length() - 4);
-      setText(s);
+      if (session == null)
+        setText(R.string.MainActivityLastSessionDateText);
+      else
+        setText(formatter.format(new Date(session.getDate())));
     }
 
   public void setSession (Session session)
     {
       this.session = session;
+      updateView();
     }
 
 }
