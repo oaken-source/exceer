@@ -29,11 +29,13 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.gui.base.ServiceBoundActivity;
 import org.grapentin.apps.exceer.gui.fragments.ExerciseFragment;
+import org.grapentin.apps.exceer.models.Exercise;
 import org.grapentin.apps.exceer.models.Training;
 
 public class TrainingActivity extends ServiceBoundActivity
@@ -43,6 +45,7 @@ public class TrainingActivity extends ServiceBoundActivity
   private ViewPagerAdapter adapter;
 
   private ProgressBar progressBar;
+  private Button contextButton;
 
   @Override
   protected void onCreate (Bundle savedInstanceState)
@@ -53,6 +56,7 @@ public class TrainingActivity extends ServiceBoundActivity
       adapter = new ViewPagerAdapter();
 
       progressBar = (ProgressBar)findViewById(R.id.TrainingActivityProgressBar);
+      contextButton = (Button)findViewById(R.id.TrainingActivityContextButton);
 
       viewPager = (ViewPager)findViewById(R.id.TrainingActivityViewPager);
       viewPager.setAdapter(adapter);
@@ -62,6 +66,7 @@ public class TrainingActivity extends ServiceBoundActivity
         public void onPageSelected (int position)
           {
             progressBar.setProgress(position + 1);
+            onFragmentStateChanged();
           }
       });
     }
@@ -124,7 +129,27 @@ public class TrainingActivity extends ServiceBoundActivity
 
   public void onContextButtonClicked (View view)
     {
-      // ...
+      adapter.getCurrentFragment().onContextButtonClicked();
+    }
+
+  public void onFragmentStateChanged ()
+    {
+      switch (adapter.getCurrentFragment().getState())
+        {
+        case PREPARED:
+          contextButton.setText(R.string.TrainingActivityContextButtonTextStart);
+          break;
+        case RUNNING:
+          contextButton.setText(R.string.TrainingActivityContextButtonTextPause);
+          break;
+        case PAUSED:
+          contextButton.setText(R.string.TrainingActivityContextButtonTextResume);
+          break;
+        case FINISHED:
+          contextButton.setText(R.string.TrainingActivityContextButtonTextFinish);
+          break;
+        }
+
     }
 
   private class ViewPagerAdapter extends FragmentPagerAdapter
@@ -156,6 +181,15 @@ public class TrainingActivity extends ServiceBoundActivity
         notifyDataSetChanged();
       }
 
+    public ExerciseFragment getCurrentFragment ()
+      {
+        return getFragmentAt(viewPager.getCurrentItem());
+      }
+
+    public ExerciseFragment getFragmentAt (int position)
+      {
+        return (ExerciseFragment)getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.TrainingActivityViewPager + ":" + position);
+      }
   }
 
 }

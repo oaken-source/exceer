@@ -28,6 +28,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
+import org.grapentin.apps.exceer.gui.TrainingActivity;
 import org.grapentin.apps.exceer.models.Exercise;
 
 public class ExerciseFragment extends Fragment
@@ -37,6 +38,8 @@ public class ExerciseFragment extends Fragment
 
   protected ProgressBar progressBar;
   protected TextView progressLabel;
+
+  protected ExerciseState state = ExerciseState.PREPARED;
 
   public static Fragment newInstance (Exercise exercise)
     {
@@ -93,5 +96,28 @@ public class ExerciseFragment extends Fragment
 
       return v;
     }
+
+  public ExerciseState getState ()
+    {
+      return state;
+    }
+
+  public void onContextButtonClicked ()
+    {
+      state = ExerciseState.RUNNING;
+
+      TrainingActivity a = (TrainingActivity)getActivity();
+      a.onFragmentStateChanged();
+
+      progressBar.setProgress(progressBar.getMax() / 2);
+    }
+
+  public enum ExerciseState
+  {
+    PREPARED,
+    RUNNING,
+    PAUSED,
+    FINISHED
+  }
 
 }

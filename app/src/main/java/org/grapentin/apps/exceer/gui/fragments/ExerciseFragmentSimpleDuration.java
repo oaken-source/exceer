@@ -37,4 +37,6 @@ public class ExerciseFragmentSimpleDuration extends ExerciseFragment
       progressLabel.setText(duration.toProgressString());
     }
 
+
+
 }
