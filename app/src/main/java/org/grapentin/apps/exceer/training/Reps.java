@@ -113,6 +113,22 @@ public class Reps implements Serializable, Comparable
       return 0;
     }
 
+  public String toProgressString ()
+    {
+      String out = "";
+      for (Long set : sets)
+        out += (out.equals("") ? "" : "  ") + "0/" + set;
+      return out;
+    }
+
+  public int getProgressMax ()
+    {
+      int max = 0;
+      for (Long set : sets)
+        max += set;
+      return max;
+    }
+
   public enum IncrementDirection
   {
     front_to_back,

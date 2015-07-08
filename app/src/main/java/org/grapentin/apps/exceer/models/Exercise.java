@@ -31,8 +31,11 @@ import com.j256.ormlite.table.DatabaseTable;
 
 import org.grapentin.apps.exceer.helpers.XmlNode;
 import org.grapentin.apps.exceer.service.DatabaseService;
+import org.grapentin.apps.exceer.training.Duration;
+import org.grapentin.apps.exceer.training.Reps;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -48,9 +51,41 @@ public class Exercise implements Serializable
   @DatabaseField
   private int currentExerciseId;
   @DatabaseField
+  private String duration;
+  @DatabaseField
+  private String duration_begin;
+  @DatabaseField
+  private String duration_finish;
+  @DatabaseField
+  private String duration_increment;
+  @DatabaseField
+  private String reps_begin;
+  @DatabaseField
+  private String reps_finish;
+  @DatabaseField
+  private String reps_increment;
+  @DatabaseField
+  private String reps_duration_concentric;
+  @DatabaseField
+  private String reps_duration_eccentric;
+  @DatabaseField
+  private String reps_pause_after_concentric;
+  @DatabaseField
+  private String reps_pause_after_eccentric;
+  @DatabaseField
   private String progress;
+  @DatabaseField
+  private String pause_after_set;
+  @DatabaseField
+  private String pause_after_exercise;
+  @DatabaseField
+  private String image;
+  @DatabaseField
+  private boolean two_sided;
   @DatabaseField(dataType = DataType.ENUM_INTEGER)
   private ExerciseChildrenType exerciseChildrenType;
+  @DatabaseField(dataType = DataType.ENUM_INTEGER)
+  private ExercisePrimaryMotion exercisePrimaryMotion;
 
   @ForeignCollectionField
   @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
@@ -72,7 +107,7 @@ public class Exercise implements Serializable
       e.parentTraining = p;
 
       for (Map.Entry<String, String> entry : root.getAttributes().entrySet())
-        e.set(entry.getKey(), entry.getValue());
+        e.setAttribute(entry.getKey(), entry.getValue());
 
       DatabaseService.add(e);
 
@@ -90,7 +125,7 @@ public class Exercise implements Serializable
       e.parentExercise = p;
 
       for (Map.Entry<String, String> entry : root.getAttributes().entrySet())
-        e.set(entry.getKey(), entry.getValue());
+        e.setAttribute(entry.getKey(), entry.getValue());
 
       DatabaseService.add(e);
 
@@ -98,18 +133,29 @@ public class Exercise implements Serializable
         Exercise.fromXml(exercise, e);
     }
 
-  private void set (String key, String value)
+  private void setAttribute (String key, String value)
     {
-      Log.d("set called", key + "->" + value);
-
       switch (key)
         {
-        case "name":
-          name = value;
-          break;
         case "type":
           exerciseChildrenType = ExerciseChildrenType.valueOf(value);
           break;
+        case "primary_motion":
+          exercisePrimaryMotion = ExercisePrimaryMotion.valueOf(value);
+          break;
+        case "two_sided":
+          two_sided = Boolean.parseBoolean(value);
+          break;
+        default:
+          try
+            {
+              Field f = getClass().getDeclaredField(key);
+              f.set(this, value);
+            }
+          catch (Exception e)
+            {
+              Log.w("Exercise", "unhandled setAttribute: " + key, e);
+            }
         }
     }
 
@@ -165,11 +211,43 @@ public class Exercise implements Serializable
       return exercises.indexOf(exercise) + 1;
     }
 
+  public Duration getDuration ()
+    {
+      return (duration != null) ? Duration.fromString(duration) : ((parentExercise != null) ? parentExercise.getDuration() : null);
+    }
+
+  public Duration getDurationBegin ()
+    {
+      return (duration_begin != null) ? Duration.fromString(duration_begin) : ((parentExercise != null) ? parentExercise.getDurationBegin() : null);
+    }
+
+  public Reps getRepsBegin ()
+    {
+      return (reps_begin != null) ? Reps.fromString(reps_begin) : ((parentExercise != null) ? parentExercise.getRepsBegin() : null);
+    }
+
+  public boolean isLevel ()
+    {
+      return getParentExercise() != null && getParentExercise().getExerciseChildrenType() == ExerciseChildrenType.progressing;
+    }
+
+  public String getProgress ()
+    {
+      return progress;
+    }
+
   public enum ExerciseChildrenType
   {
     alternating,
     sequential,
     progressing
   }
+
+  public enum ExercisePrimaryMotion
+  {
+    concentric,
+    eccentric
+  }
+
 }
 

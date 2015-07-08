@@ -372,7 +372,7 @@
 
     <exercise
         name="Dips"
-        primary_motion="ecentric"
+        primary_motion="eccentric"
         reps_begin="4,4,4"
         reps_finish="8,8,8"
         type="progressing">

@@ -99,6 +99,19 @@ public class Duration implements Serializable, Comparable
       return (int)(duration - d.duration);
     }
 
+  public String toProgressString ()
+    {
+      long mins = duration / (60 * 1000);
+      long secs = (duration / 1000) % 60;
+
+      return ((mins < 10) ? "0" : "") + mins + ":" + ((secs < 10) ? "0" : "") + secs;
+    }
+
+  public int getProgressMax ()
+    {
+      return (int)duration;
+    }
+
   public static class DurationFormatException extends RuntimeException
   {
     public DurationFormatException (String msg)

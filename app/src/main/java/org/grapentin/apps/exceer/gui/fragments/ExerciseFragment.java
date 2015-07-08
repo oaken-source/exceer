@@ -24,24 +24,35 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.models.Exercise;
 
-import java.util.HashMap;
-
 public class ExerciseFragment extends Fragment
 {
 
-  private Exercise exercise;
+  protected Exercise exercise;
+
+  protected ProgressBar progressBar;
+  protected TextView progressLabel;
 
   public static Fragment newInstance (Exercise exercise)
     {
       Bundle args = new Bundle();
       args.putSerializable("exercise", exercise);
 
-      Fragment f = new ExerciseFragment();
+      Fragment f;
+      if (exercise.getDuration() != null)
+        f = new ExerciseFragmentSimpleDuration();
+      else if (exercise.getDurationBegin() != null)
+        f = new ExerciseFragmentProgressDuration();
+      else if (exercise.getRepsBegin() != null)
+        f = new ExerciseFragmentProgressReps();
+      else
+        f = new ExerciseFragment();
+
       f.setArguments(args);
       return f;
     }
@@ -64,7 +75,7 @@ public class ExerciseFragment extends Fragment
       TextView levelLabel = (TextView)v.findViewById(R.id.ExerciseFragmentLevelLabel);
       TextView levelNameLabel = (TextView)v.findViewById(R.id.ExerciseFragmentLevelNameLabel);
 
-      if (isLevel())
+      if (exercise.isLevel())
         {
           exerciseNameLabel.setText(exercise.getParentExercise().getName());
           levelLabel.setText(getString(R.string.ExerciseFragmentExerciseLevel) + " " + exercise.getParentExercise().getLevelNumber(exercise));
@@ -77,12 +88,10 @@ public class ExerciseFragment extends Fragment
           levelNameLabel.setText("");
         }
 
-      return v;
-    }
+      progressBar = (ProgressBar)v.findViewById(R.id.ExerciseFragmentProgressBar);
+      progressLabel = (TextView)v.findViewById(R.id.ExerciseFragmentProgressLabel);
 
-  private boolean isLevel ()
-    {
-      return (exercise.getParentExercise() != null && exercise.getParentExercise().getExerciseChildrenType() == Exercise.ExerciseChildrenType.progressing);
+      return v;
     }
 
 }
