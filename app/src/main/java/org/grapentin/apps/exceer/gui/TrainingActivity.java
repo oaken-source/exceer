@@ -29,6 +29,7 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.gui.base.ServiceBoundActivity;
@@ -41,6 +42,8 @@ public class TrainingActivity extends ServiceBoundActivity
   private ViewPager viewPager;
   private ViewPagerAdapter adapter;
 
+  private ProgressBar progressBar;
+
   @Override
   protected void onCreate (Bundle savedInstanceState)
     {
@@ -49,8 +52,18 @@ public class TrainingActivity extends ServiceBoundActivity
 
       adapter = new ViewPagerAdapter();
 
+      progressBar = (ProgressBar)findViewById(R.id.TrainingActivityProgressBar);
+
       viewPager = (ViewPager)findViewById(R.id.TrainingActivityViewPager);
       viewPager.setAdapter(adapter);
+      viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener()
+      {
+        @Override
+        public void onPageSelected (int position)
+          {
+            progressBar.setProgress(position + 1);
+          }
+      });
     }
 
   @Override
@@ -138,6 +151,8 @@ public class TrainingActivity extends ServiceBoundActivity
     public void setTraining (Training training)
       {
         this.training = training;
+        progressBar.setMax(getCount());
+        progressBar.setProgress(viewPager.getCurrentItem() + 1);
         notifyDataSetChanged();
       }
 

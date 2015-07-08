@@ -160,6 +160,11 @@ public class Exercise implements Serializable
       return exerciseChildrenType;
     }
 
+  public int getLevelNumber (Exercise exercise)
+    {
+      return exercises.indexOf(exercise) + 1;
+    }
+
   public enum ExerciseChildrenType
   {
     alternating,

@@ -18,28 +18,8 @@
   ~    along with this program.  If not, see <http://www.gnu.org/licenses/>.  ~
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center_horizontal"
-    android:orientation="vertical">
+<resources>
 
-  <TextView
-      android:id="@+id/ExerciseFragmentExerciseNameLabel"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:textAppearance="?android:attr/textAppearanceLarge" />
+  <color name="green">#2a792c</color>
 
-  <TextView
-      android:id="@+id/ExerciseFragmentLevelLabel"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:textAppearance="?android:attr/textAppearanceSmall" />
-
-  <TextView
-      android:id="@+id/ExerciseFragmentLevelNameLabel"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content" />
-
-</LinearLayout>
+</resources>

@@ -105,7 +105,7 @@ public class MainActivity extends ServiceBoundActivity
       }
 
     @Override
-    public void destroyItem (ViewGroup container, int position, Object object)
+    public void destroyItem (ViewGroup container, int posittaion, Object object)
       {
         // nothing here
       }
