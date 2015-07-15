@@ -291,7 +291,7 @@ abstract public class BaseExercisable extends BaseModel
         long elapsed = System.currentTimeMillis() - start;
         long remaining = Math.round((duration - elapsed) / 1000.0);
 
-        if (props.two_sided && !halftime && duration / elapsed >= 0.5)
+        if (props.two_sided && !halftime && elapsed >= 0.5 * duration)
           {
             SoundManager.play(R.raw.beep_two);
             halftime = true;
