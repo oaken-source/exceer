@@ -102,6 +102,7 @@ public class AudioService extends Service
   {
     public void play (@RawRes int resource)
       {
+        Log.d("AudioService", "playing " + resource);
         soundPool.play(sounds.get(resource), 1, 1, 1, 0, 1);
       }
 

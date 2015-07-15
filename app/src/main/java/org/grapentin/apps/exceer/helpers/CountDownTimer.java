@@ -17,76 +17,77 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.gui.fragments;
+package org.grapentin.apps.exceer.helpers;
 
-import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.helpers.CountDownTimer;
-import org.grapentin.apps.exceer.service.AudioService;
-import org.grapentin.apps.exceer.training.Duration;
+import android.os.Handler;
+import android.os.SystemClock;
 
-public class ExerciseFragmentSimpleDuration extends ExerciseFragment
+public abstract class CountDownTimer
 {
 
-  private Duration duration;
+  private long duration;
+  private long interval;
 
-  private CountDownTimer timer;
+  private long ticks;
 
-  @Override
-  public void onStart ()
-    {
-      super.onStart();
+  private long start;
 
-      duration = exercise.getDuration();
-
-      progressBar.setMax(duration.getProgressMax());
-      progressLabel.setText(duration.toProgressString());
-    }
-
-  @Override
-  protected void start ()
-    {
-      state = ExerciseState.RUNNING;
-
-      timer = new CountDown();
-      timer.start();
-    }
-
-  @Override
-  protected void pause ()
-    {
-      state = ExerciseState.PAUSED;
-    }
-
-  @Override
-  protected void resume ()
-    {
-      state = ExerciseState.RUNNING;
-    }
-
-  @Override
-  protected void finish ()
-    {
-      // ...
-    }
-
-  private class CountDown extends CountDownTimer
+  private Handler handler = new Handler();
+  private Runnable task = new Runnable()
   {
-    public CountDown ()
-      {
-        super(3000, 1000);
-      }
-
     @Override
-    public void onTick (long millisUntilFinished)
+    public void run ()
       {
-        AudioService.play(R.raw.beep_low);
+        tick();
       }
+  };
 
-    @Override
-    public void onFinish ()
-      {
-        AudioService.play(R.raw.beep_four);
-      }
-  }
+  public CountDownTimer (long duration, long interval)
+    {
+      this.duration = duration;
+      this.interval = interval;
+    }
+
+  public abstract void onTick (long millisUntilFinished);
+
+  public abstract void onFinish ();
+
+  private void tick ()
+    {
+      if (ticks * interval >= duration)
+        {
+          onFinish();
+          return;
+        }
+
+      onTick(duration - (start - SystemClock.uptimeMillis()));
+
+      ++ticks;
+      if (ticks * interval >= duration)
+        handler.postAtTime(task, start + duration);
+      else
+        handler.postAtTime(task, start + ticks * interval);
+    }
+
+  public void start ()
+    {
+      start = SystemClock.uptimeMillis();
+      handler.post(task);
+    }
+
+  public void cancel ()
+    {
+      handler.removeCallbacks(task);
+    }
+
+  public void pause ()
+    {
+
+    }
+
+  public void resume ()
+    {
+
+    }
 
 }

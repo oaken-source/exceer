@@ -104,12 +104,48 @@ public class ExerciseFragment extends Fragment
 
   public void onContextButtonClicked ()
     {
-      state = ExerciseState.RUNNING;
+      switch (state)
+        {
+        case PREPARED:
+          start();
+          break;
+        case RUNNING:
+          pause();
+          break;
+        case PAUSED:
+          resume();
+          break;
+        case FINISHED:
+          finish();
+          break;
+        }
 
-      TrainingActivity a = (TrainingActivity)getActivity();
-      a.onFragmentStateChanged();
+      getTrainingActivity().onFragmentStateChanged();
+    }
 
-      progressBar.setProgress(progressBar.getMax() / 2);
+  public TrainingActivity getTrainingActivity ()
+    {
+      return (TrainingActivity)getActivity();
+    }
+
+  protected void start ()
+    {
+
+    }
+
+  protected void pause ()
+    {
+
+    }
+
+  protected void resume ()
+    {
+
+    }
+
+  protected void finish ()
+    {
+
     }
 
   public enum ExerciseState
