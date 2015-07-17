@@ -223,7 +223,9 @@ abstract public class BaseExercisable extends BaseModel
               return;
             }
 
-          reps.increment(props);
+          for (int i = 0; i < props.reps_increment; ++i)
+            reps.increment(props);
+
           setCurrentProgress(reps.toString());
         }
       else if (props.duration_begin > 0)

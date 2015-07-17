@@ -342,6 +342,8 @@
 
   <exercise>
 
+    <property name="reps_increment">2</property>
+
     <exercise name="Push Ups">
 
       <property name="primary_motion">eccentric</property>
