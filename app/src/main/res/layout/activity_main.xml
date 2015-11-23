@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+<?xml version="1.0" encoding="utf-8"?><!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ~    This file is part of Exceer                                            ~
   ~                                                                           ~
   ~    Copyright (C) 2015  Andreas Grapentin                                  ~
@@ -18,78 +17,90 @@
   ~    along with this program.  If not, see <http://www.gnu.org/licenses/>.  ~
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
-  <android.support.v4.view.ViewPager
-      android:id="@+id/MainActivityViewPager"
+  <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+      android:id="@+id/toolbar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="?attr/colorPrimary" />
+
+  <RelativeLayout
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:layout_above="@+id/MainActivityTrainButton"
-      android:layout_marginBottom="10dp">
+      android:layout_below="@+id/toolbar"
+      android:paddingBottom="@dimen/activity_vertical_margin"
+      android:paddingLeft="@dimen/activity_horizontal_margin"
+      android:paddingRight="@dimen/activity_horizontal_margin"
+      android:paddingTop="@dimen/activity_vertical_margin">
 
-    <LinearLayout
+    <android.support.v4.view.ViewPager
+        android:id="@+id/MainActivityViewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:layout_above="@+id/MainActivityTrainButton"
+        android:layout_marginBottom="10dp">
 
-      <org.grapentin.apps.exceer.gui.widgets.TimeSinceLastSessionWidget
-          android:id="@+id/MainActivityLastSessionLabel"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:freezesText="true"
-          android:text="@string/MainActivityLastSessionDateText"
-          android:textAppearance="?android:attr/textAppearanceLarge" />
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:gravity="center"
+          android:orientation="vertical">
 
-      <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:singleLine="true"
-          android:text="@string/MainActivityLastSessionLabelText" />
+        <org.grapentin.apps.exceer.gui.widgets.TimeSinceLastSessionWidget
+            android:id="@+id/MainActivityLastSessionLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:freezesText="true"
+            android:text="@string/MainActivityLastSessionDateText"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="@string/MainActivityLastSessionLabelText" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical">
+      </LinearLayout>
 
-      <TextView
-          android:id="@+id/MainActivityNumSessionLabel"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:freezesText="true"
-          android:text="@string/MainActivityNumSessionDateText"
-          android:textAppearance="?android:attr/textAppearanceLarge" />
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:gravity="center"
+          android:orientation="vertical">
 
-      <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:singleLine="true"
-          android:text="@string/MainActivityNumSessionLabelText" />
+        <TextView
+            android:id="@+id/MainActivityNumSessionLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:freezesText="true"
+            android:text="@string/MainActivityNumSessionDateText"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="@string/MainActivityNumSessionLabelText" />
 
-  </android.support.v4.view.ViewPager>
+      </LinearLayout>
 
-  <Button
-      android:id="@+id/MainActivityTrainButton"
-      android:layout_width="fill_parent"
-      android:layout_height="wrap_content"
-      android:layout_alignParentBottom="true"
-      android:layout_centerHorizontal="true"
-      android:onClick="onTrainButtonClicked"
-      android:text="@string/MainActivityTrainButtonText"
-      android:textAppearance="?android:attr/textAppearanceLarge" />
+    </android.support.v4.view.ViewPager>
+
+    <Button
+        android:id="@+id/MainActivityTrainButton"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:onClick="onTrainButtonClicked"
+        android:text="@string/MainActivityTrainButtonText"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+  </RelativeLayout>
 
 </RelativeLayout>

@@ -25,6 +25,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.service.AudioService;
@@ -43,6 +44,9 @@ public class SplashActivity extends AppCompatActivity
     {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_splash);
+
+      Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+      setSupportActionBar(toolbar);
 
       new Thread(new Runnable()
       {

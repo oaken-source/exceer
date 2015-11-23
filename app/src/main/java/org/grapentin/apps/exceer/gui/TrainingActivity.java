@@ -26,6 +26,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -51,6 +52,9 @@ public class TrainingActivity extends CustomBaseActivity
     {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_training);
+
+      Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+      setSupportActionBar(toolbar);
 
       adapter = new ViewPagerAdapter();
 

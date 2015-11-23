@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,6 +45,9 @@ public class MainActivity extends CustomBaseActivity
     {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_main);
+
+      Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+      setSupportActionBar(toolbar);
 
       viewPager = (ViewPager) findViewById(R.id.MainActivityViewPager);
       viewPager.setAdapter(new ViewPagerAdapter());
@@ -105,7 +109,7 @@ public class MainActivity extends CustomBaseActivity
       }
 
     @Override
-    public void destroyItem (ViewGroup container, int posittaion, Object object)
+    public void destroyItem (ViewGroup container, int position, Object object)
       {
         // nothing here
       }
