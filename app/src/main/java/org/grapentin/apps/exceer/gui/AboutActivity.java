@@ -24,9 +24,9 @@ import android.widget.TextView;
 
 import org.grapentin.apps.exceer.BuildConfig;
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.gui.base.ServiceBoundActivity;
+import org.grapentin.apps.exceer.gui.base.CustomBaseActivity;
 
-public class AboutActivity extends ServiceBoundActivity
+public class AboutActivity extends CustomBaseActivity
 {
 
   @Override
@@ -35,8 +35,8 @@ public class AboutActivity extends ServiceBoundActivity
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_about);
 
-      TextView titleLabel = (TextView)findViewById(R.id.AboutActivityTitleLabel);
-      titleLabel.setText(getString(R.string.app_name) + "-" + BuildConfig.VERSION_NAME);
+      TextView titleLabel = (TextView) findViewById(R.id.AboutActivityTitleLabel);
+      titleLabel.setText(String.format("%1$s-%2$s", getString(R.string.app_name), BuildConfig.VERSION_NAME));
     }
 
 }

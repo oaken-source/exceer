@@ -22,7 +22,6 @@ package org.grapentin.apps.exceer.gui;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
@@ -60,9 +59,6 @@ public class SplashActivity extends AppCompatActivity
       // init lock for services
       final CountDownLatch initLock = new CountDownLatch(2);
 
-      // set default audio stream (controlled with hardware buttons)
-      setVolumeControlStream(AudioManager.STREAM_MUSIC);
-
       // bind to audio service and start threaded wait for finished init
       Intent audioServiceIntent = new Intent(this, AudioService.class);
       audioService = new ServiceConnection()
@@ -75,7 +71,7 @@ public class SplashActivity extends AppCompatActivity
               @Override
               public void run ()
                 {
-                  ((AudioService.LocalBinder)service).await();
+                  ((AudioService.LocalBinder) service).await();
                   initLock.countDown();
                 }
             }).start();
@@ -101,7 +97,7 @@ public class SplashActivity extends AppCompatActivity
               @Override
               public void run ()
                 {
-                  ((DatabaseService.LocalBinder)service).await();
+                  ((DatabaseService.LocalBinder) service).await();
                   initLock.countDown();
                 }
             }).start();

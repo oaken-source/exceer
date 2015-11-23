@@ -33,12 +33,11 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.gui.base.ServiceBoundActivity;
+import org.grapentin.apps.exceer.gui.base.CustomBaseActivity;
 import org.grapentin.apps.exceer.gui.fragments.ExerciseFragment;
-import org.grapentin.apps.exceer.models.Exercise;
 import org.grapentin.apps.exceer.models.Training;
 
-public class TrainingActivity extends ServiceBoundActivity
+public class TrainingActivity extends CustomBaseActivity
 {
 
   private ViewPager viewPager;
@@ -55,10 +54,10 @@ public class TrainingActivity extends ServiceBoundActivity
 
       adapter = new ViewPagerAdapter();
 
-      progressBar = (ProgressBar)findViewById(R.id.TrainingActivityProgressBar);
-      contextButton = (Button)findViewById(R.id.TrainingActivityContextButton);
+      progressBar = (ProgressBar) findViewById(R.id.TrainingActivityProgressBar);
+      contextButton = (Button) findViewById(R.id.TrainingActivityContextButton);
 
-      viewPager = (ViewPager)findViewById(R.id.TrainingActivityViewPager);
+      viewPager = (ViewPager) findViewById(R.id.TrainingActivityViewPager);
       viewPager.setAdapter(adapter);
       viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener()
       {
@@ -188,7 +187,7 @@ public class TrainingActivity extends ServiceBoundActivity
 
     public ExerciseFragment getFragmentAt (int position)
       {
-        return (ExerciseFragment)getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.TrainingActivityViewPager + ":" + position);
+        return (ExerciseFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.TrainingActivityViewPager + ":" + position);
       }
   }
 

@@ -22,6 +22,7 @@ package org.grapentin.apps.exceer.gui.base;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.CallSuper;
@@ -30,7 +31,7 @@ import android.support.v7.app.AppCompatActivity;
 import org.grapentin.apps.exceer.service.AudioService;
 import org.grapentin.apps.exceer.service.DatabaseService;
 
-public class ServiceBoundActivity extends AppCompatActivity
+public class CustomBaseActivity extends AppCompatActivity
 {
 
   protected ServiceConnection audioService;
@@ -41,6 +42,9 @@ public class ServiceBoundActivity extends AppCompatActivity
   protected void onCreate (Bundle savedInstanceState)
     {
       super.onCreate(savedInstanceState);
+
+      // set default audio stream (controlled with hardware buttons)
+      setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
       Intent audioServiceIntent = new Intent(this, AudioService.class);
       audioService = new ServiceConnection()

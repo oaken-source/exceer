@@ -30,11 +30,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.gui.base.ServiceBoundActivity;
+import org.grapentin.apps.exceer.gui.base.CustomBaseActivity;
 import org.grapentin.apps.exceer.gui.widgets.TimeSinceLastSessionWidget;
 import org.grapentin.apps.exceer.models.Session;
 
-public class MainActivity extends ServiceBoundActivity
+public class MainActivity extends CustomBaseActivity
 {
 
   private ViewPager viewPager;
@@ -45,7 +45,7 @@ public class MainActivity extends ServiceBoundActivity
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_main);
 
-      viewPager = (ViewPager)findViewById(R.id.MainActivityViewPager);
+      viewPager = (ViewPager) findViewById(R.id.MainActivityViewPager);
       viewPager.setAdapter(new ViewPagerAdapter());
     }
 
@@ -54,11 +54,11 @@ public class MainActivity extends ServiceBoundActivity
     {
       super.onResume();
 
-      TimeSinceLastSessionWidget lastSession = (TimeSinceLastSessionWidget)findViewById(R.id.MainActivityLastSessionLabel);
+      TimeSinceLastSessionWidget lastSession = (TimeSinceLastSessionWidget) findViewById(R.id.MainActivityLastSessionLabel);
       lastSession.setSession(Session.getLast());
 
-      TextView numSession = (TextView)findViewById(R.id.MainActivityNumSessionLabel);
-      numSession.setText(Long.toString(Session.count()));
+      TextView numSession = (TextView) findViewById(R.id.MainActivityNumSessionLabel);
+      numSession.setText(String.format("%1$d", Session.count()));
     }
 
   @Override
