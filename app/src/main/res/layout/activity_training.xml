@@ -41,7 +41,7 @@
         android:layout_height="2dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:progressDrawable="@drawable/custom" />
+        android:progressDrawable="@drawable/custom_progressbar" />
 
     <RelativeLayout
         android:layout_width="match_parent"
