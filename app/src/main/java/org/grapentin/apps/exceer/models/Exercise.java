@@ -93,18 +93,18 @@ public class Exercise implements Serializable
   private ArrayList<Exercise> exercises = null;
 
   @DatabaseField(foreign = true)
-  private Training parentTraining;
+  private Workout parentWorkout;
   @DatabaseField(foreign = true)
   private Exercise parentExercise;
 
-  public static void fromXml (@NonNull XmlNode root, Training p)
+  public static void fromXml (@NonNull XmlNode root, Workout p)
     {
       Exercise e = new Exercise();
 
       e.currentExerciseId = 0;
       e.progress = null;
 
-      e.parentTraining = p;
+      e.parentWorkout = p;
 
       for (Map.Entry<String, String> entry : root.getAttributes().entrySet())
         e.setAttribute(entry.getKey(), entry.getValue());

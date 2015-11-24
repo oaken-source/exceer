@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 @DatabaseTable
-public class Training implements Serializable
+public class Workout implements Serializable
 {
 
   @DatabaseField(generatedId = true)
@@ -51,7 +51,7 @@ public class Training implements Serializable
 
   public static void fromXml (@NonNull XmlNode root)
     {
-      Training t = new Training();
+      Workout t = new Workout();
       t.name = root.getAttribute("name");
       DatabaseService.add(t);
 
@@ -60,10 +60,10 @@ public class Training implements Serializable
     }
 
   @Nullable
-  public static Training get (int id)
+  public static Workout get (int id)
     {
       //noinspection unchecked
-      return (Training)DatabaseService.query(Training.class).get(id);
+      return (Workout)DatabaseService.query(Workout.class).get(id);
     }
 
   public int getId ()

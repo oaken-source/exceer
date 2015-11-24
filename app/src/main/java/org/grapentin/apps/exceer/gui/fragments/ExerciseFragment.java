@@ -28,7 +28,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.gui.TrainingActivity;
+import org.grapentin.apps.exceer.gui.WorkoutActivity;
 import org.grapentin.apps.exceer.models.Exercise;
 
 public class ExerciseFragment extends Fragment
@@ -81,7 +81,7 @@ public class ExerciseFragment extends Fragment
       if (exercise.isLevel())
         {
           exerciseNameLabel.setText(exercise.getParentExercise().getName());
-          levelLabel.setText(getString(R.string.ExerciseFragmentExerciseLevel) + " " + exercise.getParentExercise().getLevelNumber(exercise));
+          levelLabel.setText(String.format("%1$s %2$s", getString(R.string.ExerciseFragmentExerciseLevel), exercise.getParentExercise().getLevelNumber(exercise)));
           levelNameLabel.setText(exercise.getName());
         }
       else
@@ -123,9 +123,9 @@ public class ExerciseFragment extends Fragment
       getTrainingActivity().onFragmentStateChanged();
     }
 
-  public TrainingActivity getTrainingActivity ()
+  public WorkoutActivity getTrainingActivity ()
     {
-      return (TrainingActivity)getActivity();
+      return (WorkoutActivity)getActivity();
     }
 
   protected void start ()

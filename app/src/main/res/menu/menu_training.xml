@@ -25,18 +25,4 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
 
-  <item
-      android:id="@+id/menu_overflow"
-      android:icon="@drawable/ic_more_vert_white_24dp"
-      android:title="@string/action_overflow"
-      app:showAsAction="always">
-
-    <menu>
-
-      <!-- ... -->
-
-    </menu>
-
-  </item>
-
 </menu>

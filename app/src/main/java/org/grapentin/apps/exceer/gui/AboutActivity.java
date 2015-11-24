@@ -20,27 +20,28 @@
 package org.grapentin.apps.exceer.gui;
 
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 
 import org.grapentin.apps.exceer.BuildConfig;
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.gui.base.CustomBaseActivity;
+import org.grapentin.apps.exceer.gui.base.ServiceBoundActivity;
 
-public class AboutActivity extends CustomBaseActivity
+public class AboutActivity extends ServiceBoundActivity
 {
 
   @Override
   protected void onCreate (Bundle savedInstanceState)
     {
       super.onCreate(savedInstanceState);
-      setContentView(R.layout.activity_about);
-
-      Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-      setSupportActionBar(toolbar);
 
       TextView titleLabel = (TextView) findViewById(R.id.AboutActivityTitleLabel);
       titleLabel.setText(String.format("%1$s-%2$s", getString(R.string.app_name), BuildConfig.VERSION_NAME));
+    }
+
+  @Override
+  protected int getContentView()
+    {
+      return R.layout.activity_about;
     }
 
 }

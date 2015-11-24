@@ -26,7 +26,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,11 +33,11 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.gui.base.CustomBaseActivity;
+import org.grapentin.apps.exceer.gui.base.ServiceBoundActivity;
 import org.grapentin.apps.exceer.gui.fragments.ExerciseFragment;
-import org.grapentin.apps.exceer.models.Training;
+import org.grapentin.apps.exceer.models.Workout;
 
-public class TrainingActivity extends CustomBaseActivity
+public class WorkoutActivity extends ServiceBoundActivity
 {
 
   private ViewPager viewPager;
@@ -51,10 +50,6 @@ public class TrainingActivity extends CustomBaseActivity
   protected void onCreate (Bundle savedInstanceState)
     {
       super.onCreate(savedInstanceState);
-      setContentView(R.layout.activity_training);
-
-      Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-      setSupportActionBar(toolbar);
 
       adapter = new ViewPagerAdapter();
 
@@ -75,11 +70,17 @@ public class TrainingActivity extends CustomBaseActivity
     }
 
   @Override
+  protected int getContentView()
+    {
+      return R.layout.activity_training;
+    }
+
+  @Override
   protected void onResume ()
     {
       super.onResume();
-      // TODO: make training id configurable
-      adapter.setTraining(Training.get(1));
+      // TODO: make workout id configurable
+      adapter.setWorkout(Workout.get(1));
     }
 
   @Override
@@ -115,7 +116,7 @@ public class TrainingActivity extends CustomBaseActivity
             switch (which)
               {
               case DialogInterface.BUTTON_POSITIVE:
-                TrainingActivity.super.onBackPressed();
+                WorkoutActivity.super.onBackPressed();
                 break;
               case DialogInterface.BUTTON_NEGATIVE:
                 break;
@@ -157,7 +158,7 @@ public class TrainingActivity extends CustomBaseActivity
 
   private class ViewPagerAdapter extends FragmentPagerAdapter
   {
-    private Training training = null;
+    private Workout workout = null;
 
     public ViewPagerAdapter ()
       {
@@ -167,18 +168,18 @@ public class TrainingActivity extends CustomBaseActivity
     @Override
     public Fragment getItem (int position)
       {
-        return ExerciseFragment.newInstance(training.getExercise(position));
+        return ExerciseFragment.newInstance(workout.getExercise(position));
       }
 
     @Override
     public int getCount ()
       {
-        return (training == null) ? 0 : training.getNumberOfExercises();
+        return (workout == null) ? 0 : workout.getNumberOfExercises();
       }
 
-    public void setTraining (Training training)
+    public void setWorkout (Workout workout)
       {
-        this.training = training;
+        this.workout = workout;
         progressBar.setMax(getCount());
         progressBar.setProgress(viewPager.getCurrentItem() + 1);
         notifyDataSetChanged();

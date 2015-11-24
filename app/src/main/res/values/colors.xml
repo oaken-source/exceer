@@ -31,4 +31,6 @@
   <!-- primary palette: amber -->
   <color name="colorSecondary"><!-- 500 -->#FFC107</color>
 
+  <color name="colorBackground">?android:colorBackground</color>
+
 </resources>

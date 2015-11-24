@@ -19,75 +19,32 @@
 
 package org.grapentin.apps.exceer.gui.base;
 
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.CallSuper;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
-import org.grapentin.apps.exceer.service.AudioService;
-import org.grapentin.apps.exceer.service.DatabaseService;
+import org.grapentin.apps.exceer.R;
 
-public class CustomBaseActivity extends AppCompatActivity
+abstract public class CustomBaseActivity extends AppCompatActivity
 {
-
-  protected ServiceConnection audioService;
-  protected ServiceConnection databaseService;
 
   @CallSuper
   @Override
   protected void onCreate (Bundle savedInstanceState)
     {
       super.onCreate(savedInstanceState);
+      setContentView(getContentView());
 
       // set default audio stream (controlled with hardware buttons)
       setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-      Intent audioServiceIntent = new Intent(this, AudioService.class);
-      audioService = new ServiceConnection()
-      {
-        @Override
-        public void onServiceConnected (ComponentName name, final IBinder service)
-          {
-
-          }
-
-        @Override
-        public void onServiceDisconnected (ComponentName name)
-          {
-            throw new Error("AudioService initialization failed");
-          }
-      };
-      bindService(audioServiceIntent, audioService, BIND_AUTO_CREATE);
-
-      Intent databaseServiceIntent = new Intent(this, DatabaseService.class);
-      databaseService = new ServiceConnection()
-      {
-        @Override
-        public void onServiceConnected (ComponentName name, final IBinder service)
-          {
-
-          }
-
-        @Override
-        public void onServiceDisconnected (ComponentName name)
-          {
-            throw new Error("DatabaseService initialization failed");
-          }
-      };
-      bindService(databaseServiceIntent, databaseService, BIND_AUTO_CREATE);
+      // setup the toolbar
+      Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+      setSupportActionBar(toolbar);
     }
 
-  @CallSuper
-  @Override
-  protected void onDestroy ()
-    {
-      super.onDestroy();
-      unbindService(audioService);
-      unbindService(databaseService);
-    }
+  abstract protected int getContentView();
 
 }

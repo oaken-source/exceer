@@ -17,69 +17,37 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ******************************************************************************/
 
-package org.grapentin.apps.exceer.gui;
+package org.grapentin.apps.exceer.gui.base;
 
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.CallSuper;
 
-import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.gui.base.CustomBaseActivity;
 import org.grapentin.apps.exceer.service.AudioService;
 import org.grapentin.apps.exceer.service.DatabaseService;
 
-import java.util.concurrent.CountDownLatch;
-
-public class SplashActivity extends CustomBaseActivity
+abstract public class ServiceBoundActivity extends CustomBaseActivity
 {
 
-  private ServiceConnection audioService;
-  private ServiceConnection databaseService;
+  protected ServiceConnection audioService;
+  protected ServiceConnection databaseService;
 
+  @CallSuper
   @Override
   protected void onCreate (Bundle savedInstanceState)
     {
       super.onCreate(savedInstanceState);
 
-      new Thread(new Runnable()
-      {
-        @Override
-        public void run ()
-          {
-            initialize();
-          }
-      }).start();
-    }
-
-  @Override
-  protected int getContentView()
-    {
-      return R.layout.activity_splash;
-    }
-
-  private void initialize ()
-    {
-      // init lock for services
-      final CountDownLatch initLock = new CountDownLatch(2);
-
-      // bind to audio service and start threaded wait for finished init
       Intent audioServiceIntent = new Intent(this, AudioService.class);
       audioService = new ServiceConnection()
       {
         @Override
         public void onServiceConnected (ComponentName name, final IBinder service)
           {
-            new Thread(new Runnable()
-            {
-              @Override
-              public void run ()
-                {
-                  ((AudioService.LocalBinder) service).await();
-                  initLock.countDown();
-                }
-            }).start();
+
           }
 
         @Override
@@ -90,22 +58,13 @@ public class SplashActivity extends CustomBaseActivity
       };
       bindService(audioServiceIntent, audioService, BIND_AUTO_CREATE);
 
-      // bind to database service and start threaded wait for finished init
       Intent databaseServiceIntent = new Intent(this, DatabaseService.class);
       databaseService = new ServiceConnection()
       {
         @Override
         public void onServiceConnected (ComponentName name, final IBinder service)
           {
-            new Thread(new Runnable()
-            {
-              @Override
-              public void run ()
-                {
-                  ((DatabaseService.LocalBinder) service).await();
-                  initLock.countDown();
-                }
-            }).start();
+
           }
 
         @Override
@@ -115,25 +74,10 @@ public class SplashActivity extends CustomBaseActivity
           }
       };
       bindService(databaseServiceIntent, databaseService, BIND_AUTO_CREATE);
-
-      // wait for services to start
-      while (initLock.getCount() > 0)
-        try
-          {
-            initLock.await();
-          }
-        catch (InterruptedException e)
-          {
-            // just retry...
-          }
-
-      // initialization done - proceed to main activity
-      Intent mainIntent = new Intent(this, MainActivity.class);
-      startActivity(mainIntent);
-
-      finish();
     }
 
+  @CallSuper
+  @Override
   protected void onDestroy ()
     {
       super.onDestroy();

@@ -34,7 +34,7 @@
     </activity>
 
     <activity
-        android:name=".gui.TrainingActivity"
+        android:name=".gui.WorkoutActivity"
         android:label="@string/title_activity_training">
       <meta-data
           android:name="android.support.PARENT_ACTIVITY"

@@ -23,7 +23,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.grapentin.apps.exceer.gui.TrainingActivity">
+    tools:context=".gui.WorkoutActivity">
 
   <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
       android:id="@+id/toolbar"

@@ -38,7 +38,7 @@ import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.helpers.XmlNode;
 import org.grapentin.apps.exceer.models.Exercise;
 import org.grapentin.apps.exceer.models.Session;
-import org.grapentin.apps.exceer.models.Training;
+import org.grapentin.apps.exceer.models.Workout;
 
 import java.sql.SQLException;
 import java.util.concurrent.CountDownLatch;
@@ -206,7 +206,7 @@ public class DatabaseService extends Service
 
   private class DatabaseOpenHelper extends OrmLiteSqliteOpenHelper
   {
-    public Dao<Training, Integer> DaoTraining;
+    public Dao<Workout, Integer> DaoTraining;
     public Dao<Exercise, Integer> DaoExercise;
     public Dao<Session, Integer> DaoSession;
 
@@ -221,13 +221,13 @@ public class DatabaseService extends Service
         Log.d("DatabaseService", "onCreate");
         try
           {
-            TableUtils.createTable(connectionSource, Training.class);
+            TableUtils.createTable(connectionSource, Workout.class);
             TableUtils.createTable(connectionSource, Exercise.class);
             TableUtils.createTable(connectionSource, Session.class);
 
             XmlNode root = new XmlNode(getResources().getXml(R.xml.trainings_default));
-            for (XmlNode n : root.getChildren("training"))
-              Training.fromXml(n);
+            for (XmlNode n : root.getChildren("workout"))
+              Workout.fromXml(n);
           }
         catch (Exception e)
           {
@@ -246,7 +246,7 @@ public class DatabaseService extends Service
       {
         try
           {
-            DaoTraining = getDao(Training.class);
+            DaoTraining = getDao(Workout.class);
             DaoExercise = getDao(Exercise.class);
             DaoSession = getDao(Session.class);
           }
@@ -261,7 +261,7 @@ public class DatabaseService extends Service
   {
     public DatabaseQuery query (Class c)
       {
-        if (c == Training.class)
+        if (c == Workout.class)
           return new DatabaseQuery<>(database.DaoTraining);
         if (c == Exercise.class)
           return new DatabaseQuery<>(database.DaoExercise);
@@ -273,8 +273,8 @@ public class DatabaseService extends Service
     public void add (Object o) throws SQLException
       {
         Class c = o.getClass();
-        if (c == Training.class)
-          database.DaoTraining.create((Training)o);
+        if (c == Workout.class)
+          database.DaoTraining.create((Workout)o);
         else if (c == Exercise.class)
           database.DaoExercise.create((Exercise)o);
         else if (c == Session.class)

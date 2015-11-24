@@ -23,7 +23,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,11 +30,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
-import org.grapentin.apps.exceer.gui.base.CustomBaseActivity;
+import org.grapentin.apps.exceer.gui.base.ServiceBoundActivity;
 import org.grapentin.apps.exceer.gui.widgets.TimeSinceLastSessionWidget;
 import org.grapentin.apps.exceer.models.Session;
 
-public class MainActivity extends CustomBaseActivity
+public class MainActivity extends ServiceBoundActivity
 {
 
   private ViewPager viewPager;
@@ -44,13 +43,15 @@ public class MainActivity extends CustomBaseActivity
   protected void onCreate (Bundle savedInstanceState)
     {
       super.onCreate(savedInstanceState);
-      setContentView(R.layout.activity_main);
-
-      Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-      setSupportActionBar(toolbar);
 
       viewPager = (ViewPager) findViewById(R.id.MainActivityViewPager);
       viewPager.setAdapter(new ViewPagerAdapter());
+    }
+
+  @Override
+  protected int getContentView()
+    {
+      return R.layout.activity_main;
     }
 
   @Override
@@ -90,7 +91,7 @@ public class MainActivity extends CustomBaseActivity
 
   public void onTrainButtonClicked (View view)
     {
-      Intent intent = new Intent(this, TrainingActivity.class);
+      Intent intent = new Intent(this, WorkoutActivity.class);
       startActivity(intent);
     }
 

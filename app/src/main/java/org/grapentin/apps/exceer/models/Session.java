@@ -37,17 +37,17 @@ public class Session
   private long date;
 
   @DatabaseField(foreign = true)
-  private Training training;
+  private Workout workout;
 
   public Session ()
     {
 
     }
 
-  public Session (Training training)
+  public Session (Workout workout)
     {
       this.date = System.currentTimeMillis();
-      this.training = training;
+      this.workout = workout;
     }
 
   public static long count ()
