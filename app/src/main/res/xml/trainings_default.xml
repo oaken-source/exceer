@@ -19,8 +19,7 @@
   ~    along with this program.  If not, see <http://www.gnu.org/licenses/>.  ~
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
-<training
-    name="default">
+<training name="default">
 
   <exercise
       name="Dynamic Warm Up"
@@ -292,8 +291,7 @@
 
   </exercise>
 
-  <exercise
-      type="alternating">
+  <exercise type="alternating">
 
     <exercise
         name="Push Ups"
@@ -494,11 +492,11 @@
 
   <exercise
       name="Plank"
-      type="progressing"
       duration_begin="30s"
       duration_finish="1min"
       duration_increment="5s"
-      pause_after_exercise="0">
+      pause_after_exercise="0"
+      type="progressing">
 
     <exercise
         name="Kneeling Plank"
