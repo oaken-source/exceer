@@ -64,89 +64,89 @@ public class DatabaseService extends Service
 
   @NonNull
   public static DatabaseQuery query (Class c)
-    {
-      return local.query(c);
-    }
+  {
+    return local.query(c);
+  }
 
   public static void add (Object o)
-    {
-      try
-        {
-          local.add(o);
-        }
-      catch (SQLException e)
-        {
-          throw new DatabaseAccessException("failed to add object of type " + o.getClass().getSimpleName(), e);
-        }
-    }
+  {
+    try
+      {
+        local.add(o);
+      }
+    catch (SQLException e)
+      {
+        throw new DatabaseAccessException("failed to add object of type " + o.getClass().getSimpleName(), e);
+      }
+  }
 
   @Override
   public void onCreate ()
-    {
-      super.onCreate();
+  {
+    super.onCreate();
 
-      new Thread(new Runnable()
+    new Thread(new Runnable()
+    {
+      @Override
+      public void run ()
       {
-        @Override
-        public void run ()
-          {
-            initialize();
-          }
-      }).start();
-    }
+        initialize();
+      }
+    }).start();
+  }
 
   @Override
   public void onDestroy ()
-    {
-      Log.d("DatabaseService", "onDestroy");
-    }
+  {
+    Log.d("DatabaseService", "onDestroy");
+  }
 
   void initialize ()
-    {
-      Log.d("DatabaseService", "starting Initialization");
+  {
+    Log.d("DatabaseService", "starting Initialization");
 
-      database = new DatabaseOpenHelper(getApplicationContext(), DATABASE_NAME, null, DATABASE_VERSION);
-      database.initDaos();
-      database.getWritableDatabase();
+    database = new DatabaseOpenHelper(getApplicationContext(), DATABASE_NAME, null, DATABASE_VERSION);
+    database.initDaos();
+    database.getWritableDatabase();
 
-      initLock.countDown();
+    initLock.countDown();
 
-      Log.d("DatabaseService", "finished Initialization");
-    }
+    Log.d("DatabaseService", "finished Initialization");
+  }
 
   @Override
   public IBinder onBind (Intent intent)
-    {
-      local = (LocalBinder)binder;
-      return binder;
-    }
+  {
+    local = (LocalBinder) binder;
+    return binder;
+  }
 
   private static class DatabaseRevision
   {
     private final String upgradeSql;
 
     public DatabaseRevision (String upgradeSql)
-      {
-        this.upgradeSql = upgradeSql;
-      }
+    {
+      this.upgradeSql = upgradeSql;
+    }
 
     public void runUpgrade (@NonNull SQLiteDatabase db)
-      {
-        db.execSQL(this.upgradeSql);
-      }
+    {
+      db.execSQL(this.upgradeSql);
+    }
   }
 
   public static class DatabaseAccessException extends RuntimeException
   {
     public DatabaseAccessException (String msg)
-      {
-        super(msg);
-      }
+    {
+      super(msg);
+    }
 
     public DatabaseAccessException (String msg, Exception e)
-      {
-        super(msg, e);
-      }
+    {
+      super(msg, e);
+    }
   }
 
   public static class DatabaseQuery<T, K>
@@ -155,52 +155,52 @@ public class DatabaseService extends Service
     private QueryBuilder<T, K> builder;
 
     protected DatabaseQuery (@NonNull Dao<T, K> dao)
-      {
-        this.dao = dao;
-        this.builder = dao.queryBuilder();
-      }
+    {
+      this.dao = dao;
+      this.builder = dao.queryBuilder();
+    }
 
     public T get (K id)
-      {
-        try
-          {
-            return dao.queryForId(id);
-          }
-        catch (SQLException e)
-          {
-            throw new DatabaseAccessException("query failed", e);
-          }
-      }
+    {
+      try
+        {
+          return dao.queryForId(id);
+        }
+      catch (SQLException e)
+        {
+          throw new DatabaseAccessException("query failed", e);
+        }
+    }
 
     public T first ()
-      {
-        try
-          {
-            return builder.queryForFirst();
-          }
-        catch (SQLException e)
-          {
-            throw new DatabaseAccessException("query failed", e);
-          }
-      }
+    {
+      try
+        {
+          return builder.queryForFirst();
+        }
+      catch (SQLException e)
+        {
+          throw new DatabaseAccessException("query failed", e);
+        }
+    }
 
     public DatabaseQuery orderBy (String order, boolean ascending)
-      {
-        builder.orderBy(order, ascending);
-        return this;
-      }
+    {
+      builder.orderBy(order, ascending);
+      return this;
+    }
 
     public long count ()
-      {
-        try
-          {
-            return builder.countOf();
-          }
-        catch (SQLException e)
-          {
-            throw new DatabaseAccessException("query failed", e);
-          }
-      }
+    {
+      try
+        {
+          return builder.countOf();
+        }
+      catch (SQLException e)
+        {
+          throw new DatabaseAccessException("query failed", e);
+        }
+    }
 
   }
 
@@ -211,90 +211,91 @@ public class DatabaseService extends Service
     public Dao<Session, Integer> DaoSession;
 
     public DatabaseOpenHelper (Context context, String databaseName, SQLiteDatabase.CursorFactory factory, int databaseVersion)
-      {
-        super(context, databaseName, factory, databaseVersion);
-      }
+    {
+      super(context, databaseName, factory, databaseVersion);
+    }
 
     @Override
     public void onCreate (SQLiteDatabase db, ConnectionSource source)
-      {
-        Log.d("DatabaseService", "onCreate");
-        try
-          {
-            TableUtils.createTable(connectionSource, Workout.class);
-            TableUtils.createTable(connectionSource, Exercise.class);
-            TableUtils.createTable(connectionSource, Session.class);
+    {
+      Log.d("DatabaseService", "onCreate");
+      try
+        {
+          TableUtils.createTable(connectionSource, Workout.class);
+          TableUtils.createTable(connectionSource, Exercise.class);
+          TableUtils.createTable(connectionSource, Session.class);
 
-            XmlNode root = new XmlNode(getResources().getXml(R.xml.trainings_default));
-            for (XmlNode n : root.getChildren("workout"))
-              Workout.fromXml(n);
-          }
-        catch (Exception e)
-          {
-            throw new DatabaseAccessException("failed to access database", e);
-          }
-      }
+          XmlNode root = new XmlNode(getResources().getXml(R.xml.trainings_default));
+          XmlNode workouts = root.getChildren("workouts").get(0);
+          for (XmlNode n : workouts.getChildren("workout"))
+            Workout.fromXml(n);
+        }
+      catch (Exception e)
+        {
+          throw new DatabaseAccessException("failed to access database", e);
+        }
+    }
 
     @Override
     public void onUpgrade (SQLiteDatabase db, ConnectionSource source, int oldVersion, int newVersion)
-      {
-        for (int i = oldVersion + 1; i <= newVersion; ++i)
-          revisions[i - 2].runUpgrade(db);
-      }
+    {
+      for (int i = oldVersion + 1; i <= newVersion; ++i)
+        revisions[i - 2].runUpgrade(db);
+    }
 
     public void initDaos ()
-      {
-        try
-          {
-            DaoTraining = getDao(Workout.class);
-            DaoExercise = getDao(Exercise.class);
-            DaoSession = getDao(Session.class);
-          }
-        catch (SQLException e)
-          {
-            throw new DatabaseAccessException("failed to access database", e);
-          }
-      }
+    {
+      try
+        {
+          DaoTraining = getDao(Workout.class);
+          DaoExercise = getDao(Exercise.class);
+          DaoSession = getDao(Session.class);
+        }
+      catch (SQLException e)
+        {
+          throw new DatabaseAccessException("failed to access database", e);
+        }
+    }
   }
 
   public class LocalBinder extends Binder
   {
     public DatabaseQuery query (Class c)
-      {
-        if (c == Workout.class)
-          return new DatabaseQuery<>(database.DaoTraining);
-        if (c == Exercise.class)
-          return new DatabaseQuery<>(database.DaoExercise);
-        if (c == Session.class)
-          return new DatabaseQuery<>(database.DaoSession);
-        throw new DatabaseAccessException(c.getSimpleName() + ": queried class is no model");
-      }
+    {
+      if (c == Workout.class)
+        return new DatabaseQuery<>(database.DaoTraining);
+      if (c == Exercise.class)
+        return new DatabaseQuery<>(database.DaoExercise);
+      if (c == Session.class)
+        return new DatabaseQuery<>(database.DaoSession);
+      throw new DatabaseAccessException(c.getSimpleName() + ": queried class is no model");
+    }
 
     public void add (Object o) throws SQLException
-      {
-        Class c = o.getClass();
-        if (c == Workout.class)
-          database.DaoTraining.create((Workout)o);
-        else if (c == Exercise.class)
-          database.DaoExercise.create((Exercise)o);
-        else if (c == Session.class)
-          database.DaoSession.create((Session)o);
-        else
-          throw new DatabaseAccessException(o.getClass().getSimpleName() + ": queried class is no model");
-      }
+    {
+      Class c = o.getClass();
+      if (c == Workout.class)
+        database.DaoTraining.create((Workout) o);
+      else if (c == Exercise.class)
+        database.DaoExercise.create((Exercise) o);
+      else if (c == Session.class)
+        database.DaoSession.create((Session) o);
+      else
+        throw new DatabaseAccessException(o.getClass().getSimpleName() + ": queried class is no model");
+    }
 
     public void await ()
-      {
-        while (initLock.getCount() > 0)
-          try
-            {
-              initLock.await();
-            }
-          catch (InterruptedException e)
-            {
-              // just retry
-            }
-      }
+    {
+      while (initLock.getCount() > 0)
+        try
+          {
+            initLock.await();
+          }
+        catch (InterruptedException e)
+          {
+            // just retry
+          }
+    }
   }
 
 }

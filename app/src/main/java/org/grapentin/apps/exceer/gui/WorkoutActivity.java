@@ -21,23 +21,30 @@ package org.grapentin.apps.exceer.gui;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import org.grapentin.apps.exceer.R;
 import org.grapentin.apps.exceer.gui.base.ServiceBoundActivity;
 import org.grapentin.apps.exceer.gui.fragments.ExerciseFragment;
 import org.grapentin.apps.exceer.models.Workout;
+import org.w3c.dom.Text;
 
-public class WorkoutActivity extends ServiceBoundActivity
+public class WorkoutActivity extends ServiceBoundActivity implements SensorEventListener
 {
 
   private ViewPager viewPager;
@@ -45,6 +52,13 @@ public class WorkoutActivity extends ServiceBoundActivity
 
   private ProgressBar progressBar;
   private Button contextButton;
+
+  private SensorManager mSensorManager;
+
+	private float[] m_lastMagFields = new float[3];
+	private float[] m_lastAccels = new float[3];
+	private float[] m_rotationMatrix = new float[16];
+  private float[] m_lastLinAccels = new float[4];
 
   @Override
   protected void onCreate (Bundle savedInstanceState)
@@ -67,12 +81,58 @@ public class WorkoutActivity extends ServiceBoundActivity
             onFragmentStateChanged();
           }
       });
+
+      mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+      Log.d("moo", "" + mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
+      Log.d("moo", "" + mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD));
+      Log.d("moo", "" + mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY));
+      Log.d("moo", "" + mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION));
+      mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+      mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_NORMAL);
+      mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+  public void onSensorChanged (SensorEvent event)
+    {
+      switch (event.sensor.getType())
+        {
+        case Sensor.TYPE_ACCELEROMETER:
+          System.arraycopy(event.values, 0, m_lastAccels, 0, 3);
+          break;
+        case Sensor.TYPE_GRAVITY:
+          System.arraycopy(event.values, 0, m_lastMagFields, 0, 3);
+          break;
+        case Sensor.TYPE_LINEAR_ACCELERATION:
+          System.arraycopy(event.values, 0, m_lastLinAccels, 0, 3);
+        default:
+          return;
+        }
+
+      float[] inv_rotationMatrix = new float[16];
+      SensorManager.getRotationMatrix(m_rotationMatrix, null, m_lastAccels, m_lastMagFields);
+
+      float[] res = new float[4];
+      android.opengl.Matrix.invertM(inv_rotationMatrix, 0, m_rotationMatrix, 0);
+      android.opengl.Matrix.multiplyMV(res, 0, inv_rotationMatrix, 0, m_lastLinAccels, 0);
+
+      TextView labelX = (TextView) findViewById(R.id.label_x);
+      labelX.setText(Float.toString(res[0]));
+      TextView labelY = (TextView) findViewById(R.id.label_y);
+      labelY.setText(Float.toString(res[1]));
+      TextView labelZ = (TextView) findViewById(R.id.label_z);
+      labelZ.setText(Float.toString(res[2]));
     }
 
   @Override
-  protected int getContentView()
+  public void onAccuracyChanged (Sensor sensor, int accuracy)
     {
-      return R.layout.activity_training;
+
+    }
+
+  @Override
+  protected int getContentView ()
+    {
+      return R.layout.activity_workout;
     }
 
   @Override

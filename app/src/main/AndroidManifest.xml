@@ -3,52 +3,52 @@
     package="org.grapentin.apps.exceer"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-  <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
-  <application
-      android:allowBackup="true"
-      android:fullBackupContent="false"
-      android:icon="@mipmap/ic_launcher"
-      android:label="@string/app_name"
-      android:theme="@style/AppTheme">
+    <application
+        android:allowBackup="true"
+        android:fullBackupContent="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
 
-    <service
-        android:name=".service.AudioService"
-        android:exported="false" />
-    <service
-        android:name=".service.DatabaseService"
-        android:exported="false" />
+        <service
+            android:name=".service.AudioService"
+            android:exported="false"/>
+        <service
+            android:name=".service.DatabaseService"
+            android:exported="false"/>
 
-    <activity
-        android:name=".gui.SplashActivity"
-        android:label="@string/app_name">
-      <intent-filter>
-        <action android:name="android.intent.action.MAIN" />
-        <category android:name="android.intent.category.LAUNCHER" />
-      </intent-filter>
-    </activity>
+        <activity
+            android:name=".gui.SplashActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
 
-    <activity
-        android:name=".gui.MainActivity"
-        android:label="@string/app_name">
-    </activity>
+        <activity
+            android:name=".gui.MainActivity"
+            android:label="@string/app_name">
+        </activity>
 
-    <activity
-        android:name=".gui.WorkoutActivity"
-        android:label="@string/title_activity_training">
-      <meta-data
-          android:name="android.support.PARENT_ACTIVITY"
-          android:value=".gui.MainActivity" />
-    </activity>
+        <activity
+            android:name=".gui.WorkoutActivity"
+            android:label="@string/title_activity_training">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".gui.MainActivity"/>
+        </activity>
 
-    <activity
-        android:name=".gui.AboutActivity"
-        android:label="@string/title_activity_about">
-      <meta-data
-          android:name="android.support.PARENT_ACTIVITY"
-          android:value=".gui.MainActivity" />
-    </activity>
+        <activity
+            android:name=".gui.AboutActivity"
+            android:label="@string/title_activity_about">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".gui.MainActivity"/>
+        </activity>
 
-  </application>
+    </application>
 
 </manifest>
